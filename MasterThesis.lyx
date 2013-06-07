@@ -155,34 +155,171 @@ status open
 
 \begin_layout Plain Layout
 
-filter <- function(x, group){   groupName <- switch(group, vollenkodiert="vollen
-kodiert", teilenkodiert="teilenkodiert") #  sessionID <- switch(session,
- first=0, second=1) #  x.ret <- x[x$group==groupName & x$session==sessionID,]
-   x.ret <- x[x$group==groupName,]   x.ret$resp <- factor(x.ret$resp, levels=if(gro
-up==1) 0:7  else  0:5)   return(x.ret) }
+filter <- function(x, group){
 \end_layout
 
 \begin_layout Plain Layout
 
-probabilityDist = function(x){   x.freq <- table(x)   x.relfreq <- x.freq /
- length(x)   return(x.relfreq) }
+	groupName <- switch(group, vollenkodiert="vollenkodiert", teilenkodiert="teilen
+kodiert") 
 \end_layout
 
 \begin_layout Plain Layout
 
-emp.dists <- function(x){   cast.formula <- code+session+scale+enc+posold~result_v
-ariable   value.name <- "resp"   ret.list <- list(cast(filter(x, 1), cast.formula,
- probabilityDist, value=value.name), cast(filter(x, 2), cast.formula, probabilityD
-ist, value=value.name))   names(ret.list) <- c("fully encoded", "partly encoded")
-   return(lapply(ret.list, rename.and.melt, 1:5, value.name)) }
+#	sessionID <- switch(session, first=0, second=1) 
 \end_layout
 
 \begin_layout Plain Layout
 
-rename.and.melt <- function(x, melt.id, variable.name){ #  names(x)[match(paste("X",
-0:7,sep=""),names(x), nomatch=0)] <- as.character(0:7)   suppressWarnings(x
- <- melt(x, melt.id))   names(x)[names(x)=="result_variable"]<-variable.name
-   return(x) }
+#	x.ret <- x[x$group==groupName & x$session==sessionID,]
+\end_layout
+
+\begin_layout Plain Layout
+
+	x.ret <- x[x$group==groupName,]
+\end_layout
+
+\begin_layout Plain Layout
+
+	x.ret$resp <- factor(x.ret$resp, levels=if(group==1) 0:7  else  0:5)   
+\end_layout
+
+\begin_layout Plain Layout
+
+	return(x.ret) 
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+probabilityDist = function(x){   
+\end_layout
+
+\begin_layout Plain Layout
+
+x.freq <- table(x)   
+\end_layout
+
+\begin_layout Plain Layout
+
+x.relfreq <- x.freq / length(x)   
+\end_layout
+
+\begin_layout Plain Layout
+
+return(x.relfreq) }
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+emp.dists <- function(x){   
+\end_layout
+
+\begin_layout Plain Layout
+
+cast.formula <- code+session+scale+enc+posold~result_variable   
+\end_layout
+
+\begin_layout Plain Layout
+
+value.name <- "resp"
+\end_layout
+
+\begin_layout Plain Layout
+
+ret.list <- list(cast(filter(x, 1), cast.formula, probabilityDist, value=value.name
+), cast(filter(x, 2), cast.formula, probabilityDist, value=value.name)) 
+\end_layout
+
+\begin_layout Plain Layout
+
+names(ret.list) <- c("fully encoded", "partly encoded")   
+\end_layout
+
+\begin_layout Plain Layout
+
+ret.list <- lapply(ret.list, rename.and.melt, 1:5, value.name)
+\end_layout
+
+\begin_layout Plain Layout
+
+ret.list <- lapply(ret.list, split.sessions)
+\end_layout
+
+\begin_layout Plain Layout
+
+return(ret.list) 
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+split.sessions <- function(x){
+\end_layout
+
+\begin_layout Plain Layout
+
+	return(list(words=x[x$session==0,], images=x[x$session==1,]))
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+rename.and.melt <- function(x, melt.id, variable.name){ 
+\end_layout
+
+\begin_layout Plain Layout
+
+#  names(x)[match(paste("X",0:7,sep=""),names(x), nomatch=0)] <- as.character(0:7
+)   
+\end_layout
+
+\begin_layout Plain Layout
+
+suppressWarnings(x <- melt(x, melt.id))   
+\end_layout
+
+\begin_layout Plain Layout
+
+names(x)[names(x)=="result_variable"]<-variable.name   
+\end_layout
+
+\begin_layout Plain Layout
+
+return(x) 
+\end_layout
+
+\begin_layout Plain Layout
+
+}
 \end_layout
 
 \begin_layout Plain Layout
@@ -196,7 +333,22 @@ rename.and.melt <- function(x, melt.id, variable.name){ #  names(x)[match(paste(
 
 \begin_layout Plain Layout
 
-<<dataSetup, echo=TRUE, eval=TRUE>>=
+<<dataSetup, echo=TRUE, eval=TRUE, fig.height=7*1.4>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+suppressMessages(library(plyr))
+\end_layout
+
+\begin_layout Plain Layout
+
+suppressMessages(library(ggplot2))
+\end_layout
+
+\begin_layout Plain Layout
+
+suppressMessages(library(reshape))
 \end_layout
 
 \begin_layout Plain Layout
@@ -211,9 +363,103 @@ dists.list <- emp.dists(rec.data)
 
 \begin_layout Plain Layout
 
-ggplot(subset(dists.list[[2]],session==0&code%in%levels(factor(code))), aes(x=fac
-tor(resp), y=value, group=factor(paste(enc, posold)), colour=factor(enc)))+geom_
-freqpoly(ymax=1, ymin=0, stat="identity")+facet_grid(code+scale~session)
+plot.in.chunks <- function(data, lines){
+\end_layout
+
+\begin_layout Plain Layout
+
+	max.len <- length(levels(factor(data$code)))
+\end_layout
+
+\begin_layout Plain Layout
+
+	i <- 1
+\end_layout
+
+\begin_layout Plain Layout
+
+	while(i+lines-1 < max.len){
+\end_layout
+
+\begin_layout Plain Layout
+
+		print(ggplot(subset(data,code%in%levels(factor(code))[i:(i+lines-1)]),aes(x=fa
+ctor(resp),y=value,group=factor(paste(enc,posold)),colour=factor(enc)))+
+\end_layout
+
+\begin_layout Plain Layout
+
+		geom_freqpoly(stat="identity")+
+\end_layout
+
+\begin_layout Plain Layout
+
+		facet_grid(code+scale~posold)+
+\end_layout
+
+\begin_layout Plain Layout
+
+		scale_y_continuous("Probability", limits=c(0,1)))
+\end_layout
+
+\begin_layout Plain Layout
+
+		i <- i+lines
+\end_layout
+
+\begin_layout Plain Layout
+
+	}
+\end_layout
+
+\begin_layout Plain Layout
+
+	print(ggplot(subset(data,code%in%levels(factor(code))[i:max.len]),aes(x=factor(r
+esp),y=value,group=factor(paste(enc,posold)),colour=factor(enc)))+
+\end_layout
+
+\begin_layout Plain Layout
+
+	geom_freqpoly(stat="identity")+
+\end_layout
+
+\begin_layout Plain Layout
+
+	facet_grid(code+scale~posold)+
+\end_layout
+
+\begin_layout Plain Layout
+
+	scale_y_continuous("Probability", limits=c(0,1)))
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+plot.in.chunks(dists.list[[1]][[1]], 4)
+\end_layout
+
+\begin_layout Plain Layout
+
+plot.in.chunks(dists.list[[1]][[2]], 8)
+\end_layout
+
+\begin_layout Plain Layout
+
+plot.in.chunks(dists.list[[2]][[1]], 4)
+\end_layout
+
+\begin_layout Plain Layout
+
+plot.in.chunks(dists.list[[2]][[2]], 8)
 \end_layout
 
 \begin_layout Plain Layout
