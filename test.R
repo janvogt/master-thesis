@@ -93,9 +93,9 @@ fit.models.to.vp.data <- function(vp.data){
                            data=vp.data, 
                            lower=lower.bounds.mpt.2.htm(levels.x, levels.enc, levels.scales),
                            upper=upper.bounds.mpt.2.htm(levels.x, levels.enc, levels.scales))
-  npar.sdt.uv <- length(lower.bounds.sdt.uv(levels.x, levels.enc, levels.scales))
-  npar.sdt.ev <- length(lower.bounds.sdt.ev(levels.x, levels.enc, levels.scales))
-  npar.mpt.2.htm <- length(lower.bounds.mpt.2.htm(levels.x, levels.enc, levels.scales))
+  npar.sdt.uv <- n.param.sdt.uv(levels.x, levels.enc, levels.scales)
+  npar.sdt.ev <- n.param.sdt.ev(levels.x, levels.enc, levels.scales)
+  npar.mpt.2.htm <- n.param.mpt.2.htm(levels.x, levels.enc, levels.scales)
   ret <- c(sdt.uv$par, sdt.uv$objective, sdt.ev$par, sdt.ev$objective, mpt.2.htm$par, mpt.2.htm$objective)
   names(ret) <- c(paste(rep("sdt.uv_",npar.sdt.uv+1), c(paste("par",1:npar.sdt.uv, sep=""), "gsq"), sep=""), 
                   paste(rep("sdt.ev_",npar.sdt.ev+1), c(paste("par",1:npar.sdt.ev, sep=""), "gsq"), sep=""), 
@@ -154,10 +154,132 @@ rand.par.mpt.2.htm <-function(x.states, enc.states, scales){
   return(runif(2*length(enc.states[enc.states!=0])+1+(length(x.states)-2)*length(scales)))
 }
 lower.bounds.mpt.2.htm <- function(x.states, enc.states, scales){
-  return(rep(0, 2*length(enc.states[enc.states!=0])+1+(length(x.states)-2)*length(scales)))
+  return(rep(0, n.param.mpt.2.htm(x.states, enc.states, scales)))
 }
 upper.bounds.mpt.2.htm <- function(x.states, enc.states, scales){
-  return(rep(1, 2*length(enc.states[enc.states!=0])+1+(length(x.states)-2)*length(scales)))
+  return(rep(1, n.param.mpt.2.htm(x.states, enc.states, scales)))
+}
+n.param.mpt.2.htm <- function(x.states, enc.states, scales){
+  return(2*length(enc.states[enc.states!=0])+1+(length(x.states)-2)*length(scales))
+}
+
+plot.mpt.2.htm <- function(parameter, x.states, enc.states, scales, left.right.names){
+  n.states <- length(x.states)
+  prob.factor <- 2
+  y0.guess <- n.states/2+2
+  x0 <- n.states/2+0.5
+  dist.param <- parameter[(length(enc.states)*2+2):length(parameter)]
+  map.dists <- mapdists.mpt.2.htm(dist.param, x.states, scales)
+  for(map in scales){
+    guess.dist = map.dists[[2]][match(map, levels(factor(scales))),]
+    det.dist = map.dists[[1]][match(map, levels(factor(scales))),]
+    param.offset <- (n.states-2)*(match(map, levels(factor(scales)))-1)
+    for(mem in enc.states){
+      dl <- parameter[(match(mem, levels(factor(enc.states[enc.states!=0])))-1)*2+1]
+      dr <- parameter[(match(mem, levels(factor(enc.states[enc.states!=0])))-1)*2+2]
+      gr <- parameter[length(enc.states[enc.states!=0])*2+1]
+      y.dist.offset <- c(rep(n.states/2+0.5, n.states), rep(y0.guess+n.states/2+0.5, n.states))
+      dist.lines <- data.frame(mem=mem, 
+                               map=map, 
+                               x=rep(c(1:(n.states/2)-0.1, (n.states/2+1):n.states+0.1),2)-0.45, 
+                               y=c(rep(n.states/2+0.5, n.states), rep(y0.guess+n.states/2+0.5, n.states)),
+                               xend=rep(c(1:(n.states/2)-0.1, (n.states/2+1):n.states+0.1),2)+0.45, 
+                               yend=y.dist.offset+c(det.dist, guess.dist)*prob.factor, 
+                               linetype=2, 
+                               color=c(rep(2,n.states), rep(3,n.states)), 
+                               weight=NA, 
+                               name=NA)
+      axis.lines <- data.frame(mem=mem, 
+                               map=map, 
+                               x=c(rep(0.45,4), rep(n.states+0.55,4)),
+                               y=rep(c(rep(n.states/2+0.5, 2), rep(y0.guess+n.states/2+0.5,2)), 2),
+                               xend=c(rep(c(0.45, n.states/2+0.35), 2), rep(c(n.states+0.55, n.states/2+0.65), 2)), 
+                               yend=rep(c(n.states/2+0.5+1*prob.factor, n.states/2+0.5, y0.guess+n.states/2+0.5+1*prob.factor, y0.guess+n.states/2+0.5), 2),
+                               linetype=3, 
+                               color=1, 
+                               weight=NA, 
+                               name=NA)
+      origin <- rbind(dist.lines, axis.lines, data.frame(mem=mem, map=map, xend=c(x0+0.5,x0-0.5), yend=0, x=x0, y=y0.guess, linetype=1, color=1, weight=c(1-dr, 1-dl), name=NA))
+      if(!exists("ret.val")) ret.val <- origin
+      else ret.val <- rbind(ret.val, origin)
+      x1.offset <- (n.states/2)/2.0
+      state.lines <- data.frame(mem=mem, 
+                                map=map, 
+                                x=c(x0+0.5,x0-0.5, rep(x0,2)), 
+                                y=c(rep(0,2),rep(y0.guess,2)), 
+                                xend=c(x0+x1.offset, x0-x1.offset, 0.5+x1.offset, 0.5+n.states-x1.offset), 
+                                yend=c(rep(1,2),rep(y0.guess+1,2)), 
+                                linetype=1,
+                                color=1,
+                                weight=c(dr, dl, 1-gr, gr), 
+                                name=c("d(rigth)","d(left)", "1-g(right)", "g(right)"))
+      ret.val <- rbind(ret.val, state.lines)
+      next.weights <- c(dr, dl, 1-gr, gr)
+      for(state in 1:(n.states/2-1)){
+        x0.offset <- (n.states/2-state+1)/2.0
+        x1.offset <- (n.states/2-state)/2.0
+        next.weights <- c(next.weights[1]*(1-dist.param[param.offset+state]),
+                          next.weights[2]*(1-dist.param[param.offset+state]),
+                          next.weights[3]*(1-dist.param[param.offset+n.states/2-1+state]),
+                          next.weights[4]*(1-dist.param[param.offset+n.states/2-1+state]),
+                          next.weights[1]*(dist.param[param.offset+state]),
+                          next.weights[2]*(dist.param[param.offset+state]),
+                          next.weights[3]*(dist.param[param.offset+n.states/2-1+state]),
+                          next.weights[4]*(dist.param[param.offset+n.states/2-1+state]))
+        map.lines <- data.frame(mem=mem, 
+                                map=map, 
+                                x=c(x0+x0.offset, x0-x0.offset, 0.5+x0.offset, 0.5+n.states-x0.offset), 
+                                y=c(rep(state,2),rep(y0.guess+state,2)), 
+                                xend=c(x0+x1.offset, x0-x1.offset, 0.5+x1.offset, 0.5+n.states-x1.offset,
+                                       n.states-state+1, state, n.states/2-state+1, n.states/2+state), 
+                                yend=c(rep(state+1,2),rep(y0.guess+state+1,2), rep(n.states/2, 2), rep(y0.guess+n.states/2, 2)), 
+                                linetype=1,
+                                color=1,
+                                weight=next.weights, 
+                                name=NA)
+        ret.val <- rbind(ret.val, map.lines)
+      }
+    }
+  }
+  line.width.factor <- 0.1
+  suppressWarnings(print(ggplot(data=ret.val, aes(x=xend, y=yend, xend=x, yend=y, label=ifelse(is.na(name), "", paste(name, round(weight, digits=2), sep="="))))+
+          scale_colour_manual(values = c("black", "red", "blue"))+
+          facet_grid(map~mem)+
+          geom_text(aes(x=xend, y=y, label=ifelse(is.na(name), NA, paste(name, round(weight, digits=2), sep="="))))+
+          geom_segment(aes(size=weight), lineend="round", subset=.(linetype==1))+
+          geom_rect(aes(xmin=xend, xmax=x, ymin=yend, ymax=y, fill=factor(color)), subset=.(linetype==2))+
+          geom_segment(aes(x=x, y=y, yend=yend, xend=xend), subset=.(linetype==3))+
+          theme_bw()+
+          scale_x_discrete("Response", limits=levels(factor(x.states)))+
+          theme(legend.position = "none", panel.background=element_blank(), axis.title=element_blank(), axis.text.y=element_blank(), axis.ticks=element_blank(), axis.line=element_blank(), panel.grid.minor.y=element_blank(), panel.grid.major.y=element_blank())))
+  return(ret.val)
+}
+rm(ret.val)
+ret.val <- plot.mpt.2.htm(c(0.3384928, 0.3116541, 0.5056103, 0.4629673, 0.4167943, 0.3478645, 0.1871808, 0.3214955, 0.1008351, 0.4860229, 0.7897952, 0.4579274, 0.1593782,  0, 0.06871952, 0.3978788, 0.8192095), 1:8, 1:2, 1:2, c("l","r"))
+
+ggplot(data=t, aes(x=x, y=y, xend=xend, yend=yend, linetype=factor(linetype)))+facet_grid(map~mem)+geom_segment()
+
+mapdists.mpt.2.htm <- function(map.pars, x.states, scales){
+  n.states <- length(x.states)
+  map.det.mat <- array(1, dim=c(length(scales), rep(n.states/2, 2)))
+  map.guess.mat <- array(1, dim=c(length(scales), rep(n.states/2, 2)))
+  for(s in 1:length(scales)){
+    for(col in 1:(n.states/2)){
+      col.par.det <- map.pars[(n.states-2) * (s-1) + (n.states/2-col) + 1]
+      col.par.guess <- map.pars[(n.states/2-1) * (2*s-1) + col]
+      for(row in 1:(n.states/2)){
+        if(col==row & col>1) map.det.mat[s, row, col] <- col.par.det
+        if(col>row) map.det.mat[s, row, col] <- 1-col.par.det
+        if(col==row & col<(n.states/2)) map.guess.mat[s, row, col] <- col.par.guess
+        if(col<row) map.guess.mat[s, row, col] <- 1-col.par.guess
+      }
+    }
+  }
+  det.dists <- apply(map.det.mat, c(1,2), prod)[,c((n.states/2):1, 1:(n.states/2))]
+  dim(det.dists) <- c(length(scales), n.states)
+  guess.dists <- apply(map.guess.mat, c(1,2), prod)[,c((n.states/2):1, 1:(n.states/2))]
+  dim(guess.dists) <- c(length(scales), n.states)
+  return(list(detection=det.dists, guessing=guess.dists))
 }
 mpt.2.htm <- function(parameter, x, enc, scale, posold, x.states, enc.states, scales, left.right.names)
 {
@@ -210,7 +332,10 @@ lower.bounds.sdt.uv <- function(x.states, enc.states, scales){
   return(c(rep(0:1, length(enc.states[enc.states!=0])), rep(c(-Inf, rep(0, length(x.states)-2)), length(scales))))
 }
 upper.bounds.sdt.uv <- function(x.states, enc.states, scales){
-  return(c(rep(Inf, length(enc.states[enc.states!=0])*2 + (length(x.states)-1)*length(scales))))
+  return(c(rep(Inf, n.param.sdt.uv(x.states, enc.states, scales))))
+}
+n.param.sdt.uv <- function(x.states, enc.states, scales){
+  return(length(enc.states[enc.states!=0])*2 + (length(x.states)-1)*length(scales))
 }
 sdt.uv <- function(parameter, x, enc, scale, posold, x.states, enc.states, scales, left.right.names){
   enc.states <- enc.states[enc.states!=0]
@@ -244,7 +369,10 @@ lower.bounds.sdt.ev <- function(x.states, enc.states, scales){
   return(c(rep(0, length(enc.states[enc.states!=0])), rep(c(-Inf, rep(0, length(x.states)-2)), length(scales))))
 }
 upper.bounds.sdt.ev <- function(x.states, enc.states, scales){
-  return(c(rep(Inf, length(enc.states[enc.states!=0]) + (length(x.states)-1)*length(scales))))
+  return(c(rep(Inf, n.param.sdt.ev(x.states, enc.states, scales))))
+}
+n.param.sdt.ev <- function(x.states, enc.states, scales){
+  return(length(enc.states[enc.states!=0]) + (length(x.states)-1)*length(scales))
 }
 sdt.ev <- function(parameter, x, enc, scale, posold, x.states, enc.states, scales, left.right.names){
   enc.states <- enc.states[enc.states!=0]
