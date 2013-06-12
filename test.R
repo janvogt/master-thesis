@@ -70,18 +70,41 @@ plot.vp <- function(data, params){
                              levels(factor(data$scale)))
   tmp <- ggplot_gtable(ggplot_build(sdt.ev.plot))
   leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  fits <- data.frame("G^2"=round(unlist(params[grep(".*gsq", colnames(params), perl=TRUE)]), digits=2), row.names=c("UVSDT", "EVSDT", "MPT: 2HTM"))
   legend <- tmp$grobs[[leg]]
-  sdt <- arrangeGrob(sdt.uv.plot+theme(legend.position="none"), sdt.ev.plot+theme(legend.position="none"), legend, widths=c(3/7,3/7,1/7), nrow=1, left="UVSDT")
+  legendArranged <- arrangeGrob(tableGrob(fits, cols="Gsq"), legend, ncol=1)
+  sdt <- arrangeGrob(sdt.uv.plot+theme(legend.position="none"), sdt.ev.plot+theme(legend.position="none"), legendArranged, widths=c(3/7,3/7,1/7), nrow=1, left="UVSDT")
   models <- arrangeGrob(mpt, plot, ncol=2, widths=c(1/3,2/3))
-  suppressWarnings(grid.arrange(models, sdt, ncol=1, heights=c(2/3, 1/3), main=paste("VP: ", data$code[1])))
+  suppressWarnings(grid.arrange(models, sdt, ncol=1, heights=c(2/3, 1/3), main=paste("VP:", data$code[1], "Session:", data$session[1])))
 }
-
-plot.vp(dists.list[[1]][[1]][dists.list[[1]][[1]]$code=="SO2308",], model.param[[1]][[1]][model.param[[1]][[1]]$code=="SO2308",])
 
 vp.data <- function(data, vp=1){
   vps <- levels(factor(data$code))
   if(!is.character(vp)) vp <- vps[vp]
   return(subset(data, code==vp))
+}
+
+
+#run fun for each vp in data. Fun should return a dataframe with the same columns as data.
+foreach.vp <- function(data, fun, ..., echo=TRUE){
+  ret <- NULL
+  further.data <- list(...)
+  for(vp in levels(factor(data$code))){
+    if(echo) cat(paste("Processing ", substitute(fun), "() for VP: ", vp, ":\n\tstart...", sep=""))
+    if(length(further.data)>0){
+      further.data.vp <- lapply(further.data, vp.data, vp)
+      fun.ret <- do.call(fun, c(list(vp.data(data, vp)), further.data.vp))
+      if(length(fun.ret)>0) vp.ret <- data.frame(code=vp, fun.ret)
+      else vp.ret <- data.frame(code=vp, TRUE)
+    }
+    else{
+      vp.ret <- data.frame(code=vp, t(fun(vp.data(data, vp))))
+    }
+    if(echo) cat("\n\tfinished.\n")
+    if(is.null(ret)) ret <- vp.ret
+    else ret <- rbind(ret, vp.ret)
+  }
+  return(ret)
 }
 
 model.parameter <- function(data){
@@ -103,14 +126,14 @@ append.predicted.data <- function(x, param){
 add.model.data <- function(x, params) {
   mpt <- data.frame(x)
   mpt$value <-  mpt.2.htm(unlist(params[grep("mpt.2.htm_par\\d+", colnames(params), perl=TRUE)]), 
-                             x$variable, 
-                             x$enc, 
-                             x$scale, 
-                             x$posold, 
-                             levels(factor(x$variable)), 
-                             levels(factor(x$enc)), 
-                             levels(factor(x$scale)),
-                             levels(factor(x$posold)))
+                          x$variable, 
+                          x$enc, 
+                          x$scale, 
+                          x$posold, 
+                          levels(factor(x$variable)), 
+                          levels(factor(x$enc)), 
+                          levels(factor(x$scale)),
+                          levels(factor(x$posold)))
   mpt$model <- "2HTM MPT"
   sdt.uv.df <- data.frame(x)
   sdt.uv.df$value <-  sdt.uv(unlist(params[grep("sdt.uv_par\\d+", colnames(params), perl=TRUE)]), 
@@ -125,14 +148,14 @@ add.model.data <- function(x, params) {
   sdt.uv.df$model <- "UVSDT"
   sdt.ev.df <- data.frame(x)
   sdt.ev.df$value <-  sdt.ev(unlist(params[grep("sdt.ev_par\\d+", colnames(params), perl=TRUE)]), 
-                                x$variable, 
-                                x$enc, 
-                                x$scale, 
-                                x$posold, 
-                                levels(factor(x$variable)), 
-                                levels(factor(x$enc)), 
-                                levels(factor(x$scale)),
-                                levels(factor(x$posold)))
+                             x$variable, 
+                             x$enc, 
+                             x$scale, 
+                             x$posold, 
+                             levels(factor(x$variable)), 
+                             levels(factor(x$enc)), 
+                             levels(factor(x$scale)),
+                             levels(factor(x$posold)))
   sdt.ev.df$model <- "EVSDT"
   return(rbind(x[-1], mpt[-1], sdt.uv.df[-1], sdt.ev.df[-1]))
 }
@@ -185,26 +208,6 @@ best.nlminb <- function(start.fun, start.fun.par, ..., n.optim=5){
   return(ret)
 }
 
-#run fun for each vp in data. Fun should return a dataframe with the same columns as data.
-foreach.vp <- function(data, fun, ..., echo=TRUE){
-  ret <- NULL
-  further.data <- list(...)
-  for(vp in levels(factor(data$code))){
-    if(echo) cat(paste("Processing ", substitute(fun), "() for VP: ", vp, ":\n\tstart...", sep=""))
-    if(length(further.data)>0){
-      further.data.vp <- lapply(further.data, vp.data, vp)
-      vp.ret <- data.frame(code=vp, do.call(fun, c(list(vp.data(data, vp)), further.data.vp)))
-    }
-    else{
-      vp.ret <- data.frame(code=vp, t(fun(vp.data(data, vp))))
-    }
-    if(echo) cat("\n\tfinished.\n")
-    if(is.null(ret)) ret <- vp.ret
-    else ret <- rbind(ret, vp.ret)
-  }
-  return(ret)
-}
-
 model.objective <- function(parameter, model, data, x=variable, value=value, enc=enc, scale=scale, posold=posold, ntrials=ntrials){
   p.expected <- model(parameter, 
                       eval(substitute(x), data), 
@@ -244,13 +247,13 @@ plot.mpt.2.htm <- function(parameter, x.states, enc.states, scales, left.right.n
   prob.factor <- 2
   y0.guess <- n.states/2+2
   x0 <- n.states/2+0.5
-  dist.param <- parameter[(length(enc.states)*2+2):length(parameter)]
+  dist.param <- parameter[(length(enc.states[enc.states!=0])*2+2):length(parameter)]
   map.dists <- mapdists.mpt.2.htm(dist.param, x.states, scales)
   for(map in scales){
     guess.dist = map.dists[[2]][match(map, levels(factor(scales))),]
     det.dist = map.dists[[1]][match(map, levels(factor(scales))),]
     param.offset <- (n.states-2)*(match(map, levels(factor(scales)))-1)
-    for(mem in enc.states){
+    for(mem in enc.states[enc.states!=0]){
       dl <- parameter[(match(mem, levels(factor(enc.states[enc.states!=0])))-1)*2+1]
       dr <- parameter[(match(mem, levels(factor(enc.states[enc.states!=0])))-1)*2+2]
       gr <- parameter[length(enc.states[enc.states!=0])*2+1]
@@ -320,12 +323,13 @@ plot.mpt.2.htm <- function(parameter, x.states, enc.states, scales, left.right.n
   return(ggplot(data=ret.val, aes(x=xend, y=yend, xend=x, yend=y))+
           scale_colour_manual(values = c("black", "red", "blue"))+
           facet_grid(map~mem)+
-          geom_text(aes(x=xend, y=y, label=ifelse(is.na(name), NA, paste(name, round(weight, digits=2), sep="=")), size=0.1))+
-          geom_segment(aes(size=weight*0.5), lineend="round", subset=.(linetype==1))+
+          geom_text(aes(x=xend, y=y, label=ifelse(is.na(name), NA, paste(name, round(weight, digits=2), sep="=")), size=2))+
+          geom_segment(aes(size=weight), lineend="round", subset=.(linetype==1))+
           geom_rect(aes(xmin=xend, xmax=x, ymin=yend, ymax=y, fill=factor(color)), subset=.(linetype==2))+
           geom_segment(aes(x=x, y=y, yend=yend, xend=xend), subset=.(linetype==3))+
           theme_bw()+
-          scale_x_discrete("Response", limits=levels(factor(x.states)))+
+           scale_x_discrete("Response", limits=levels(factor(x.states)))+
+           scale_size_continuous(range = c(0.3, 4))+
           theme(legend.position = "none", panel.background=element_blank(), axis.title=element_blank(), axis.text.y=element_blank(), axis.ticks=element_blank(), axis.line=element_blank(), panel.grid.minor.y=element_blank(), panel.grid.major.y=element_blank()))
 }
 
@@ -384,15 +388,16 @@ mpt.2.htm <- function(parameter, x, enc, scale, posold, x.states, enc.states, sc
           guess.vec * guess.dists[(match(scale, scales)-1)*n.states + match(x, x.states)])
   return(ret)
 }
+
 #parameters: [mu, sd]*length(enc.states[enc.states!=0]), [criterion*(length(x.states)-1)]*n.scale
 #lowerBounds: c(-Inf, -Inf, ..., -Inf, 0, ...)
 #upperBounds: c(Inf, Inf, ..., Inf, Inf, ...)
-plot.sdt.uv <- function(parameter, x.states, enc.states, scales, left.right.names){
+plot.sdt.uv <- function(parameter, x.states, enc.states, scales, left.right.names){ 
   df <- data.frame()
   c.df <- data.frame()
   c.vec <- matrix(NA, ncol=length(x.states)-1, nrow=length(scales)) 
   for(scale in 1:length(scales)){
-    c.vec[scale,] <- cumsum(parameter[(length(enc.states)*2+(scale-1)*(length(x.states)-1)+1):(length(enc.states)*2+(scale)*(length(x.states)-1))])
+    c.vec[scale,] <- cumsum(parameter[(length(enc.states[enc.states!=0])*2+(scale-1)*(length(x.states)-1)+1):(length(enc.states[enc.states!=0])*2+(scale)*(length(x.states)-1))])
     c.df <- rbind(c.df, data.frame(scale=levels(factor(scales))[scale], cutoff=c.vec[scale,]))
   }
   x.range <- c(min(c.vec[,1])-1,
@@ -409,12 +414,14 @@ plot.sdt.uv <- function(parameter, x.states, enc.states, scales, left.right.name
   for(level in levels(factor(enc.states[enc.states!=0]))){
     mu <- parameter[(match(level, enc.states)-1)*2+1]
     sd <- parameter[(match(level, enc.states)-1)*2+2]
+    attr(mu, "names")<- NULL
+    attr(sd, "names")<- NULL
     label <- paste(level, "time(s) shown")
     y <- dnorm(x.vec, mu, sqrt(1+sd^2))
-    id <- (match(level, factor(enc.states[enc.states!=0]))-1)*2+1
+    id <- (match(level, levels(factor(enc.states[enc.states!=0])))-1)*2+1
     df <- rbind(df, data.frame(id=id, x=x.vec,  y=y, label=label, mu=mu, sd=sd))
     y <- dnorm(x.vec, -mu, sqrt(1+sd^2))
-    id <- (match(level, factor(enc.states[enc.states!=0]))-1)*2+2
+    id <- (match(level, levels(factor(enc.states[enc.states!=0])))-1)*2+2
     df <- rbind(df, data.frame(id=id, x=x.vec,  y=y, label=label, mu=-mu, sd=sd))
   }
   return(ggplot(df)+facet_grid(.~scale)+geom_line(aes(x=x, y=y, colour=label, group=id), stat="identity")+geom_vline(data=c.df, aes(colour=factor(scale), xintercept=cutoff))+scale_colour_discrete("factors"))
@@ -464,7 +471,7 @@ plot.sdt.ev <- function(parameter, x.states, enc.states, scales, left.right.name
   c.df <- data.frame()
   c.vec <- matrix(NA, ncol=length(x.states)-1, nrow=length(scales))
   for(scale in 1:length(scales)){
-    c.vec[scale,] <- cumsum(parameter[(length(enc.states)+(scale-1)*(length(x.states)-1)+1):(length(enc.states)+(scale)*(length(x.states)-1))])
+    c.vec[scale,] <- cumsum(parameter[(length(enc.states[enc.states!=0])+(scale-1)*(length(x.states)-1)+1):(length(enc.states[enc.states!=0])+(scale)*(length(x.states)-1))])
     c.df <- rbind(c.df, data.frame(scale=levels(factor(scales))[scale], cutoff=c.vec[scale,]))
   }
   x.range <- c(min(c.vec[,1])-1,
@@ -480,13 +487,14 @@ plot.sdt.ev <- function(parameter, x.states, enc.states, scales, left.right.name
   }
   for(level in levels(factor(enc.states[enc.states!=0]))){
     mu <- parameter[match(level, enc.states)]
+    attr(mu, "names")<- NULL
     sd <- 1
     label <- paste(level, "time(s) shown")
     y <- dnorm(x.vec, mu, sqrt(1+sd^2))
-    id <- (match(level, factor(enc.states[enc.states!=0]))-1)*2+1
+    id <- (match(level, levels(factor(enc.states[enc.states!=0])))-1)*2+1
     df <- rbind(df, data.frame(id=id, x=x.vec,  y=y, label=label, mu=mu, sd=sd))
     y <- dnorm(x.vec, -mu, sqrt(1+sd^2))
-    id <- (match(level, factor(enc.states[enc.states!=0]))-1)*2+2
+    id <- (match(level, levels(factor(enc.states[enc.states!=0])))-1)*2+2
     df <- rbind(df, data.frame(id=id, x=x.vec,  y=y, label=label, mu=-mu, sd=sd))
   }
   return(ggplot(df)+facet_grid(.~scale)+geom_line(aes(x=x, y=y, colour=label, group=id), stat="identity")+geom_vline(data=c.df, aes(colour=factor(scale), xintercept=cutoff))+scale_colour_discrete("factors"))
@@ -533,10 +541,16 @@ suppressMessages(library(gridExtra))
 rec.data <- read.csv(file="data/Rec.csv", sep=";")
 dists.list <- emp.dists(rec.data)
 
-plot.in.chunks(dists.list[[1]][[1]], 1)
-plot.in.chunks(dists.list[[1]][[2]], 8)
-plot.in.chunks(dists.list[[2]][[1]], 4)
-plot.in.chunks(dists.list[[2]][[2]], 8)
+#plot.in.chunks(dists.list[[1]][[1]], 1)
+#plot.in.chunks(dists.list[[1]][[2]], 8)
+#plot.in.chunks(dists.list[[2]][[1]], 4)
+#plot.in.chunks(dists.list[[2]][[2]], 8)
 
 model.param<- model.parameter(dists.list)
 dists.list <- append.predicted.data(dists.list, model.param)
+
+
+foreach.vp(dists.list[[1]][[1]], plot.vp, model.param[[1]][[1]], echo=FALSE)
+foreach.vp(dists.list[[1]][[2]], plot.vp, model.param[[1]][[2]], echo=FALSE)
+foreach.vp(dists.list[[2]][[1]], plot.vp, model.param[[2]][[1]], echo=FALSE)
+foreach.vp(dists.list[[2]][[2]], plot.vp, model.param[[2]][[2]], echo=FALSE)
