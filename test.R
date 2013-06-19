@@ -9,7 +9,10 @@ probabilityDist = function(x){
   x.freq <- table(x)
   x.relfreq <- vector(length=length(x.freq)+1)
   x.relfreq[1] <- length(x)
-  x.relfreq[-1] <- (x.freq+(0.5/length(x.freq))) / (length(x)+0.5)
+  # Empty cell correction:
+  #x.relfreq[-1] <- (x.freq+(0.5/length(x.freq))) / (length(x)+0.5)
+  # No empty Cell correction
+  x.relfreq[-1] <- x.freq / length(x)
   names(x.relfreq)[1] <- "ntrials"
   names(x.relfreq)[-1] <- names(x.freq)
   return(x.relfreq) 
@@ -70,7 +73,7 @@ plot.vp <- function(data, params){
                              levels(factor(data$scale)))
   tmp <- ggplot_gtable(ggplot_build(sdt.ev.plot))
   leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
-  fits <- data.frame("G^2"=round(unlist(params[grep(".*gsq", colnames(params), perl=TRUE)]), digits=2), row.names=c("UVSDT", "EVSDT", "MPT: 2HTM"))
+  fits <- data.frame("G^2"=round(unlist(params[grep(".*gsq", colnames(params), perl=TRUE)]), digits=2), row.names=c("UVSDT", "EVSDT", "MPT: 2HTM", "MPT: 1HTM2g"))
   legend <- tmp$grobs[[leg]]
   legendArranged <- arrangeGrob(tableGrob(fits, cols="Gsq"), legend, ncol=1)
   sdt <- arrangeGrob(sdt.uv.plot+theme(legend.position="none"), sdt.ev.plot+theme(legend.position="none"), legendArranged, widths=c(3/7,3/7,1/7), nrow=1, left="UVSDT")
@@ -83,30 +86,33 @@ vp.data <- function(data, vp=1){
   if(!is.character(vp)) vp <- vps[vp]
   return(subset(data, code==vp))
 }
-
-
 #run fun for each vp in data. Fun should return a dataframe with the same columns as data.
 foreach.vp <- function(data, fun, ..., echo=TRUE){
   ret <- NULL
   further.data <- list(...)
   for(vp in levels(factor(data$code))){
     if(echo) cat(paste("Processing ", substitute(fun), "() for VP: ", vp, ":\n\tstart...", sep=""))
-    if(length(further.data)>0){
+    if(length(further.data)>0 & "code" %in% names(further.data)){
       further.data.vp <- lapply(further.data, vp.data, vp)
       fun.ret <- do.call(fun, c(list(vp.data(data, vp)), further.data.vp))
       if(length(fun.ret)>0) vp.ret <- data.frame(code=vp, fun.ret)
       else vp.ret <- data.frame(code=vp, TRUE)
     }
     else{
-      vp.ret <- data.frame(code=vp, t(fun(vp.data(data, vp))))
+      fun.ret <- fun(vp.data(data, vp), ...)
+      if(class(fun.ret)=="list"){
+        fun.ret <- lapply(fun.ret, function(x, vp) return(data.frame(code=vp, x)), vp)
+      }
+      else{
+        vp.ret <- data.frame(code=vp, t(fun(vp.data(data, vp))))
+      }
     }
     if(echo) cat("\n\tfinished.\n")
     if(is.null(ret)) ret <- vp.ret
-    else ret <- rbind(ret, vp.ret)
+    else ret <- mapply(rbind, c(list(), ret), c(list(), vp.ret))
   }
   return(ret)
 }
-
 model.parameter <- function(data){
   pars.grp1.ses1 <- foreach.vp(data[[1]][[1]], fit.models.to.vp.data)
   pars.grp1.ses2 <- foreach.vp(data[[1]][[2]], fit.models.to.vp.data)
@@ -114,7 +120,6 @@ model.parameter <- function(data){
   pars.grp2.ses2 <- foreach.vp(data[[2]][[2]], fit.models.to.vp.data)
   return(list(list(pars.grp1.ses1, pars.grp1.ses2), list(pars.grp2.ses1, pars.grp2.ses2)))
 }
-
 append.predicted.data <- function(x, param){
   x[[1]][[1]] <- foreach.vp(x[[1]][[1]], add.model.data, param[[1]][[1]])
   x[[1]][[2]] <- foreach.vp(x[[1]][[2]], add.model.data, param[[1]][[2]])
@@ -122,7 +127,6 @@ append.predicted.data <- function(x, param){
   x[[2]][[2]] <- foreach.vp(x[[2]][[2]], add.model.data, param[[2]][[2]])
   return(x)
 }
-
 add.model.data <- function(x, params) {
   mpt <- data.frame(x)
   mpt$value <-  mpt.2.htm(unlist(params[grep("mpt.2.htm_par\\d+", colnames(params), perl=TRUE)]), 
@@ -159,7 +163,6 @@ add.model.data <- function(x, params) {
   sdt.ev.df$model <- "EVSDT"
   return(rbind(x[-1], mpt[-1], sdt.uv.df[-1], sdt.ev.df[-1]))
 }
-
 fit.models.to.vp.data <- function(vp.data){
   levels.x <- levels(factor(vp.data$variable))
   levels.enc <- levels(factor(vp.data$enc))
@@ -185,14 +188,78 @@ fit.models.to.vp.data <- function(vp.data){
                            data=vp.data, 
                            lower=lower.bounds.mpt.2.htm(levels.x, levels.enc, levels.scales),
                            upper=upper.bounds.mpt.2.htm(levels.x, levels.enc, levels.scales))
+  vp.data$enc <- factor(vp.data$enc)
+  mpt.1.htm.2g <- best.nlminb(rand.par.mpt.1.htm.2g,
+                              list(levels.x, levels.enc, levels.scales),
+                              model.objective, 
+                              model=mpt.1.htm.2g, 
+                              data=vp.data, 
+                              lower=lower.bounds.mpt.1.htm.2g(levels.x, levels.enc, levels.scales),
+                              upper=upper.bounds.mpt.1.htm.2g(levels.x, levels.enc, levels.scales))
   npar.sdt.uv <- n.param.sdt.uv(levels.x, levels.enc, levels.scales)
   npar.sdt.ev <- n.param.sdt.ev(levels.x, levels.enc, levels.scales)
   npar.mpt.2.htm <- n.param.mpt.2.htm(levels.x, levels.enc, levels.scales)
-  ret <- c(sdt.uv$par, sdt.uv$objective, sdt.ev$par, sdt.ev$objective, mpt.2.htm$par, mpt.2.htm$objective)
+  npar.mpt.1.htm.2g <- n.param.mpt.1.htm.2g(levels.x, levels.enc, levels.scales)
+  ret <- c(sdt.uv$par, sdt.uv$objective, sdt.ev$par, sdt.ev$objective, mpt.2.htm$par, mpt.2.htm$objective, mpt.1.htm.2g$par, mpt.1.htm.2g$objective)
   names(ret) <- c(paste(rep("sdt.uv_",npar.sdt.uv+1), c(paste("par",1:npar.sdt.uv, sep=""), "gsq"), sep=""), 
                   paste(rep("sdt.ev_",npar.sdt.ev+1), c(paste("par",1:npar.sdt.ev, sep=""), "gsq"), sep=""), 
-                  paste(rep("mpt.2.htm_",npar.mpt.2.htm), c(paste("par",1:npar.mpt.2.htm, sep=""), "gsq"), sep=""))
+                  paste(rep("mpt.2.htm_",npar.mpt.2.htm), c(paste("par",1:npar.mpt.2.htm, sep=""), "gsq"), sep=""),
+                  paste(rep("mpt.1.htm.2g_",npar.mpt.1.htm.2g), c(paste("par",1:npar.mpt.1.htm.2g, sep=""), "gsq"), sep=""))
   return(ret)
+}
+
+#New (MPTinR):
+gen.fit.models <- function(data, ...){
+  models <- list(...)
+  gen.fit.to.vp.data <- function(vp.data, models){
+    fit.results <- lapply(models, gen.fit.model, vp.data[vp.data$model =="empirical",])
+    predicted.data.list <- lapply(fit.results, "[[", "data")
+    predicted.data <- do.call(rbind, c(predicted.data.list, list(vp.data)))
+    mptinr.res.list <- lapply(fit.results, "[[", "mptinr")
+    res.lines.list <- mapply(function(x, model) return(extract.mptinr.results(model()[[1]],x)), mptinr.res.list, models, SIMPLIFY=FALSE)
+    res.line <- do.call(cbind, res.lines.list)
+    return(list(predicted.data, res.line))
+  }
+  vp.data.list <- split(data, factor(data$code))
+  all.vp.results <- lapply(vp.data.list, gen.fit.to.vp.data, models)
+  all.data.frames <- lapply(all.vp.results, "[[", 1)
+  all.fit.lines <- lapply(all.vp.results, "[[", 2)
+  data.ret <- do.call(rbind, all.data.frames)
+  fit.ret <- do.call(rbind, all.fit.lines)
+  fit.ret <- data.frame(code=row.names(fit.ret), fit.ret)
+  return(list(data=data.ret, fit.par=fit.ret))
+}
+multi.gen.fit.models <- function(data, ...){
+  models <- list(...)
+  model.res.list <- lapply(models, multi.gen.fit.model, data[data$model=="empirical",])
+  predicted.data.list <- lapply(model.res.list, "[[", "data")
+  predicted.data.df <- do.call(rbind, predicted.data.list)
+  mptinr.res.list <- lapply(model.res.list, "[[", "mptinr")
+  names(mptinr.res.list) <- vapply(models, function(x) x()[[1]], "")
+  fit.par.list <- mapply(function(x, name) extract.multi.mptinr.results(name, x), mptinr.res.list, names(mptinr.res.list))
+  fit.par <- do.call(cbind, fit.par.list)
+  fit.par <- cbind(code=row.names(fit.par), fit.par)
+  select.res <- select.mpt(mptinr.res.list)
+  return(list(data=predicted.data.df, fit.par=fit.par, model.comp=select.res))
+}
+extract.mptinr.results <- function(model.name, mptinr.res){
+  ret <- data.frame(mptinr.res$goodness.of.fit[,1:2], mptinr.res$information.criteria[,1:2], t(mptinr.res$parameters[,1,drop=FALSE]))
+  names(ret) <- paste(model.name, names(ret), sep="_")
+  return(ret)
+}
+extract.multi.mptinr.results <- function(model.name, mptinr.res){
+  ret <- data.frame(mptinr.res$goodness.of.fit$individual, mptinr.res$information.criteria$individual, t(mptinr.res$parameters$individual[,1,]))
+  row.names(ret) <- row.names(mptinr.res$data$observed$individual)
+  names(ret) <- paste(model.name, names(ret), sep="_")
+  return(ret)
+}
+do.fitting <- function(data, ...){
+  ret.val.list <- lapply(data, lapply, multi.gen.fit.models, ...)
+  ret.dists <- lapply(ret.val.list, lapply, "[[", "data")
+  ret.dists <- mapply(function(x,y) mapply(rbind, x, y), ret.dists, data)
+  ret.pars <- lapply(ret.val.list, lapply, "[[", "fit.par")
+  ret.comp <- lapply(ret.val.list, lapply, "[[", "model.comp")
+  return(list(data=ret.dists, fit.par=ret.pars, model.comp=ret.comp))
 }
 
 best.nlminb <- function(start.fun, start.fun.par, ..., n.optim=5){
@@ -207,7 +274,6 @@ best.nlminb <- function(start.fun, start.fun.par, ..., n.optim=5){
   }
   return(ret)
 }
-
 model.objective <- function(parameter, model, data, x=variable, value=value, enc=enc, scale=scale, posold=posold, ntrials=ntrials){
   p.expected <- model(parameter, 
                       eval(substitute(x), data), 
@@ -222,33 +288,136 @@ model.objective <- function(parameter, model, data, x=variable, value=value, enc
   if(!is.numeric(n.trials)) n.trials <- as.numeric(levels(n.trials)[n.trials])
   n.expected <- p.expected*as.numeric(n.trials)
   n.empirical <- eval(substitute(value), data)*n.trials
-  return(2 * sum( n.empirical[n.empirical!=0] * (log(n.empirical[n.empirical!=0]) - log(n.expected[n.empirical!=0]) ) ) )
+  #return(2 * sum( n.empirical[n.empirical!=0] * (log(n.empirical[n.empirical!=0]) - log(n.expected[n.empirical!=0]) ) ) )
+  return(-sum(eval(substitute(value), data)*log(p.expected)))
 }
+#x= Requested state of random variable, n.enc= number of encodings, n.scale= number of scales
+#parameters: [detection]*length(enc.states[enc.states!=0]), [guess(right), detect.map*(length(x.states)/2)-1, guess.map*(length(x.states)/2)-1]*n.scale
+#levels(posold) muss in richtung links-> rechts geordnet sein!
+rand.par.mpt.1.htm.2g <-function(x.states, enc.states, scales){
+  return(runif(n.param.mpt.1.htm.2g(x.states, enc.states, scales)))
+}
+lower.bounds.mpt.1.htm.2g <- function(x.states, enc.states, scales){
+  return(rep(0, n.param.mpt.1.htm.2g(x.states, enc.states, scales)))
+}
+upper.bounds.mpt.1.htm.2g <- function(x.states, enc.states, scales){
+  return(rep(1, n.param.mpt.1.htm.2g(x.states, enc.states, scales)))
+}
+n.param.mpt.1.htm.2g <- function(x.states, enc.states, scales){
+  return(length(enc.states[enc.states!=0])+(length(x.states)-1)*length(scales))
+}
+mpt.1.htm.2g <- function(parameter, x, enc, scale, posold, ...){
+  n.states <- length(levels(x))
+  n.scales <- length(levels(scale))
+  n.enc <- length(levels(enc)[levels(enc)!=0])
+  if(n.states%%2 > 0) stop("Number of rating scale point has to be even.")
+  det.vec <- ifelse(enc==0, 0, parameter[(match(enc, levels(enc)[levels(enc)!=0]))])
+  guess.right.par <- parameter[n.enc+(1:n.scales-1)*(n.states-1)+1]
+  guess.vec <- ifelse(match(x,levels(x)) > n.states/2, (1-det.vec)*guess.right.par[match(scale, levels(scale))], (1-det.vec)*(1-guess.right.par[match(scale, levels(scale))]))
+  map.pars <- parameter[rep(n.enc+(1:n.scales-1)*(n.states-1), each=n.states-2)+2:(n.states-1)]
+  map.dists <- mapdists.mpt(map.pars, levels(x), levels(scale))
+  confidence.vec <- ifelse(match(posold, levels(posold)) == 1, (-1*match(x, levels(x)))+length(levels(x))+1, match(x, levels(x)))
+  possible.detect <- confidence.vec > (length(levels(x))/2)
+  ret <- (ifelse(possible.detect, det.vec, 0) * map.dists[[1]][(match(scale,levels(scale))-1)*n.states + match(x, levels(x))] +
+            guess.vec * map.dists[[2]][(match(scale,levels(scale))-1)*n.states + match(x, levels(x))])
+  return(ret)
+}
+test.mpt.1.htm.2g <- function(){
+  #Test detection
+  assert_equal(mpt.1.htm.2g(c(0.3, #d1
+                              runif(1), #d2
+                              0.45, #g1
+                              runif(1), #md1
+                              0.1), #mg1
+                            factor(3, levels=1:4), #x
+                            factor(1, levels=1:2), #enc
+                            factor("low", levels=c("low")), #scale
+                            factor("left", levels=c("left", "right"))),#posold
+               (1-0.3)*0.45*0.1)
+  assert_equal(mpt.1.htm.2g(c(runif(1), #d1
+                              0.3, #d2
+                              0.45, #g1
+                              runif(1), #md1
+                              0.1), #mg1
+                            factor(3, levels=1:4), #x
+                            factor(2, levels=1:2), #enc
+                            factor("low", levels=c("low")), #scale
+                            factor("left", levels=c("left", "right"))),#posold
+               (1-0.3)*0.45*0.1)
+  assert_equal(mpt.1.htm.2g(c(runif(1), #d1
+                              0.3, #d2
+                              0.45, #g1
+                              0.2, #md1
+                              0.1), #mg1
+                            factor(2, levels=1:4), #x
+                            factor(2, levels=1:2), #enc
+                            factor("low", levels=c("low")), #scale
+                            factor("left", levels=c("left", "right"))),#posold
+               0.3*(1-0.2)+(1-0.3)*(1-0.45)*0.1)
+  assert_equal(mpt.1.htm.2g(c(runif(1), #d1
+                              0.3, #d2
+                              0.45, #g1
+                              0.2, #md1
+                              0.1), #mg1
+                            factor(4, levels=1:4), #x
+                            factor(2, levels=1:2), #enc
+                            factor("low", levels=c("low")), #scale
+                            factor("right", levels=c("left", "right"))),#posold
+               0.3*0.2+(1-0.3)*0.45*(1-0.1))
+  assert_equal(mpt.1.htm.2g(c(0.7, #d1
+                              runif(1), #d1
+                              runif(1), #g1
+                              runif(1), #md1
+                              runif(1), #mg1
+                              0.35, #g2
+                              0.4, #md2
+                              0.57), #mg2
+                            factor(4, levels=1:4), #x
+                            factor(1, levels=1:2), #enc
+                            factor("high", levels=c("low", "high")), #scale
+                            factor("right", levels=c("left", "right"))),#posold
+               0.7*0.4+(1-0.7)*0.35*(1-0.57))
+  assert_equal(mpt.1.htm.2g(c(0.7, #d1
+                              runif(1), #d1
+                              runif(1), #g1
+                              runif(1), #md1
+                              runif(1), #mg1
+                              0.35, #g2
+                              0.4, #md2
+                              0.57), #mg2
+                            factor(4, levels=1:4), #x
+                            factor(1, levels=0:2), #enc
+                            factor("high", levels=c("low", "high")), #scale
+                            factor("right", levels=c("left", "right"))),#posold
+               0.7*0.4+(1-0.7)*0.35*(1-0.57))
+  assert_equal(mpt.1.htm.2g(c(runif(1), #d1
+                              runif(1), #d1
+                              runif(1), #g1
+                              runif(1), #md1
+                              runif(1), #mg1
+                              0.35, #g2
+                              0.4, #md2
+                              0.57), #mg2
+                            factor(4, levels=1:4), #x
+                            factor(0, levels=0:2), #enc
+                            factor("high", levels=c("low", "high")), #scale
+                            factor("right", levels=c("left", "right"))),#posold
+               0.35*(1-0.57))
+}
+
+
 
 #x= Requested state of random variable, n.enc= number of encodings, n.scale= number of scales
 #parameters: [detection(left),detection(right)]*length(enc.states[enc.states!=0]), guess(right), [detect.map*(length(x.states)/2)-1, guess.map*(length(x.states)/2)-1]*n.scale
 #detect.map= 1. P(most extrem rating), 2. P(second extrem rating | not most extrem rating), 3. ...
 #guess.map= 1. P(most central rating), 2. P(second central rating | not most central rating), 3. ...
-rand.par.mpt.2.htm <-function(x.states, enc.states, scales){
-  return(runif(2*length(enc.states[enc.states!=0])+1+(length(x.states)-2)*length(scales)))
-}
-lower.bounds.mpt.2.htm <- function(x.states, enc.states, scales){
-  return(rep(0, n.param.mpt.2.htm(x.states, enc.states, scales)))
-}
-upper.bounds.mpt.2.htm <- function(x.states, enc.states, scales){
-  return(rep(1, n.param.mpt.2.htm(x.states, enc.states, scales)))
-}
-n.param.mpt.2.htm <- function(x.states, enc.states, scales){
-  return(2*length(enc.states[enc.states!=0])+1+(length(x.states)-2)*length(scales))
-}
-
 plot.mpt.2.htm <- function(parameter, x.states, enc.states, scales, left.right.names){
   n.states <- length(x.states)
   prob.factor <- 2
   y0.guess <- n.states/2+2
   x0 <- n.states/2+0.5
   dist.param <- parameter[(length(enc.states[enc.states!=0])*2+2):length(parameter)]
-  map.dists <- mapdists.mpt.2.htm(dist.param, x.states, scales)
+  map.dists <- mapdists.mpt(dist.param, x.states, scales)
   for(map in scales){
     guess.dist = map.dists[[2]][match(map, levels(factor(scales))),]
     det.dist = map.dists[[1]][match(map, levels(factor(scales))),]
@@ -321,19 +490,30 @@ plot.mpt.2.htm <- function(parameter, x.states, enc.states, scales, left.right.n
     }
   }
   return(ggplot(data=ret.val, aes(x=xend, y=yend, xend=x, yend=y))+
-          scale_colour_manual(values = c("black", "red", "blue"))+
-          facet_grid(map~mem)+
-          geom_text(aes(x=xend, y=y, label=ifelse(is.na(name), NA, paste(name, round(weight, digits=2), sep="=")), size=2))+
-          geom_segment(aes(size=weight), lineend="round", subset=.(linetype==1))+
-          geom_rect(aes(xmin=xend, xmax=x, ymin=yend, ymax=y, fill=factor(color)), subset=.(linetype==2))+
-          geom_segment(aes(x=x, y=y, yend=yend, xend=xend), subset=.(linetype==3))+
-          theme_bw()+
+           scale_colour_manual(values = c("black", "red", "blue"))+
+           facet_grid(map~mem)+
+           geom_text(aes(x=xend, y=y, label=ifelse(is.na(name), NA, paste(name, round(weight, digits=2), sep="=")), size=2))+
+           geom_segment(aes(size=weight), lineend="round", subset=.(linetype==1))+
+           geom_rect(aes(xmin=xend, xmax=x, ymin=yend, ymax=y, fill=factor(color)), subset=.(linetype==2))+
+           geom_segment(aes(x=x, y=y, yend=yend, xend=xend), subset=.(linetype==3))+
+           theme_bw()+
            scale_x_discrete("Response", limits=levels(factor(x.states)))+
            scale_size_continuous(range = c(0.3, 4))+
-          theme(legend.position = "none", panel.background=element_blank(), axis.title=element_blank(), axis.text.y=element_blank(), axis.ticks=element_blank(), axis.line=element_blank(), panel.grid.minor.y=element_blank(), panel.grid.major.y=element_blank()))
+           theme(legend.position = "none", panel.background=element_blank(), axis.title=element_blank(), axis.text.y=element_blank(), axis.ticks=element_blank(), axis.line=element_blank(), panel.grid.minor.y=element_blank(), panel.grid.major.y=element_blank()))
 }
-
-mapdists.mpt.2.htm <- function(map.pars, x.states, scales){
+rand.par.mpt.2.htm <-function(x.states, enc.states, scales){
+  return(runif(2*length(enc.states[enc.states!=0])+1+(length(x.states)-2)*length(scales)))
+}
+lower.bounds.mpt.2.htm <- function(x.states, enc.states, scales){
+  return(rep(0, n.param.mpt.2.htm(x.states, enc.states, scales)))
+}
+upper.bounds.mpt.2.htm <- function(x.states, enc.states, scales){
+  return(rep(1, n.param.mpt.2.htm(x.states, enc.states, scales)))
+}
+n.param.mpt.2.htm <- function(x.states, enc.states, scales){
+  return(2*length(enc.states[enc.states!=0])+1+(length(x.states)-2)*length(scales))
+}
+mapdists.mpt <- function(map.pars, x.states, scales){
   n.states <- length(x.states)
   map.det.mat <- array(1, dim=c(length(scales), rep(n.states/2, 2)))
   map.guess.mat <- array(1, dim=c(length(scales), rep(n.states/2, 2)))
@@ -355,8 +535,7 @@ mapdists.mpt.2.htm <- function(map.pars, x.states, scales){
   dim(guess.dists) <- c(length(scales), n.states)
   return(list(detection=det.dists, guessing=guess.dists))
 }
-mpt.2.htm <- function(parameter, x, enc, scale, posold, x.states, enc.states, scales, left.right.names)
-{
+mpt.2.htm <- function(parameter, x, enc, scale, posold, x.states, enc.states, scales, left.right.names){
   n.states <- length(x.states)
   if(n.states%%2 > 0) stop("x.states needs to be even.")
   enc.states <- enc.states[enc.states!=0]
@@ -389,6 +568,324 @@ mpt.2.htm <- function(parameter, x, enc, scale, posold, x.states, enc.states, sc
   return(ret)
 }
 
+
+
+#Accepts a model and a data.frame to fit. Returns the a data.frame with the predicted data.
+#A model is a function returning a list of functions. The first functions are called with for equal-length factors for: 
+# function(resp, enc, scale, posold)
+#and are exprected to return a same-length vector.
+#The next to last function is a function(...) of all the previosly returned vectors and is expected to return a character vector of same length as its arguments representing specifying the model.
+#The last function(data, model.filename, parameter, ...) is exprected to return an mptinr fit result based on it's parameters)
+#Model boilerplate:
+#NAME <- function(){
+#   a <- function(resp, enc, scale, posold){
+#     return(resp)
+#   }
+#   model.description <- function(a){
+#     return(a)
+#   }
+#   fit.call <- function(data, model.filename, parameter, ...){
+#     return(fit.model(data, model.filename, ...))
+#   }
+#   return(list("NAME", a, model.description, fit.call))
+# }
+gen.fit.model <- function(model.gen, data.df, ..., resp=variable, enc=enc, scale=scale, posold=posold, prob=value, model=model){
+  original.data.df <- data.df
+  cf <- match.call()[-2]
+  cf[[1]] <- as.name("prepare.data.for.mptinr")
+  data.df <- eval.parent(cf)
+  model.list <- model.gen()
+  par.vec.fun.list <- model.list[2:(length(model.list)-2)]
+  model.func <- model.list[[length(model.list)-1]]
+  fit.func <- model.list[[length(model.list)]]
+  par.vec.list <- lapply(par.vec.fun.list, do.call, list(resp=data.df$resp, enc=data.df$enc, scale=data.df$scale, posold=data.df$posold))
+  tmp.model <- do.call(model.func, par.vec.list)
+  n.states <- length(levels(data.df$resp))
+  final.model <- c()
+  for(i in 1:(nrow(data.df)/n.states)){
+    offset <- (i-1)*(n.states+1)
+    tmp.offset <- (i-1)*n.states
+    final.model[(offset+1):(offset+n.states)] <- tmp.model[(tmp.offset+1):(tmp.offset+n.states)]
+    final.model[offset+n.states+1] <- ""
+  }
+  #print(final.model)
+  mptinr.res <- fit.func(data=data.df$prob, model.filename=textConnection(final.model), parameter=check.mpt(textConnection(final.model))$parameters, ...)
+  data.df[["prob"]] <- t(mptinr.res$data$predicted)
+  names(data.df)[match("prob", names(data.df))] <- as.character(substitute(prob))
+  ret.df <- merge(original.data.df[,-match(as.character(substitute(prob)), names(original.data.df))], data.df, by.x=c(as.character(substitute(resp)), as.character(substitute(enc)), as.character(substitute(scale)), as.character(substitute(posold))), by.y=c("resp", "enc", "scale", "posold"))
+  ret.df$model <- model.list[[1]]
+  return(list(data=ret.df, mptinr=mptinr.res))
+}
+multi.gen.fit.model <- function(model.gen, data.df, ..., resp=variable, enc=enc, scale=scale, posold=posold, model=model, split.by=code, prob=value, ntrials=ntrials){
+  model.list <- model.gen()
+  par.vec.fun.list <- model.list[2:(length(model.list)-2)]
+  model.func <- model.list[[length(model.list)-1]]
+  fit.func <- model.list[[length(model.list)]]
+  mc <- match.call()
+  mc[[1]] <- gen.model
+  model.file <- eval.parent(mc[c(-4,-8)])
+  mc[[1]] <- sort.data
+  data.df[,as.character(substitute(value))] <- data.df[,as.character(substitute(value))]*data.df[,as.character(substitute(ntrials))]
+  sorted.df.list <- by(data.df, factor(data.df[[as.character(substitute(split.by))]]), function(x, mc, model.name){
+                          mc[[3]] <- x[x[[model.name]]=="empirical",]
+                          eval.parent(mc[c(-2,-4,-8)])
+                       },
+                       mc,
+                       as.character(substitute(model)),
+                       simplify=FALSE)
+  data.mat <- vapply(sorted.df.list, function(x, value.name) x[[value.name]], 1:length(model.file[model.file!=""])*1.0, as.character(substitute(value)))
+  mptinr.res <- fit.func(data=t(data.mat), textConnection(model.file), parameter=check.mpt(textConnection(model.file))$parameters, ...)
+  ret.df <- do.call(rbind, sorted.df.list)
+  predicted.data.vec <- t(mptinr.res$data$predicted$individual)
+  attr(predicted.data.vec, "dim") <- NULL
+  ret.df[,as.character(substitute(value))] <- predicted.data.vec
+  ret.df[,as.character(substitute(model))] <- model.list[[1]]
+  row.names(ret.df) <- NULL
+  return(list(data=ret.df, mptinr=mptinr.res))
+}
+#posold needs to be a factor with first level meaning 'left' and last level meaning 'rigth'
+#returns a ready to use character vector decribing the model for mptinr
+gen.model <- function(model.gen, data.df, resp=variable, enc=enc, scale=scale, posold=posold){
+  mc <- match.call()
+  mc[[1]] <- as.name("gen.datapoints")
+  data.df <- eval.parent(mc[-2])
+  model.list <- model.gen()
+  par.vec.fun.list <- model.list[2:(length(model.list)-2)]
+  model.func <- model.list[[length(model.list)-1]]
+  par.vec.list <- lapply(par.vec.fun.list, do.call, list(resp=data.df$resp, enc=data.df$enc, scale=data.df$scale, posold=data.df$posold))
+  tmp.model <- do.call(model.func, par.vec.list)
+  print(paste("Generated", model.list[[1]], ":"))
+  print(cbind(data.df, tmp.model))
+  n.states <- length(levels(data.df$resp))
+  final.model <- vapply(1:(nrow(data.df)/n.states), function(x, n.states, tmp.model){
+                              bounds <- ((x-1)*n.states+1):(x*n.states)
+                              return(c(tmp.model[bounds], ""))
+                           },
+                           rep("",(n.states+1)),
+                           n.states, tmp.model)
+  attr(final.model, "dim") <- NULL
+  return(final.model)
+}
+gen.datapoints <- function(data.df, resp=variable, enc=enc, scale=scale, posold=posold){
+  positions <- levels(factor(eval(substitute(posold), data.df)))
+  data.df <- expand.grid(resp=levels(factor(eval(substitute(resp), data.df))),
+                         enc=levels(factor(eval(substitute(enc), data.df))),
+                         scale=levels(factor(eval(substitute(scale), data.df))),
+                         posold=positions)
+  #remove are zero encodings with posold left/rigth
+  data.df <- data.df[!(data.df$enc==0 & data.df$posold %in% positions[c(1,length(positions))]),]
+  #remove all encoded items without position
+  data.df <- data.df[!(data.df$enc!=0 & !(data.df$posold %in% positions[c(1,length(positions))])),]
+  return(sort.data(data.df, resp, enc, scale, posold))
+}
+sort.data <- function(data.df, resp=variable, enc=enc, scale=scale, posold=posold){
+  order.vec = order(data.df[[as.character(substitute(posold))]], 
+                    data.df[[as.character(substitute(scale))]], 
+                    data.df[[as.character(substitute(enc))]], 
+                    data.df[[as.character(substitute(resp))]])
+  return(data.df[order.vec,])
+}
+level <- function(factor){
+  return(match(factor, levels(factor)))
+}
+cumop.symbol <- function(symbols, op, no.paren=FALSE){
+  cumop <- c()
+  for(i in 1:length(symbols)){
+    tmp.cumop <- do.call(paste, c(as.list(symbols[1:i]), list(sep=op)))
+    cumop[i] <- ifelse(no.paren, tmp.cumop, paste("(", tmp.cumop, ")", sep=""))
+  }
+  return(cumop)
+}
+prepare.data.for.mptinr <- function(data.df, resp=variable, enc=enc, scale=scale, posold=posold, prob=value){
+  resp <- eval(substitute(resp), data.df)
+  enc <- eval(substitute(enc), data.df)
+  scale <- eval(substitute(scale), data.df)
+  posold <- eval(substitute(posold), data.df)
+  prob <- eval(substitute(prob), data.df)*data.df$ntrials
+  if(!is.factor(resp)) resp <- factor(resp)
+  if(!is.factor(enc)) enc <- factor(enc)
+  if(!is.factor(scale)) scale <- factor(scale)
+  if(!is.factor(posold)) posold <- factor(posold)
+  data.df.sort <- data.frame(scale=scale, enc=enc, posold=posold, resp=resp, prob=prob)
+  data.df <- data.df.sort[do.call(order, data.df.sort),]
+  return(data.df)
+}
+
+#models: 
+MPT2HTM <- function(){
+  d.vec <- function(resp, enc, scale, posold, internal=FALSE){
+    enc.states <- levels(enc)[levels(enc)!=0]
+    d.par <- paste("d", rep(enc.states, each=length(levels(posold))), levels(posold), sep="")
+    confidence.vec <- ifelse(level(posold)==1, -level(resp)+length(levels(resp))+1, level(resp))
+    ret <- ifelse(enc==0 | (!internal & confidence.vec <= length(levels(resp))/2), NA, d.par[(match(enc, enc.states)-1)*length(levels(posold))+level(posold)])
+    return(ret)
+  }
+  gr.vec <- function(resp, enc, scale, posold){
+    d.vec <- d.vec(resp, enc, scale, posold, internal=TRUE)
+    gr.par <- "gr"
+    ret <- ifelse(level(resp)>length(levels(resp))/2, 
+                  gr.par, 
+                  comp.prob.symbol(gr.par))
+    ret <- ifelse(is.na(d.vec), ret, paste(comp.prob.symbol(d.vec), ret, sep="*"))
+    return(ret)
+  }
+  dmap.vec <- function(resp, enc, scale, posold){
+    dmap.par <- paste("dm", rep(2:(length(levels(resp))/2)-1, length(levels(scale))), rep(levels(scale), each=length(levels(resp))/2-1), sep="")
+    dmaps <- map.par.mpt.symbol(dmap.par, length(levels(scale)))[,c(1:(length(levels(resp))/2),(length(levels(resp))/2):1)]
+    ret <- dmaps[(level(resp)-1)*length(levels(scale))+level(scale)]
+    return(ret)
+  }
+  gmap.vec <- function(resp, enc, scale, posold){
+    gmap.par <- paste("gm", rep(2:(length(levels(resp))/2)-1, length(levels(scale))), rep(levels(scale), each=length(levels(resp))/2-1), sep="")
+    gmaps <- map.par.mpt.symbol(gmap.par, length(levels(scale)))[,c((length(levels(resp))/2):1,1:(length(levels(resp))/2))]
+    ret <- gmaps[(level(resp)-1)*length(levels(scale))+level(scale)]
+    return(ret)
+  }
+  model.description <- function(d.vec, gr.vec, dmap.vec, gmap.vec){
+    return(ifelse(is.na(d.vec), 
+                  paste(gr.vec, gmap.vec, sep="*"),
+                  paste(paste(d.vec, dmap.vec, sep="*"), paste(gr.vec, gmap.vec, sep="*"), sep="+")))
+  }
+  fit.call <- function(data, model.filename, parameter, ...){
+    return(fit.mpt(data, model.filename, ...))
+  }
+  return(list("MPT2HTM", d.vec, gr.vec, dmap.vec, gmap.vec, model.description, fit.call))
+}
+MPT1HTM2g <- function(){
+  d.vec <- function(resp, enc, scale, posold, internal=FALSE){
+    enc.states <- levels(enc)[levels(enc)!=0]
+    d.par <- paste("d", enc.states, sep="")
+    confidence.vec <- ifelse(level(posold)==1, -level(resp)+length(levels(resp))+1, level(resp))
+    ret <- ifelse(enc==0 | (!internal & confidence.vec <= length(levels(resp))/2), NA, d.par[match(enc, enc.states)])
+    return(ret)
+  }
+  gr.vec <- function(resp, enc, scale, posold){
+    d.vec <- d.vec(resp, enc, scale, posold, internal=TRUE)
+    gr.par <- paste("gr", levels(scale), sep="")
+    ret <- ifelse(level(resp)>length(levels(resp))/2, 
+                  gr.par[level(scale)], 
+                  comp.prob.symbol(gr.par[level(scale)]))
+    ret <- ifelse(is.na(d.vec), ret, paste(comp.prob.symbol(d.vec), ret, sep="*"))
+    return(ret)
+  }
+  dmap.vec <- function(resp, enc, scale, posold){
+    dmap.par <- paste("dm", rep(2:(length(levels(resp))/2)-1, length(levels(scale))), rep(levels(scale), each=length(levels(resp))/2-1), sep="")
+    dmaps <- map.par.mpt.symbol(dmap.par, length(levels(scale)))[,c(1:(length(levels(resp))/2),(length(levels(resp))/2):1)]
+    ret <- dmaps[(level(resp)-1)*length(levels(scale))+level(scale)]
+    return(ret)
+  }
+  gmap.vec <- function(resp, enc, scale, posold){
+    gmap.par <- paste("gm", rep(2:(length(levels(resp))/2)-1, length(levels(scale))), rep(levels(scale), each=length(levels(resp))/2-1), sep="")
+    gmaps <- map.par.mpt.symbol(gmap.par, length(levels(scale)))[,c((length(levels(resp))/2):1,1:(length(levels(resp))/2))]
+    ret <- gmaps[(level(resp)-1)*length(levels(scale))+level(scale)]
+    return(ret)
+  }
+  model.description <- function(d.vec, gr.vec, dmap.vec, gmap.vec){
+    return(ifelse(is.na(d.vec), 
+                  paste(gr.vec, gmap.vec, sep="*"),
+                  paste(paste(d.vec, dmap.vec, sep="*"), paste(gr.vec, gmap.vec, sep="*"), sep="+")))
+  }
+  fit.call <- function(data, model.filename, parameter, ...){
+    return(fit.mpt(data, model.filename, ...))
+  }
+  return(list("MPT1HTM2g", d.vec, gr.vec, dmap.vec, gmap.vec, model.description, fit.call))
+}
+comp.prob.symbol <- function(symbols){
+  return(paste("(1-", symbols, ")", sep=""))
+}
+map.par.mpt.symbol <- function(map.par, n.scales){
+  n.states.half <- length(map.par)/n.scales+1
+  maps <- array(rep("1", n.states.half*n.scales), dim=c(n.scales, n.states.half))
+  for(s in 1:n.scales){
+    offset <- (s-1)*(n.states.half-1)
+    offset.maps <- (s-1)*(n.states.half)
+    maps[s,2:n.states.half] <- cumop.symbol(comp.prob.symbol(map.par[(offset+1):(offset+n.states.half-1)]), "*", no.paren=TRUE)
+    maps[s,2:n.states.half-1] <- paste(maps[s,2:n.states.half-1],
+                                       map.par[(offset+1):(offset+n.states.half-1)], 
+                                       sep="*")
+  }
+  return(maps)
+}
+EVSDT <- function(){
+  mu.vec <- function(resp, enc, scale, posold){
+    enc.states <- levels(enc)[levels(enc)!=0]
+    mu.par <- paste("mu", enc.states, sep="")
+    ret <- ifelse(enc==0, "0", mu.par[match(enc, enc.states)])
+    ret <- ifelse(level(posold)==1, paste("-", ret, sep=""), ret)
+    return(ret)
+  }
+  low.bound.vec <- function(resp, enc, scale, posold){
+    n.states <- length(levels(resp))
+    crit.par <- sdt.crit.par(n.states, scale)
+    ret <- ifelse(level(resp)==1, "-Inf", crit.par[(level(scale)-1)*(n.states) + level(resp)])
+    return(ret)
+  }
+  upper.bound.vec <- function(resp, enc, scale, posold){
+    n.states <- length(levels(resp))
+    crit.par <- sdt.crit.par(n.states, scale)
+    ret <- ifelse(level(resp)==n.states, "Inf", crit.par[(level(scale)-1)*(n.states) + level(resp) + 1])
+    return(ret)
+  }
+  model.description <- function(mu.vec, low.bound.vec, upper.bound.vec){
+    return(paste("pnorm((", upper.bound.vec, "-1*", mu.vec, ")/sqrt(2))-pnorm((", low.bound.vec, "-1*", mu.vec, ")/sqrt(2))", sep=""))
+  }
+  fit.call <- function(data, model.filename, parameter, ...){
+    param.order <- parameter
+    lower.bound <- rep(-Inf, length(param.order))
+    upper.bound <- rep(Inf, length(param.order))
+    lower.bound[grep("c[^1].*", param.order)] <- 0
+    return(fit.model(data, model.filename, lower.bound=lower.bound, upper.bound=upper.bound, ...))
+  }
+  return(list("EVSDT", mu.vec, low.bound.vec, upper.bound.vec, model.description, fit.call))
+}
+UVSDT <- function(){
+  mu.vec <- function(resp, enc, scale, posold){
+    enc.states <- levels(enc)[levels(enc)!=0]
+    mu.par <- paste("mu", enc.states, sep="")
+    ret <- ifelse(enc==0, "0", mu.par[match(enc, enc.states)])
+    ret <- ifelse(level(posold)==1, paste("-", ret, sep=""), ret)
+    return(ret)
+  }
+  sd.vec <- function(resp, enc, scale, posold){
+    enc.states <- levels(enc)[levels(enc)!=0]
+    sd.par <- paste("sd", enc.states, sep="")
+    ret <- ifelse(enc==0, "1", sd.par[match(enc, enc.states)])
+    return(ret)
+  }
+  low.bound.vec <- function(resp, enc, scale, posold){
+    n.states <- length(levels(resp))
+    crit.par <- sdt.crit.par(n.states, scale)
+    ret <- ifelse(level(resp)==1, "-Inf", crit.par[(level(scale)-1)*(n.states) + level(resp)])
+    return(ret)
+  }
+  upper.bound.vec <- function(resp, enc, scale, posold){
+    n.states <- length(levels(resp))
+    crit.par <- sdt.crit.par(n.states, scale)
+    ret <- ifelse(level(resp)==n.states, "Inf", crit.par[(level(scale)-1)*(n.states) + level(resp) + 1])
+    return(ret)
+  }
+  model.description <- function(mu.vec, sd.vec, low.bound.vec, upper.bound.vec){
+    return(paste("pnorm(", upper.bound.vec, ",", mu.vec, ",sqrt(1^2+", sd.vec, "^2))-pnorm(", low.bound.vec, ",", mu.vec, ",sqrt(1^2+", sd.vec, "^2))", sep=""))
+  }
+  fit.call <- function(data, model.filename, parameter, ...){
+    param.order <- parameter
+    lower.bound <- rep(-Inf, length(param.order))
+    upper.bound <- rep(Inf, length(param.order))
+    lower.bound[grep("c[^1].*", param.order)] <- 0
+    lower.bound[grep("sd.*", param.order)] <- 0
+    return(fit.model(data, model.filename, use.gradient=FALSE, lower.bound=lower.bound, upper.bound=upper.bound, ...))
+  }
+  return(list("UVSDT", mu.vec, sd.vec, low.bound.vec, upper.bound.vec, model.description, fit.call))
+}
+sdt.crit.par <- function(n.states, scale){
+  crit.par <- paste("c", rep(1:(n.states-1), length(levels(scale))), rep(levels(scale), each=n.states-1), sep="")
+  crit <- array(NA, dim=c(n.states, length(levels(scale))))
+  for(s in 1:length(levels(scale))){
+    offset <- (s-1)*(n.states-1)
+    crit[2:n.states, s] <- cumop.symbol(crit.par[(offset+1):(offset+n.states-1)], "+")
+  }
+  return(crit)
+}
 #parameters: [mu, sd]*length(enc.states[enc.states!=0]), [criterion*(length(x.states)-1)]*n.scale
 #lowerBounds: c(-Inf, -Inf, ..., -Inf, 0, ...)
 #upperBounds: c(Inf, Inf, ..., Inf, Inf, ...)
@@ -426,7 +923,6 @@ plot.sdt.uv <- function(parameter, x.states, enc.states, scales, left.right.name
   }
   return(ggplot(df)+facet_grid(.~scale)+geom_line(aes(x=x, y=y, colour=label, group=id), stat="identity")+geom_vline(data=c.df, aes(colour=factor(scale), xintercept=cutoff))+scale_colour_discrete("factors"))
 }
-
 rand.par.sdt.uv <-function(x.states, enc.states, scales){
   rand.mu <- runif(length(enc.states[enc.states!=0]), 0.5,1.5)
   rand.sd <- runif(length(enc.states[enc.states!=0]), 1,2.5)
@@ -462,6 +958,8 @@ sdt.uv <- function(parameter, x, enc, scale, posold, x.states, enc.states, scale
   ret = pnorm(upper.bound.vec, mu.vec, sqrt(1^2+sd.vec^2)) - pnorm(low.bound.vec, mu.vec, sqrt(1^2+sd.vec^2))
   return(ret)
 }
+
+
 
 #parameters: [mu]*length(enc.states[enc.states!=0]), [criterion*(length(x.states)-1)]*n.scale
 #lowerBounds: c(-Inf, -Inf, ..., -Inf, 0, ...)
@@ -499,7 +997,6 @@ plot.sdt.ev <- function(parameter, x.states, enc.states, scales, left.right.name
   }
   return(ggplot(df)+facet_grid(.~scale)+geom_line(aes(x=x, y=y, colour=label, group=id), stat="identity")+geom_vline(data=c.df, aes(colour=factor(scale), xintercept=cutoff))+scale_colour_discrete("factors"))
 }
-
 rand.par.sdt.ev <-function(x.states, enc.states, scales){
   rand.mem.par <- runif(length(enc.states[enc.states!=0]), 0.5,1.5)
   rand.crit0 <- runif(length(scales), -1,1)
@@ -534,10 +1031,30 @@ sdt.ev <- function(parameter, x, enc, scale, posold, x.states, enc.states, scale
 }
 
 
+
+
+exctractModelCriteria <- function(param.mats.lists){
+  ret.df <- data.frame()
+  for(list.id in 1:length(param.mats.lists)){
+    for(param.df.id in 1:length(param.mats.lists[[list.id]])){
+      param.mat <- param.mats.lists[[list.id]][[param.df.id]]
+      ret.df <- rbind(ret.df, cbind(data.frame(code=param.mat["code"], group=list.id, session=param.df.id), param.mat[,grep(".*G.Squared", names(param.mat), perl=TRUE)]))
+    }
+  }
+  return(ret.df)
+}
+
+assert_equal<- function(test, expected, error=paste("Assertion Error:", substitute(test), "not equal to", substitute(expected))){
+  print(test); print(expected);
+  if(all(test != expected))  stop(error)
+}
+
+
 suppressMessages(library(plyr))
 suppressMessages(library(ggplot2))
 suppressMessages(library(reshape))
 suppressMessages(library(gridExtra))
+suppressMessages(library(MPTinR))
 rec.data <- read.csv(file="data/Rec.csv", sep=";")
 dists.list <- emp.dists(rec.data)
 
@@ -546,11 +1063,21 @@ dists.list <- emp.dists(rec.data)
 #plot.in.chunks(dists.list[[2]][[1]], 4)
 #plot.in.chunks(dists.list[[2]][[2]], 8)
 
-model.param<- model.parameter(dists.list)
-dists.list <- append.predicted.data(dists.list, model.param)
+#fit.models.to.vp.data(dists.list[[1]][[1]][dists.list[[1]][[1]]$code=="AG1503",])
+#fit.models.to.vp.data(dists.list[[2]][[1]][dists.list[[2]][[1]]$code=="RN0609",])
 
+#model.param <- model.parameter(dists.list)
+#dists.list <- append.predicted.data(dists.list, model.param)
 
-foreach.vp(dists.list[[1]][[1]], plot.vp, model.param[[1]][[1]], echo=FALSE)
-foreach.vp(dists.list[[1]][[2]], plot.vp, model.param[[1]][[2]], echo=FALSE)
-foreach.vp(dists.list[[2]][[1]], plot.vp, model.param[[2]][[1]], echo=FALSE)
-foreach.vp(dists.list[[2]][[2]], plot.vp, model.param[[2]][[2]], echo=FALSE)
+fit.data <- do.fitting(dists.list, EVSDT, UVSDT, MPT2HTM, MPT1HTM2g)
+dists.list <- fit.data$data
+model.param <- fit.data$fit.par
+model.comp <- fit.data$model.comp
+
+#foreach.vp(dists.list[[1]][[1]], plot.vp, model.param[[1]][[1]], echo=FALSE)
+#foreach.vp(dists.list[[1]][[2]], plot.vp, model.param[[1]][[2]], echo=FALSE)
+#foreach.vp(dists.list[[2]][[1]], plot.vp, model.param[[2]][[1]], echo=FALSE)
+#foreach.vp(dists.list[[2]][[2]], plot.vp, model.param[[2]][[2]], echo=FALSE)
+
+gsq <- exctractModelCriteria(model.param)
+plot((gsq[,4]-gsq[,7])[order(gsq[,2], gsq[,3], gsq[,4]-gsq[,7])])
