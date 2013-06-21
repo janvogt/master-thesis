@@ -150,2869 +150,6 @@ status open
 
 \begin_layout Plain Layout
 
-<<dataPreparation, echo=FALSE, eval=TRUE>>=
-\end_layout
-
-\begin_layout Plain Layout
-
-filter <- function(x, group){
-\end_layout
-
-\begin_layout Plain Layout
-
-  groupName <- switch(group, vollenkodiert="vollenkodiert", teilenkodiert="teile
-nkodiert")
-\end_layout
-
-\begin_layout Plain Layout
-
-  x.ret <- x[x$group==groupName,]
-\end_layout
-
-\begin_layout Plain Layout
-
-  x.ret$resp <- factor(x.ret$resp, levels=if(group==1) 0:7  else  0:5)   
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(x.ret) 
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-probabilityDist = function(x){   
-\end_layout
-
-\begin_layout Plain Layout
-
-  x.freq <- table(x)
-\end_layout
-
-\begin_layout Plain Layout
-
-  x.relfreq <- vector(length=length(x.freq)+1)
-\end_layout
-
-\begin_layout Plain Layout
-
-  x.relfreq[1] <- length(x)
-\end_layout
-
-\begin_layout Plain Layout
-
-  x.relfreq[-1] <- (x.freq+(0.5/length(x.freq))) / (length(x)+0.5)
-\end_layout
-
-\begin_layout Plain Layout
-
-  names(x.relfreq)[1] <- "ntrials"
-\end_layout
-
-\begin_layout Plain Layout
-
-  names(x.relfreq)[-1] <- names(x.freq)
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(x.relfreq) 
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-emp.dists <- function(x){
-\end_layout
-
-\begin_layout Plain Layout
-
-  x <- cbind(x, model="empirical")
-\end_layout
-
-\begin_layout Plain Layout
-
-  cast.formula <- code+session+scale+enc+posold+model~result_variable   
-\end_layout
-
-\begin_layout Plain Layout
-
-  value.name <- "resp"
-\end_layout
-
-\begin_layout Plain Layout
-
-  ret.list <- list(cast(filter(x, 1), cast.formula, probabilityDist, value=value.na
-me), cast(filter(x, 2), cast.formula, probabilityDist, value=value.name))
- 
-\end_layout
-
-\begin_layout Plain Layout
-
-  names(ret.list) <- c("fully encoded", "partly encoded")
-\end_layout
-
-\begin_layout Plain Layout
-
-  ret.list <- lapply(ret.list, rename.and.melt, 1:7, value.name)
-\end_layout
-
-\begin_layout Plain Layout
-
-  ret.list <- lapply(ret.list, split.sessions)
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(ret.list) 
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-split.sessions <- function(x){
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(list(words=x[x$session==0,], images=x[x$session==1,]))
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-rename.and.melt <- function(x, melt.id, variable.name){ 
-\end_layout
-
-\begin_layout Plain Layout
-
-  #  names(x)[match(paste("X",0:7,sep=""),names(x), nomatch=0)] <- as.character(0
-:7)
-\end_layout
-
-\begin_layout Plain Layout
-
-  x <- melt.data.frame(x, melt.id)
-\end_layout
-
-\begin_layout Plain Layout
-
-  names(x)[names(x)=="result_variable"]<-variable.name   
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(x) 
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-@
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-<<plotting, echo=FALSE, eval=TRUE>>=
-\end_layout
-
-\begin_layout Plain Layout
-
-plot.in.chunks <- function(data, vp.per.page){
-\end_layout
-
-\begin_layout Plain Layout
-
-  max.len <- length(levels(factor(data$code)))
-\end_layout
-
-\begin_layout Plain Layout
-
-  i <- 1
-\end_layout
-
-\begin_layout Plain Layout
-
-  while(i+vp.per.page-1 < max.len){
-\end_layout
-
-\begin_layout Plain Layout
-
-    plot.data(subset(data,code%in%levels(factor(code))[i:(i+vp.per.page-1)]))
-\end_layout
-
-\begin_layout Plain Layout
-
-    i <- i+vp.per.page
-\end_layout
-
-\begin_layout Plain Layout
-
-  }
-\end_layout
-
-\begin_layout Plain Layout
-
-  plot.data(subset(data,code%in%levels(factor(code))[i:max.len]))
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-plot.data <- function(data){
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(ggplot(data,aes(x=factor(variable),y=value,group=factor(paste(enc,posol
-d)),colour=factor(enc)))+
-\end_layout
-
-\begin_layout Plain Layout
-
-  geom_freqpoly(stat="identity")+
-\end_layout
-
-\begin_layout Plain Layout
-
-  facet_grid(scale~model~posold)+
-\end_layout
-
-\begin_layout Plain Layout
-
-  scale_y_continuous("Probability", limits=c(0,1)))
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-plot.vp <- function(data, params){
-\end_layout
-
-\begin_layout Plain Layout
-
-  plot <- plot.data(data)
-\end_layout
-
-\begin_layout Plain Layout
-
-  mpt <-  plot.mpt.2.htm(unlist(params[grep("mpt.2.htm_par
-\backslash
-
-\backslash
-d+", colnames(params), perl=TRUE)]),
-\end_layout
-
-\begin_layout Plain Layout
-
-                          levels(factor(data$variable)), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                          levels(factor(data$enc)), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                          levels(factor(data$scale)))
-\end_layout
-
-\begin_layout Plain Layout
-
-  sdt.uv.plot <-  plot.sdt.uv(unlist(params[grep("sdt.uv_par
-\backslash
-
-\backslash
-d+", colnames(params), perl=TRUE)]), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                             levels(factor(data$variable)), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                             levels(factor(data$enc)), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                             levels(factor(data$scale)))
-\end_layout
-
-\begin_layout Plain Layout
-
-  sdt.ev.plot <-  plot.sdt.ev(unlist(params[grep("sdt.ev_par
-\backslash
-
-\backslash
-d+", colnames(params), perl=TRUE)]), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                             levels(factor(data$variable)), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                             levels(factor(data$enc)), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                             levels(factor(data$scale)))
-\end_layout
-
-\begin_layout Plain Layout
-
-  tmp <- ggplot_gtable(ggplot_build(sdt.ev.plot))
-\end_layout
-
-\begin_layout Plain Layout
-
-  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
-\end_layout
-
-\begin_layout Plain Layout
-
-  fits <- data.frame("G^2"=round(unlist(params[grep(".*gsq", colnames(params),
- perl=TRUE)]), digits=2), row.names=c("UVSDT", "EVSDT", "MPT: 2HTM"))
-\end_layout
-
-\begin_layout Plain Layout
-
-  legend <- tmp$grobs[[leg]]
-\end_layout
-
-\begin_layout Plain Layout
-
-  legendArranged <- arrangeGrob(tableGrob(fits, cols="Gsq"), legend, ncol=1)
-\end_layout
-
-\begin_layout Plain Layout
-
-  sdt <- arrangeGrob(sdt.uv.plot+theme(legend.position="none"), sdt.ev.plot+theme(leg
-end.position="none"), legendArranged, widths=c(3/7,3/7,1/7), nrow=1, left="UVSDT"
-)
-\end_layout
-
-\begin_layout Plain Layout
-
-  models <- arrangeGrob(mpt, plot, ncol=2, widths=c(1/3,2/3))
-\end_layout
-
-\begin_layout Plain Layout
-
-  suppressWarnings(grid.arrange(models, sdt, ncol=1, heights=c(2/3, 1/3),
- main=paste("VP:", data$code[1], "Session:", data$session[1])))
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-@
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-<<utilityFunctions, echo=FALSE, eval=TRUE>>=
-\end_layout
-
-\begin_layout Plain Layout
-
-vp.data <- function(data, vp=1){
-\end_layout
-
-\begin_layout Plain Layout
-
-  vps <- levels(factor(data$code))
-\end_layout
-
-\begin_layout Plain Layout
-
-  if(!is.character(vp)) vp <- vps[vp]
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(subset(data, code==vp))
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-#run fun for each vp in data.
- Fun should return a dataframe with the same columns as data.
-\end_layout
-
-\begin_layout Plain Layout
-
-foreach.vp <- function(data, fun, ..., echo=TRUE){
-\end_layout
-
-\begin_layout Plain Layout
-
-  ret <- NULL
-\end_layout
-
-\begin_layout Plain Layout
-
-  further.data <- list(...)
-\end_layout
-
-\begin_layout Plain Layout
-
-  for(vp in levels(factor(data$code))){
-\end_layout
-
-\begin_layout Plain Layout
-
-    if(echo) cat(paste("Processing ", substitute(fun), "() for VP: ", vp,
- ":
-\backslash
-n
-\backslash
-tstart...", sep=""))
-\end_layout
-
-\begin_layout Plain Layout
-
-    if(length(further.data)>0){
-\end_layout
-
-\begin_layout Plain Layout
-
-      further.data.vp <- lapply(further.data, vp.data, vp)
-\end_layout
-
-\begin_layout Plain Layout
-
-      fun.ret <- do.call(fun, c(list(vp.data(data, vp)), further.data.vp))
-\end_layout
-
-\begin_layout Plain Layout
-
-      if(length(fun.ret)>0) vp.ret <- data.frame(code=vp, fun.ret)
-\end_layout
-
-\begin_layout Plain Layout
-
-      else vp.ret <- data.frame(code=vp, TRUE)
-\end_layout
-
-\begin_layout Plain Layout
-
-    }
-\end_layout
-
-\begin_layout Plain Layout
-
-    else{
-\end_layout
-
-\begin_layout Plain Layout
-
-      vp.ret <- data.frame(code=vp, t(fun(vp.data(data, vp))))
-\end_layout
-
-\begin_layout Plain Layout
-
-    }
-\end_layout
-
-\begin_layout Plain Layout
-
-    if(echo) cat("
-\backslash
-n
-\backslash
-tfinished.
-\backslash
-n")
-\end_layout
-
-\begin_layout Plain Layout
-
-    if(is.null(ret)) ret <- vp.ret
-\end_layout
-
-\begin_layout Plain Layout
-
-    else ret <- rbind(ret, vp.ret)
-\end_layout
-
-\begin_layout Plain Layout
-
-  }
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(ret)
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-@
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-<<fittingTools, echo=FALSE, eval=TRUE>>=
-\end_layout
-
-\begin_layout Plain Layout
-
-model.parameter <- function(data){
-\end_layout
-
-\begin_layout Plain Layout
-
-  pars.grp1.ses1 <- foreach.vp(data[[1]][[1]], fit.models.to.vp.data)
-\end_layout
-
-\begin_layout Plain Layout
-
-  pars.grp1.ses2 <- foreach.vp(data[[1]][[2]], fit.models.to.vp.data)
-\end_layout
-
-\begin_layout Plain Layout
-
-  pars.grp2.ses1 <- foreach.vp(data[[2]][[1]], fit.models.to.vp.data)
-\end_layout
-
-\begin_layout Plain Layout
-
-  pars.grp2.ses2 <- foreach.vp(data[[2]][[2]], fit.models.to.vp.data)
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(list(list(pars.grp1.ses1, pars.grp1.ses2), list(pars.grp2.ses1, pars.grp2.ses2)
-))
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-append.predicted.data <- function(x, param){
-\end_layout
-
-\begin_layout Plain Layout
-
-  x[[1]][[1]] <- foreach.vp(x[[1]][[1]], add.model.data, param[[1]][[1]])
-\end_layout
-
-\begin_layout Plain Layout
-
-  x[[1]][[2]] <- foreach.vp(x[[1]][[2]], add.model.data, param[[1]][[2]])
-\end_layout
-
-\begin_layout Plain Layout
-
-  x[[2]][[1]] <- foreach.vp(x[[2]][[1]], add.model.data, param[[2]][[1]])
-\end_layout
-
-\begin_layout Plain Layout
-
-  x[[2]][[2]] <- foreach.vp(x[[2]][[2]], add.model.data, param[[2]][[2]])
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(x)
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-add.model.data <- function(x, params) {
-\end_layout
-
-\begin_layout Plain Layout
-
-  mpt <- data.frame(x)
-\end_layout
-
-\begin_layout Plain Layout
-
-  mpt$value <-  mpt.2.htm(unlist(params[grep("mpt.2.htm_par
-\backslash
-
-\backslash
-d+", colnames(params), perl=TRUE)]), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                          x$variable, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                          x$enc, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                          x$scale, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                          x$posold, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                          levels(factor(x$variable)), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                          levels(factor(x$enc)), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                          levels(factor(x$scale)),
-\end_layout
-
-\begin_layout Plain Layout
-
-                          levels(factor(x$posold)))
-\end_layout
-
-\begin_layout Plain Layout
-
-  mpt$model <- "2HTM MPT"
-\end_layout
-
-\begin_layout Plain Layout
-
-  sdt.uv.df <- data.frame(x)
-\end_layout
-
-\begin_layout Plain Layout
-
-  sdt.uv.df$value <-  sdt.uv(unlist(params[grep("sdt.uv_par
-\backslash
-
-\backslash
-d+", colnames(params), perl=TRUE)]), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                             x$variable, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                             x$enc, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                             x$scale, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                             x$posold, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                             levels(factor(x$variable)), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                             levels(factor(x$enc)), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                             levels(factor(x$scale)),
-\end_layout
-
-\begin_layout Plain Layout
-
-                             levels(factor(x$posold)))
-\end_layout
-
-\begin_layout Plain Layout
-
-  sdt.uv.df$model <- "UVSDT"
-\end_layout
-
-\begin_layout Plain Layout
-
-  sdt.ev.df <- data.frame(x)
-\end_layout
-
-\begin_layout Plain Layout
-
-  sdt.ev.df$value <-  sdt.ev(unlist(params[grep("sdt.ev_par
-\backslash
-
-\backslash
-d+", colnames(params), perl=TRUE)]), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                             x$variable, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                             x$enc, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                             x$scale, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                             x$posold, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                             levels(factor(x$variable)), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                             levels(factor(x$enc)), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                             levels(factor(x$scale)),
-\end_layout
-
-\begin_layout Plain Layout
-
-                             levels(factor(x$posold)))
-\end_layout
-
-\begin_layout Plain Layout
-
-  sdt.ev.df$model <- "EVSDT"
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(rbind(x[-1], mpt[-1], sdt.uv.df[-1], sdt.ev.df[-1]))
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-fit.models.to.vp.data <- function(vp.data){
-\end_layout
-
-\begin_layout Plain Layout
-
-  levels.x <- levels(factor(vp.data$variable))
-\end_layout
-
-\begin_layout Plain Layout
-
-  levels.enc <- levels(factor(vp.data$enc))
-\end_layout
-
-\begin_layout Plain Layout
-
-  levels.scales <- levels(factor(vp.data$scale))
-\end_layout
-
-\begin_layout Plain Layout
-
-  sdt.uv <- best.nlminb(rand.par.sdt.uv,
-\end_layout
-
-\begin_layout Plain Layout
-
-                        list(levels.x, levels.enc, levels.scales),
-\end_layout
-
-\begin_layout Plain Layout
-
-                        model.objective, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                        model=sdt.uv, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                        data=vp.data, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                        lower=lower.bounds.sdt.uv(levels.x, levels.enc, levels.scales)
-,
-\end_layout
-
-\begin_layout Plain Layout
-
-                        upper=upper.bounds.sdt.uv(levels.x, levels.enc, levels.scales)
-)
-\end_layout
-
-\begin_layout Plain Layout
-
-  sdt.ev <- best.nlminb(rand.par.sdt.ev,
-\end_layout
-
-\begin_layout Plain Layout
-
-                        list(levels.x, levels.enc, levels.scales),
-\end_layout
-
-\begin_layout Plain Layout
-
-                        model.objective, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                        model=sdt.ev, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                        data=vp.data, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                        lower=lower.bounds.sdt.ev(levels.x, levels.enc, levels.scales)
-,
-\end_layout
-
-\begin_layout Plain Layout
-
-                        upper=upper.bounds.sdt.ev(levels.x, levels.enc, levels.scales)
-)
-\end_layout
-
-\begin_layout Plain Layout
-
-  mpt.2.htm <- best.nlminb(rand.par.mpt.2.htm,
-\end_layout
-
-\begin_layout Plain Layout
-
-                           list(levels.x, levels.enc, levels.scales),
-\end_layout
-
-\begin_layout Plain Layout
-
-                           model.objective, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                           model=mpt.2.htm, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                           data=vp.data, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                           lower=lower.bounds.mpt.2.htm(levels.x, levels.enc,
- levels.scales),
-\end_layout
-
-\begin_layout Plain Layout
-
-                           upper=upper.bounds.mpt.2.htm(levels.x, levels.enc,
- levels.scales))
-\end_layout
-
-\begin_layout Plain Layout
-
-  npar.sdt.uv <- n.param.sdt.uv(levels.x, levels.enc, levels.scales)
-\end_layout
-
-\begin_layout Plain Layout
-
-  npar.sdt.ev <- n.param.sdt.ev(levels.x, levels.enc, levels.scales)
-\end_layout
-
-\begin_layout Plain Layout
-
-  npar.mpt.2.htm <- n.param.mpt.2.htm(levels.x, levels.enc, levels.scales)
-\end_layout
-
-\begin_layout Plain Layout
-
-  ret <- c(sdt.uv$par, sdt.uv$objective, sdt.ev$par, sdt.ev$objective, mpt.2.htm$par,
- mpt.2.htm$objective)
-\end_layout
-
-\begin_layout Plain Layout
-
-  names(ret) <- c(paste(rep("sdt.uv_",npar.sdt.uv+1), c(paste("par",1:npar.sdt.uv,
- sep=""), "gsq"), sep=""), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                  paste(rep("sdt.ev_",npar.sdt.ev+1), c(paste("par",1:npar.sdt.ev,
- sep=""), "gsq"), sep=""), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                  paste(rep("mpt.2.htm_",npar.mpt.2.htm), c(paste("par",1:npar.mpt.2.htm
-, sep=""), "gsq"), sep=""))
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(ret)
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-best.nlminb <- function(start.fun, start.fun.par, ..., n.optim=5){
-\end_layout
-
-\begin_layout Plain Layout
-
-  for(run in 1:n.optim){
-\end_layout
-
-\begin_layout Plain Layout
-
-    if(!exists("ret")){
-\end_layout
-
-\begin_layout Plain Layout
-
-      ret <- nlminb(do.call(start.fun, start.fun.par), ...)
-\end_layout
-
-\begin_layout Plain Layout
-
-    }
-\end_layout
-
-\begin_layout Plain Layout
-
-    else {
-\end_layout
-
-\begin_layout Plain Layout
-
-      n.rep <- nlminb(do.call(start.fun, start.fun.par), ...)
-\end_layout
-
-\begin_layout Plain Layout
-
-      if(n.rep$objective<ret$objective) ret <- n.rep
-\end_layout
-
-\begin_layout Plain Layout
-
-    }
-\end_layout
-
-\begin_layout Plain Layout
-
-  }
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(ret)
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-model.objective <- function(parameter, model, data, x=variable, value=value,
- enc=enc, scale=scale, posold=posold, ntrials=ntrials){
-\end_layout
-
-\begin_layout Plain Layout
-
-  p.expected <- model(parameter, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                      eval(substitute(x), data), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                      eval(substitute(enc), data), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                      eval(substitute(scale), data), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                      eval(substitute(posold), data), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                      levels(factor(eval(substitute(x), data))), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                      levels(factor(eval(substitute(enc), data))), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                      levels(factor(eval(substitute(scale), data))),
-\end_layout
-
-\begin_layout Plain Layout
-
-                      levels(factor(eval(substitute(posold), data))))
-\end_layout
-
-\begin_layout Plain Layout
-
-  n.trials <- eval(substitute(ntrials), data)
-\end_layout
-
-\begin_layout Plain Layout
-
-  if(!is.numeric(n.trials)) n.trials <- as.numeric(levels(n.trials)[n.trials])
-\end_layout
-
-\begin_layout Plain Layout
-
-  n.expected <- p.expected*as.numeric(n.trials)
-\end_layout
-
-\begin_layout Plain Layout
-
-  n.empirical <- eval(substitute(value), data)*n.trials
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(2 * sum( n.empirical[n.empirical!=0] * (log(n.empirical[n.empirical!=0])
- - log(n.expected[n.empirical!=0]) ) ) )
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-@
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-<<HTM2MPT, echo=FALSE, eval=TRUE>>=
-\end_layout
-
-\begin_layout Plain Layout
-
-#x= Requested state of random variable, n.enc= number of encodings, n.scale=
- number of scales
-\end_layout
-
-\begin_layout Plain Layout
-
-#parameters: [detection(left),detection(right)]*length(enc.states[enc.states!=0]),
- guess(right), [detect.map*(length(x.states)/2)-1, guess.map*(length(x.states)/2)-1]
-*n.scale
-\end_layout
-
-\begin_layout Plain Layout
-
-#detect.map= 1.
- P(most extrem rating), 2.
- P(second extrem rating | not most extrem rating), 3.
- ...
-\end_layout
-
-\begin_layout Plain Layout
-
-#guess.map= 1.
- P(most central rating), 2.
- P(second central rating | not most central rating), 3.
- ...
-\end_layout
-
-\begin_layout Plain Layout
-
-rand.par.mpt.2.htm <-function(x.states, enc.states, scales){
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(runif(2*length(enc.states[enc.states!=0])+1+(length(x.states)-2)*length(sc
-ales)))
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-lower.bounds.mpt.2.htm <- function(x.states, enc.states, scales){
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(rep(0, n.param.mpt.2.htm(x.states, enc.states, scales)))
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-upper.bounds.mpt.2.htm <- function(x.states, enc.states, scales){
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(rep(1, n.param.mpt.2.htm(x.states, enc.states, scales)))
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-n.param.mpt.2.htm <- function(x.states, enc.states, scales){
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(2*length(enc.states[enc.states!=0])+1+(length(x.states)-2)*length(scales))
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-plot.mpt.2.htm <- function(parameter, x.states, enc.states, scales, left.right.names){
-\end_layout
-
-\begin_layout Plain Layout
-
-  n.states <- length(x.states)
-\end_layout
-
-\begin_layout Plain Layout
-
-  prob.factor <- 2
-\end_layout
-
-\begin_layout Plain Layout
-
-  y0.guess <- n.states/2+2
-\end_layout
-
-\begin_layout Plain Layout
-
-  x0 <- n.states/2+0.5
-\end_layout
-
-\begin_layout Plain Layout
-
-  dist.param <- parameter[(length(enc.states[enc.states!=0])*2+2):length(parameter)
-]
-\end_layout
-
-\begin_layout Plain Layout
-
-  map.dists <- mapdists.mpt.2.htm(dist.param, x.states, scales)
-\end_layout
-
-\begin_layout Plain Layout
-
-  for(map in scales){
-\end_layout
-
-\begin_layout Plain Layout
-
-    guess.dist = map.dists[[2]][match(map, levels(factor(scales))),]
-\end_layout
-
-\begin_layout Plain Layout
-
-    det.dist = map.dists[[1]][match(map, levels(factor(scales))),]
-\end_layout
-
-\begin_layout Plain Layout
-
-    param.offset <- (n.states-2)*(match(map, levels(factor(scales)))-1)
-\end_layout
-
-\begin_layout Plain Layout
-
-    for(mem in enc.states[enc.states!=0]){
-\end_layout
-
-\begin_layout Plain Layout
-
-      dl <- parameter[(match(mem, levels(factor(enc.states[enc.states!=0])))-1)*2+
-1]
-\end_layout
-
-\begin_layout Plain Layout
-
-      dr <- parameter[(match(mem, levels(factor(enc.states[enc.states!=0])))-1)*2+
-2]
-\end_layout
-
-\begin_layout Plain Layout
-
-      gr <- parameter[length(enc.states[enc.states!=0])*2+1]
-\end_layout
-
-\begin_layout Plain Layout
-
-      y.dist.offset <- c(rep(n.states/2+0.5, n.states), rep(y0.guess+n.states/2+0.5,
- n.states))
-\end_layout
-
-\begin_layout Plain Layout
-
-      dist.lines <- data.frame(mem=mem, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                               map=map, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                               x=rep(c(1:(n.states/2)-0.1, (n.states/2+1):n.states+0.
-1),2)-0.45, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                               y=c(rep(n.states/2+0.5, n.states), rep(y0.guess+n.stat
-es/2+0.5, n.states)),
-\end_layout
-
-\begin_layout Plain Layout
-
-                               xend=rep(c(1:(n.states/2)-0.1, (n.states/2+1):n.state
-s+0.1),2)+0.45, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                               yend=y.dist.offset+c(det.dist, guess.dist)*prob.factor
-, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                               linetype=2, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                               color=c(rep(2,n.states), rep(3,n.states)),
- 
-\end_layout
-
-\begin_layout Plain Layout
-
-                               weight=NA, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                               name=NA)
-\end_layout
-
-\begin_layout Plain Layout
-
-      axis.lines <- data.frame(mem=mem, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                               map=map, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                               x=c(rep(0.45,4), rep(n.states+0.55,4)),
-\end_layout
-
-\begin_layout Plain Layout
-
-                               y=rep(c(rep(n.states/2+0.5, 2), rep(y0.guess+n.states
-/2+0.5,2)), 2),
-\end_layout
-
-\begin_layout Plain Layout
-
-                               xend=c(rep(c(0.45, n.states/2+0.35), 2), rep(c(n.stat
-es+0.55, n.states/2+0.65), 2)), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                               yend=rep(c(n.states/2+0.5+1*prob.factor, n.states/2+0.
-5, y0.guess+n.states/2+0.5+1*prob.factor, y0.guess+n.states/2+0.5), 2),
-\end_layout
-
-\begin_layout Plain Layout
-
-                               linetype=3, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                               color=1, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                               weight=NA, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                               name=NA)
-\end_layout
-
-\begin_layout Plain Layout
-
-      origin <- rbind(dist.lines, axis.lines, data.frame(mem=mem, map=map,
- xend=c(x0+0.5,x0-0.5), yend=0, x=x0, y=y0.guess, linetype=1, color=1, weight=c(1-d
-r, 1-dl), name=NA))
-\end_layout
-
-\begin_layout Plain Layout
-
-      if(!exists("ret.val")) ret.val <- origin
-\end_layout
-
-\begin_layout Plain Layout
-
-      else ret.val <- rbind(ret.val, origin)
-\end_layout
-
-\begin_layout Plain Layout
-
-      x1.offset <- (n.states/2)/2.0
-\end_layout
-
-\begin_layout Plain Layout
-
-      state.lines <- data.frame(mem=mem, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                                map=map, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                                x=c(x0+0.5,x0-0.5, rep(x0,2)), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                                y=c(rep(0,2),rep(y0.guess,2)), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                                xend=c(x0+x1.offset, x0-x1.offset, 0.5+x1.offset,
- 0.5+n.states-x1.offset), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                                yend=c(rep(1,2),rep(y0.guess+1,2)), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                                linetype=1,
-\end_layout
-
-\begin_layout Plain Layout
-
-                                color=1,
-\end_layout
-
-\begin_layout Plain Layout
-
-                                weight=c(dr, dl, 1-gr, gr), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                                name=c("d(rigth)","d(left)", "1-g(right)",
- "g(right)"))
-\end_layout
-
-\begin_layout Plain Layout
-
-      ret.val <- rbind(ret.val, state.lines)
-\end_layout
-
-\begin_layout Plain Layout
-
-      next.weights <- c(dr, dl, 1-gr, gr)
-\end_layout
-
-\begin_layout Plain Layout
-
-      for(state in 1:(n.states/2-1)){
-\end_layout
-
-\begin_layout Plain Layout
-
-        x0.offset <- (n.states/2-state+1)/2.0
-\end_layout
-
-\begin_layout Plain Layout
-
-        x1.offset <- (n.states/2-state)/2.0
-\end_layout
-
-\begin_layout Plain Layout
-
-        next.weights <- c(next.weights[1]*(1-dist.param[param.offset+state]),
-\end_layout
-
-\begin_layout Plain Layout
-
-                          next.weights[2]*(1-dist.param[param.offset+state]),
-\end_layout
-
-\begin_layout Plain Layout
-
-                          next.weights[3]*(1-dist.param[param.offset+n.states/2-1+st
-ate]),
-\end_layout
-
-\begin_layout Plain Layout
-
-                          next.weights[4]*(1-dist.param[param.offset+n.states/2-1+st
-ate]),
-\end_layout
-
-\begin_layout Plain Layout
-
-                          next.weights[1]*(dist.param[param.offset+state]),
-\end_layout
-
-\begin_layout Plain Layout
-
-                          next.weights[2]*(dist.param[param.offset+state]),
-\end_layout
-
-\begin_layout Plain Layout
-
-                          next.weights[3]*(dist.param[param.offset+n.states/2-1+stat
-e]),
-\end_layout
-
-\begin_layout Plain Layout
-
-                          next.weights[4]*(dist.param[param.offset+n.states/2-1+stat
-e]))
-\end_layout
-
-\begin_layout Plain Layout
-
-        map.lines <- data.frame(mem=mem, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                                map=map, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                                x=c(x0+x0.offset, x0-x0.offset, 0.5+x0.offset,
- 0.5+n.states-x0.offset), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                                y=c(rep(state,2),rep(y0.guess+state,2)),
- 
-\end_layout
-
-\begin_layout Plain Layout
-
-                                xend=c(x0+x1.offset, x0-x1.offset, 0.5+x1.offset,
- 0.5+n.states-x1.offset,
-\end_layout
-
-\begin_layout Plain Layout
-
-                                       n.states-state+1, state, n.states/2-state+1
-, n.states/2+state), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                                yend=c(rep(state+1,2),rep(y0.guess+state+1,2),
- rep(n.states/2, 2), rep(y0.guess+n.states/2, 2)), 
-\end_layout
-
-\begin_layout Plain Layout
-
-                                linetype=1,
-\end_layout
-
-\begin_layout Plain Layout
-
-                                color=1,
-\end_layout
-
-\begin_layout Plain Layout
-
-                                weight=next.weights, 
-\end_layout
-
-\begin_layout Plain Layout
-
-                                name=NA)
-\end_layout
-
-\begin_layout Plain Layout
-
-        ret.val <- rbind(ret.val, map.lines)
-\end_layout
-
-\begin_layout Plain Layout
-
-      }
-\end_layout
-
-\begin_layout Plain Layout
-
-    }
-\end_layout
-
-\begin_layout Plain Layout
-
-  }
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(ggplot(data=ret.val, aes(x=xend, y=yend, xend=x, yend=y))+
-\end_layout
-
-\begin_layout Plain Layout
-
-          scale_colour_manual(values = c("black", "red", "blue"))+
-\end_layout
-
-\begin_layout Plain Layout
-
-          facet_grid(map~mem)+
-\end_layout
-
-\begin_layout Plain Layout
-
-          geom_text(aes(x=xend, y=y, label=ifelse(is.na(name), NA, paste(name,
- round(weight, digits=2), sep="=")), size=2))+
-\end_layout
-
-\begin_layout Plain Layout
-
-          geom_segment(aes(size=weight), lineend="round", subset=.(linetype==1))+
-\end_layout
-
-\begin_layout Plain Layout
-
-          geom_rect(aes(xmin=xend, xmax=x, ymin=yend, ymax=y, fill=factor(color)
-), subset=.(linetype==2))+
-\end_layout
-
-\begin_layout Plain Layout
-
-          geom_segment(aes(x=x, y=y, yend=yend, xend=xend), subset=.(linetype==3)
-)+
-\end_layout
-
-\begin_layout Plain Layout
-
-          theme_bw()+
-\end_layout
-
-\begin_layout Plain Layout
-
-           scale_x_discrete("Response", limits=levels(factor(x.states)))+
-\end_layout
-
-\begin_layout Plain Layout
-
-           scale_size_continuous(range = c(0.3, 4))+
-\end_layout
-
-\begin_layout Plain Layout
-
-          theme(legend.position = "none", panel.background=element_blank(),
- axis.title=element_blank(), axis.text.y=element_blank(), axis.ticks=element_blank()
-, axis.line=element_blank(), panel.grid.minor.y=element_blank(), panel.grid.major.y=ele
-ment_blank()))
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-mapdists.mpt.2.htm <- function(map.pars, x.states, scales){
-\end_layout
-
-\begin_layout Plain Layout
-
-  n.states <- length(x.states)
-\end_layout
-
-\begin_layout Plain Layout
-
-  map.det.mat <- array(1, dim=c(length(scales), rep(n.states/2, 2)))
-\end_layout
-
-\begin_layout Plain Layout
-
-  map.guess.mat <- array(1, dim=c(length(scales), rep(n.states/2, 2)))
-\end_layout
-
-\begin_layout Plain Layout
-
-  for(s in 1:length(scales)){
-\end_layout
-
-\begin_layout Plain Layout
-
-    for(col in 1:(n.states/2)){
-\end_layout
-
-\begin_layout Plain Layout
-
-      col.par.det <- map.pars[(n.states-2) * (s-1) + (n.states/2-col) + 1]
-\end_layout
-
-\begin_layout Plain Layout
-
-      col.par.guess <- map.pars[(n.states/2-1) * (2*s-1) + col]
-\end_layout
-
-\begin_layout Plain Layout
-
-      for(row in 1:(n.states/2)){
-\end_layout
-
-\begin_layout Plain Layout
-
-        if(col==row & col>1) map.det.mat[s, row, col] <- col.par.det
-\end_layout
-
-\begin_layout Plain Layout
-
-        if(col>row) map.det.mat[s, row, col] <- 1-col.par.det
-\end_layout
-
-\begin_layout Plain Layout
-
-        if(col==row & col<(n.states/2)) map.guess.mat[s, row, col] <- col.par.guess
-\end_layout
-
-\begin_layout Plain Layout
-
-        if(col<row) map.guess.mat[s, row, col] <- 1-col.par.guess
-\end_layout
-
-\begin_layout Plain Layout
-
-      }
-\end_layout
-
-\begin_layout Plain Layout
-
-    }
-\end_layout
-
-\begin_layout Plain Layout
-
-  }
-\end_layout
-
-\begin_layout Plain Layout
-
-  det.dists <- apply(map.det.mat, c(1,2), prod)[,c((n.states/2):1, 1:(n.states/2))]
-\end_layout
-
-\begin_layout Plain Layout
-
-  dim(det.dists) <- c(length(scales), n.states)
-\end_layout
-
-\begin_layout Plain Layout
-
-  guess.dists <- apply(map.guess.mat, c(1,2), prod)[,c((n.states/2):1, 1:(n.states/2)
-)]
-\end_layout
-
-\begin_layout Plain Layout
-
-  dim(guess.dists) <- c(length(scales), n.states)
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(list(detection=det.dists, guessing=guess.dists))
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-mpt.2.htm <- function(parameter, x, enc, scale, posold, x.states, enc.states,
- scales, left.right.names)
-\end_layout
-
-\begin_layout Plain Layout
-
-{
-\end_layout
-
-\begin_layout Plain Layout
-
-  n.states <- length(x.states)
-\end_layout
-
-\begin_layout Plain Layout
-
-  if(n.states%%2 > 0) stop("x.states needs to be even.")
-\end_layout
-
-\begin_layout Plain Layout
-
-  enc.states <- enc.states[enc.states!=0]
-\end_layout
-
-\begin_layout Plain Layout
-
-  det.vec <- ifelse(enc==0, 0, parameter[(match(enc, enc.states)-1)*2+match(posold
-, left.right.names)])
-\end_layout
-
-\begin_layout Plain Layout
-
-  guess.right <- parameter[length(enc.states)*2+1]
-\end_layout
-
-\begin_layout Plain Layout
-
-  guess.vec <- ifelse(match(x, x.states) > n.states/2, (1-det.vec)*guess.right,
- (1-det.vec)*(1-guess.right))
-\end_layout
-
-\begin_layout Plain Layout
-
-  map.pars <- parameter[(length(enc.states)*2+2):length(parameter)]
-\end_layout
-
-\begin_layout Plain Layout
-
-  map.det.mat <- array(1, dim=c(length(scales), rep(n.states/2, 2)))
-\end_layout
-
-\begin_layout Plain Layout
-
-  map.guess.mat <- array(1, dim=c(length(scales), rep(n.states/2, 2)))
-\end_layout
-
-\begin_layout Plain Layout
-
-  for(s in 1:length(scales)){
-\end_layout
-
-\begin_layout Plain Layout
-
-    for(col in 1:(n.states/2)){
-\end_layout
-
-\begin_layout Plain Layout
-
-      col.par.det <- map.pars[(n.states-2) * (s-1) + (n.states/2-col) + 1]
-\end_layout
-
-\begin_layout Plain Layout
-
-      col.par.guess <- map.pars[(n.states/2-1) * (2*s-1) + col]
-\end_layout
-
-\begin_layout Plain Layout
-
-      for(row in 1:(n.states/2)){
-\end_layout
-
-\begin_layout Plain Layout
-
-        if(col==row & col>1) map.det.mat[s, row, col] <- col.par.det
-\end_layout
-
-\begin_layout Plain Layout
-
-        if(col>row) map.det.mat[s, row, col] <- 1-col.par.det
-\end_layout
-
-\begin_layout Plain Layout
-
-        if(col==row & col<(n.states/2)) map.guess.mat[s, row, col] <- col.par.guess
-\end_layout
-
-\begin_layout Plain Layout
-
-        if(col<row) map.guess.mat[s, row, col] <- 1-col.par.guess
-\end_layout
-
-\begin_layout Plain Layout
-
-      }
-\end_layout
-
-\begin_layout Plain Layout
-
-    }
-\end_layout
-
-\begin_layout Plain Layout
-
-  }
-\end_layout
-
-\begin_layout Plain Layout
-
-  det.dists <- apply(map.det.mat, c(1,2), prod)[,c((n.states/2):1, 1:(n.states/2))]
-\end_layout
-
-\begin_layout Plain Layout
-
-  dim(det.dists) <- c(length(scales), n.states)
-\end_layout
-
-\begin_layout Plain Layout
-
-  guess.dists <- apply(map.guess.mat, c(1,2), prod)[,c((n.states/2):1, 1:(n.states/2)
-)]
-\end_layout
-
-\begin_layout Plain Layout
-
-  dim(guess.dists) <- c(length(scales), n.states)
-\end_layout
-
-\begin_layout Plain Layout
-
-  confidence.vec <- ifelse(match(posold, left.right.names, nomatch=2) == 1,
- (-1*match(x, x.states))+length(x.states)+1, match(x, x.states))
-\end_layout
-
-\begin_layout Plain Layout
-
-  possible.detect <- confidence.vec > (length(x.states)/2)
-\end_layout
-
-\begin_layout Plain Layout
-
-  ret <- (ifelse(possible.detect, det.vec, 0) * det.dists[(match(scale,scales)-1)*n.
-states + match(x, x.states)]+
-\end_layout
-
-\begin_layout Plain Layout
-
-          guess.vec * guess.dists[(match(scale, scales)-1)*n.states + match(x,
- x.states)])
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(ret)
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-@
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-<<UVSDT, echo=FALSE, eval=TRUE>>=
-\end_layout
-
-\begin_layout Plain Layout
-
-#parameters: [mu, sd]*length(enc.states[enc.states!=0]), [criterion*(length(x.state
-s)-1)]*n.scale
-\end_layout
-
-\begin_layout Plain Layout
-
-#lowerBounds: c(-Inf, -Inf, ..., -Inf, 0, ...)
-\end_layout
-
-\begin_layout Plain Layout
-
-#upperBounds: c(Inf, Inf, ..., Inf, Inf, ...)
-\end_layout
-
-\begin_layout Plain Layout
-
-plot.sdt.uv <- function(parameter, x.states, enc.states, scales, left.right.names){
- 
-\end_layout
-
-\begin_layout Plain Layout
-
-  df <- data.frame()
-\end_layout
-
-\begin_layout Plain Layout
-
-  c.df <- data.frame()
-\end_layout
-
-\begin_layout Plain Layout
-
-  c.vec <- matrix(NA, ncol=length(x.states)-1, nrow=length(scales)) 
-\end_layout
-
-\begin_layout Plain Layout
-
-  for(scale in 1:length(scales)){
-\end_layout
-
-\begin_layout Plain Layout
-
-    c.vec[scale,] <- cumsum(parameter[(length(enc.states[enc.states!=0])*2+(scale-1
-)*(length(x.states)-1)+1):(length(enc.states[enc.states!=0])*2+(scale)*(length(x.sta
-tes)-1))])
-\end_layout
-
-\begin_layout Plain Layout
-
-    c.df <- rbind(c.df, data.frame(scale=levels(factor(scales))[scale], cutoff=c.vec
-[scale,]))
-\end_layout
-
-\begin_layout Plain Layout
-
-  }
-\end_layout
-
-\begin_layout Plain Layout
-
-  x.range <- c(min(c.vec[,1])-1,
-\end_layout
-
-\begin_layout Plain Layout
-
-               max(c.vec[,length(x.states)-1])+1)
-\end_layout
-
-\begin_layout Plain Layout
-
-  x.vec <- seq(x.range[1],x.range[2], length.out=500)
-\end_layout
-
-\begin_layout Plain Layout
-
-  if(0 %in% enc.states) {
-\end_layout
-
-\begin_layout Plain Layout
-
-    mu <- 0
-\end_layout
-
-\begin_layout Plain Layout
-
-    sd <- sqrt(1^2+1^2)
-\end_layout
-
-\begin_layout Plain Layout
-
-    label <- "not shown"
-\end_layout
-
-\begin_layout Plain Layout
-
-    y <- dnorm(x.vec, mu, sd)
-\end_layout
-
-\begin_layout Plain Layout
-
-    id <- 0
-\end_layout
-
-\begin_layout Plain Layout
-
-    df <- rbind(df,data.frame(id=id, x=x.vec,  y=y, label=label, mu=mu, sd=sd))
-\end_layout
-
-\begin_layout Plain Layout
-
-  }
-\end_layout
-
-\begin_layout Plain Layout
-
-  for(level in levels(factor(enc.states[enc.states!=0]))){
-\end_layout
-
-\begin_layout Plain Layout
-
-    mu <- parameter[(match(level, enc.states)-1)*2+1]
-\end_layout
-
-\begin_layout Plain Layout
-
-    sd <- parameter[(match(level, enc.states)-1)*2+2]
-\end_layout
-
-\begin_layout Plain Layout
-
-    attr(mu, "names")<- NULL
-\end_layout
-
-\begin_layout Plain Layout
-
-    attr(sd, "names")<- NULL
-\end_layout
-
-\begin_layout Plain Layout
-
-    label <- paste(level, "time(s) shown")
-\end_layout
-
-\begin_layout Plain Layout
-
-    y <- dnorm(x.vec, mu, sqrt(1+sd^2))
-\end_layout
-
-\begin_layout Plain Layout
-
-    id <- (match(level, levels(factor(enc.states[enc.states!=0])))-1)*2+1
-\end_layout
-
-\begin_layout Plain Layout
-
-    df <- rbind(df, data.frame(id=id, x=x.vec,  y=y, label=label, mu=mu, sd=sd))
-\end_layout
-
-\begin_layout Plain Layout
-
-    y <- dnorm(x.vec, -mu, sqrt(1+sd^2))
-\end_layout
-
-\begin_layout Plain Layout
-
-    id <- (match(level, levels(factor(enc.states[enc.states!=0])))-1)*2+2
-\end_layout
-
-\begin_layout Plain Layout
-
-    df <- rbind(df, data.frame(id=id, x=x.vec,  y=y, label=label, mu=-mu,
- sd=sd))
-\end_layout
-
-\begin_layout Plain Layout
-
-  }
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(ggplot(df)+facet_grid(.~scale)+geom_line(aes(x=x, y=y, colour=label,
- group=id), stat="identity")+geom_vline(data=c.df, aes(colour=factor(scale),
- xintercept=cutoff))+scale_colour_discrete("factors"))
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-rand.par.sdt.uv <-function(x.states, enc.states, scales){
-\end_layout
-
-\begin_layout Plain Layout
-
-  rand.mu <- runif(length(enc.states[enc.states!=0]), 0.5,1.5)
-\end_layout
-
-\begin_layout Plain Layout
-
-  rand.sd <- runif(length(enc.states[enc.states!=0]), 1,2.5)
-\end_layout
-
-\begin_layout Plain Layout
-
-  rand.mem.par <- rbind(rand.mu, rand.sd)[1:(length(enc.states[enc.states!=0])*2)]
-\end_layout
-
-\begin_layout Plain Layout
-
-  rand.crit0 <- runif(length(scales), -1,1)
-\end_layout
-
-\begin_layout Plain Layout
-
-  rand.crit <- runif(length(scales)*(length(x.states)-2))
-\end_layout
-
-\begin_layout Plain Layout
-
-  dim(rand.crit) <- c(length(x.states)-2, length(scales))
-\end_layout
-
-\begin_layout Plain Layout
-
-  rand.map.par <- rbind(rand.crit0, rand.crit)[1:(length(scales)*(length(x.states)-1)
-)]
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(c(rand.mem.par, rand.map.par))
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-lower.bounds.sdt.uv <- function(x.states, enc.states, scales){
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(c(rep(0:1, length(enc.states[enc.states!=0])), rep(c(-Inf, rep(0,
- length(x.states)-2)), length(scales))))
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-upper.bounds.sdt.uv <- function(x.states, enc.states, scales){
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(c(rep(Inf, n.param.sdt.uv(x.states, enc.states, scales))))
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-n.param.sdt.uv <- function(x.states, enc.states, scales){
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(length(enc.states[enc.states!=0])*2 + (length(x.states)-1)*length(scales))
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-sdt.uv <- function(parameter, x, enc, scale, posold, x.states, enc.states,
- scales, left.right.names){
-\end_layout
-
-\begin_layout Plain Layout
-
-  enc.states <- enc.states[enc.states!=0]
-\end_layout
-
-\begin_layout Plain Layout
-
-  mu.vec <- ifelse(enc==0, 0, parameter[(match(enc, enc.states)-1)*2+1])
-\end_layout
-
-\begin_layout Plain Layout
-
-  sd.vec <- ifelse(enc==0, 1, parameter[(match(enc, enc.states)-1)*2+2])
-\end_layout
-
-\begin_layout Plain Layout
-
-  mu.vec <- ifelse(match(posold, left.right.names, nomatch=2)==1, -mu.vec, mu.vec)
-\end_layout
-
-\begin_layout Plain Layout
-
-  crit <- c(NA)
-\end_layout
-
-\begin_layout Plain Layout
-
-  for(s in 1:length(scales)){
-\end_layout
-
-\begin_layout Plain Layout
-
-    offset <- length(enc.states)*2+
-\end_layout
-
-\begin_layout Plain Layout
-
-              (s-1)*(length(x.states)-1)
-\end_layout
-
-\begin_layout Plain Layout
-
-    crit <- c(crit, cumsum(parameter[(offset+1):(offset+(length(x.states)-1))]))
-\end_layout
-
-\begin_layout Plain Layout
-
-  }
-\end_layout
-
-\begin_layout Plain Layout
-
-  low.bound.vec <- ifelse(match(x, x.states)==1, -Inf, crit[(match(scale, scales)-1
-)*(length(x.states)-1) + match(x, x.states)])
-\end_layout
-
-\begin_layout Plain Layout
-
-  upper.bound.vec <- ifelse(match(x, x.states)==length(x.states), Inf, crit[1+(match
-(scale, scales)-1)*(length(x.states)-1) + match(x, x.states)])
-\end_layout
-
-\begin_layout Plain Layout
-
-  ret = pnorm(upper.bound.vec, mu.vec, sqrt(1^2+sd.vec^2)) - pnorm(low.bound.vec,
- mu.vec, sqrt(1^2+sd.vec^2))
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(ret)
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-@
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-<<EVSDT, echo=FALSE, eval=TRUE>>=
-\end_layout
-
-\begin_layout Plain Layout
-
-#parameters: [mu]*length(enc.states[enc.states!=0]), [criterion*(length(x.states)-1
-)]*n.scale
-\end_layout
-
-\begin_layout Plain Layout
-
-#lowerBounds: c(-Inf, -Inf, ..., -Inf, 0, ...)
-\end_layout
-
-\begin_layout Plain Layout
-
-#upperBounds: c(Inf, Inf, ..., Inf, Inf, ...)
-\end_layout
-
-\begin_layout Plain Layout
-
-plot.sdt.ev <- function(parameter, x.states, enc.states, scales, left.right.names){
-\end_layout
-
-\begin_layout Plain Layout
-
-  df <- data.frame()
-\end_layout
-
-\begin_layout Plain Layout
-
-  c.df <- data.frame()
-\end_layout
-
-\begin_layout Plain Layout
-
-  c.vec <- matrix(NA, ncol=length(x.states)-1, nrow=length(scales))
-\end_layout
-
-\begin_layout Plain Layout
-
-  for(scale in 1:length(scales)){
-\end_layout
-
-\begin_layout Plain Layout
-
-    c.vec[scale,] <- cumsum(parameter[(length(enc.states[enc.states!=0])+(scale-1)*
-(length(x.states)-1)+1):(length(enc.states[enc.states!=0])+(scale)*(length(x.states)
--1))])
-\end_layout
-
-\begin_layout Plain Layout
-
-    c.df <- rbind(c.df, data.frame(scale=levels(factor(scales))[scale], cutoff=c.vec
-[scale,]))
-\end_layout
-
-\begin_layout Plain Layout
-
-  }
-\end_layout
-
-\begin_layout Plain Layout
-
-  x.range <- c(min(c.vec[,1])-1,
-\end_layout
-
-\begin_layout Plain Layout
-
-               max(c.vec[,length(x.states)-1])+1)
-\end_layout
-
-\begin_layout Plain Layout
-
-  x.vec <- seq(x.range[1],x.range[2], length.out=500)
-\end_layout
-
-\begin_layout Plain Layout
-
-  if(0 %in% enc.states) {
-\end_layout
-
-\begin_layout Plain Layout
-
-    mu <- 0
-\end_layout
-
-\begin_layout Plain Layout
-
-    sd <- sqrt(1^2+1^2)
-\end_layout
-
-\begin_layout Plain Layout
-
-    label <- "not shown"
-\end_layout
-
-\begin_layout Plain Layout
-
-    y <- dnorm(x.vec, mu, sd)
-\end_layout
-
-\begin_layout Plain Layout
-
-    id <- 0
-\end_layout
-
-\begin_layout Plain Layout
-
-    df <- rbind(df,data.frame(id=id, x=x.vec,  y=y, label=label, mu=mu, sd=sd))
-\end_layout
-
-\begin_layout Plain Layout
-
-  }
-\end_layout
-
-\begin_layout Plain Layout
-
-  for(level in levels(factor(enc.states[enc.states!=0]))){
-\end_layout
-
-\begin_layout Plain Layout
-
-    mu <- parameter[match(level, enc.states)]
-\end_layout
-
-\begin_layout Plain Layout
-
-    attr(mu, "names")<- NULL
-\end_layout
-
-\begin_layout Plain Layout
-
-    sd <- 1
-\end_layout
-
-\begin_layout Plain Layout
-
-    label <- paste(level, "time(s) shown")
-\end_layout
-
-\begin_layout Plain Layout
-
-    y <- dnorm(x.vec, mu, sqrt(1+sd^2))
-\end_layout
-
-\begin_layout Plain Layout
-
-    id <- (match(level, levels(factor(enc.states[enc.states!=0])))-1)*2+1
-\end_layout
-
-\begin_layout Plain Layout
-
-    df <- rbind(df, data.frame(id=id, x=x.vec,  y=y, label=label, mu=mu, sd=sd))
-\end_layout
-
-\begin_layout Plain Layout
-
-    y <- dnorm(x.vec, -mu, sqrt(1+sd^2))
-\end_layout
-
-\begin_layout Plain Layout
-
-    id <- (match(level, levels(factor(enc.states[enc.states!=0])))-1)*2+2
-\end_layout
-
-\begin_layout Plain Layout
-
-    df <- rbind(df, data.frame(id=id, x=x.vec,  y=y, label=label, mu=-mu,
- sd=sd))
-\end_layout
-
-\begin_layout Plain Layout
-
-  }
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(ggplot(df)+facet_grid(.~scale)+geom_line(aes(x=x, y=y, colour=label,
- group=id), stat="identity")+geom_vline(data=c.df, aes(colour=factor(scale),
- xintercept=cutoff))+scale_colour_discrete("factors"))
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-rand.par.sdt.ev <-function(x.states, enc.states, scales){
-\end_layout
-
-\begin_layout Plain Layout
-
-  rand.mem.par <- runif(length(enc.states[enc.states!=0]), 0.5,1.5)
-\end_layout
-
-\begin_layout Plain Layout
-
-  rand.crit0 <- runif(length(scales), -1,1)
-\end_layout
-
-\begin_layout Plain Layout
-
-  rand.crit <- runif(length(scales)*(length(x.states)-2))
-\end_layout
-
-\begin_layout Plain Layout
-
-  dim(rand.crit) <- c(length(x.states)-2, length(scales))
-\end_layout
-
-\begin_layout Plain Layout
-
-  rand.map.par <- rbind(rand.crit0, rand.crit)[1:(length(scales)*(length(x.states)-1)
-)]
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(c(rand.mem.par, rand.map.par))
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-lower.bounds.sdt.ev <- function(x.states, enc.states, scales){
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(c(rep(0, length(enc.states[enc.states!=0])), rep(c(-Inf, rep(0, length(x.s
-tates)-2)), length(scales))))
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-upper.bounds.sdt.ev <- function(x.states, enc.states, scales){
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(c(rep(Inf, n.param.sdt.ev(x.states, enc.states, scales))))
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-n.param.sdt.ev <- function(x.states, enc.states, scales){
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(length(enc.states[enc.states!=0]) + (length(x.states)-1)*length(scales))
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-sdt.ev <- function(parameter, x, enc, scale, posold, x.states, enc.states,
- scales, left.right.names){
-\end_layout
-
-\begin_layout Plain Layout
-
-  enc.states <- enc.states[enc.states!=0]
-\end_layout
-
-\begin_layout Plain Layout
-
-  mu.vec <- ifelse(enc==0, 0, parameter[match(enc, enc.states)])
-\end_layout
-
-\begin_layout Plain Layout
-
-  mu.vec <- ifelse(match(posold, left.right.names, nomatch=2)==1, -mu.vec, mu.vec)
-\end_layout
-
-\begin_layout Plain Layout
-
-  crit <- c(NA)
-\end_layout
-
-\begin_layout Plain Layout
-
-  for(s in 1:length(scales)){
-\end_layout
-
-\begin_layout Plain Layout
-
-    offset <- length(enc.states)+
-\end_layout
-
-\begin_layout Plain Layout
-
-      (s-1)*(length(x.states)-1)
-\end_layout
-
-\begin_layout Plain Layout
-
-    crit <- c(crit, cumsum(parameter[(offset+1):(offset+(length(x.states)-1))]))
-\end_layout
-
-\begin_layout Plain Layout
-
-  }
-\end_layout
-
-\begin_layout Plain Layout
-
-  low.bound.vec <- ifelse(match(x, x.states)==1, -Inf, crit[(match(scale, scales)-1
-)*(length(x.states)-1) + match(x, x.states)])
-\end_layout
-
-\begin_layout Plain Layout
-
-  upper.bound.vec <- ifelse(match(x, x.states)==length(x.states), Inf, crit[1+(match
-(scale, scales)-1)*(length(x.states)-1) + match(x, x.states)])
-\end_layout
-
-\begin_layout Plain Layout
-
-  ret = pnorm(upper.bound.vec, mu.vec, sqrt(1^2+1^2)) - pnorm(low.bound.vec,
- mu.vec, sqrt(1^2+1^2))
-\end_layout
-
-\begin_layout Plain Layout
-
-  return(ret)
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-@
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
 <<includes, echo=FALSE, eval=TRUE>>=
 \end_layout
 
@@ -3038,6 +175,26 @@ suppressMessages(library(gridExtra))
 
 \begin_layout Plain Layout
 
+suppressMessages(library(MPTinR))
+\end_layout
+
+\begin_layout Plain Layout
+
+<<DataManipulation>>
+\end_layout
+
+\begin_layout Plain Layout
+
+<<ModelFitting>>
+\end_layout
+
+\begin_layout Plain Layout
+
+<<ModelSpecifications>>
+\end_layout
+
+\begin_layout Plain Layout
+
 @
 \end_layout
 
@@ -3052,26 +209,6 @@ suppressMessages(library(gridExtra))
 
 \begin_layout Plain Layout
 
-suppressMessages(library(plyr))
-\end_layout
-
-\begin_layout Plain Layout
-
-suppressMessages(library(ggplot2))
-\end_layout
-
-\begin_layout Plain Layout
-
-suppressMessages(library(reshape))
-\end_layout
-
-\begin_layout Plain Layout
-
-suppressMessages(library(gridExtra))
-\end_layout
-
-\begin_layout Plain Layout
-
 rec.data <- read.csv(file="data/Rec.csv", sep=";")
 \end_layout
 
@@ -3082,16 +219,22 @@ dists.list <- emp.dists(rec.data)
 
 \begin_layout Plain Layout
 
+fit.data <- do.fitting(dists.list, EVSDT, UVSDT, MPT2HTM, MPT1HTM2g)
 \end_layout
 
 \begin_layout Plain Layout
 
-model.param <- model.parameter(dists.list)
+dists.list <- fit.data$data
 \end_layout
 
 \begin_layout Plain Layout
 
-dists.list <- append.predicted.data(dists.list, model.param)
+model.param <- fit.data$fit.par
+\end_layout
+
+\begin_layout Plain Layout
+
+model.comp <- fit.data$model.comp
 \end_layout
 
 \begin_layout Plain Layout
@@ -3107,6 +250,11 @@ dists.list <- append.predicted.data(dists.list, model.param)
 
 <<visualisation, echo=TRUE, eval=TRUE, warning=FALSE, out.extra='angle=90',
  fig.width=14, fig.height=9>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+#model.comp[[1]][[2]]
 \end_layout
 
 \begin_layout Plain Layout
@@ -3131,22 +279,22 @@ dists.list <- append.predicted.data(dists.list, model.param)
 
 \begin_layout Plain Layout
 
-foreach.vp(dists.list[[1]][[1]], plot.vp, model.param[[1]][[1]], echo=FALSE)
+#foreach.vp(dists.list[[1]][[1]], plot.vp, model.param[[1]][[1]], echo=FALSE)
 \end_layout
 
 \begin_layout Plain Layout
 
-foreach.vp(dists.list[[1]][[2]], plot.vp, model.param[[1]][[2]], echo=FALSE)
+#foreach.vp(dists.list[[1]][[2]], plot.vp, model.param[[1]][[2]], echo=FALSE)
 \end_layout
 
 \begin_layout Plain Layout
 
-foreach.vp(dists.list[[2]][[1]], plot.vp, model.param[[2]][[1]], echo=FALSE)
+#foreach.vp(dists.list[[2]][[1]], plot.vp, model.param[[2]][[1]], echo=FALSE)
 \end_layout
 
 \begin_layout Plain Layout
 
-foreach.vp(dists.list[[2]][[2]], plot.vp, model.param[[2]][[2]], echo=FALSE)
+#foreach.vp(dists.list[[2]][[2]], plot.vp, model.param[[2]][[2]], echo=FALSE)
 \end_layout
 
 \begin_layout Plain Layout
@@ -3240,6 +388,1824 @@ options "plain"
 \end_inset
 
 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Appendix
+\end_layout
+
+\begin_layout Subsection
+Data Manipulation Code
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<DataManipulation, eval=FALSE, echo=TRUE>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+emp.dists <- function(x){
+\end_layout
+
+\begin_layout Plain Layout
+
+  x <- cbind(x, model="empirical")
+\end_layout
+
+\begin_layout Plain Layout
+
+  cast.formula <- code+session+scale+enc+posold+model~result_variable   
+\end_layout
+
+\begin_layout Plain Layout
+
+  value.name <- "resp"
+\end_layout
+
+\begin_layout Plain Layout
+
+  ret.list <- list(cast(filter(x, 1), cast.formula, probabilityDist, value=value.na
+me), cast(filter(x, 2), cast.formula, probabilityDist, value=value.name))
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+  names(ret.list) <- c("normal", "forcedguess")
+\end_layout
+
+\begin_layout Plain Layout
+
+  ret.list <- lapply(ret.list, rename.and.melt, 1:7, value.name)
+\end_layout
+
+\begin_layout Plain Layout
+
+  ret.list <- lapply(ret.list, split.sessions)
+\end_layout
+
+\begin_layout Plain Layout
+
+  return(ret.list) 
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+probabilityDist = function(x){   
+\end_layout
+
+\begin_layout Plain Layout
+
+  x.freq <- table(x)
+\end_layout
+
+\begin_layout Plain Layout
+
+  x.relfreq <- vector(length=length(x.freq)+1)
+\end_layout
+
+\begin_layout Plain Layout
+
+  x.relfreq[1] <- length(x)
+\end_layout
+
+\begin_layout Plain Layout
+
+  # Empty cell correction:
+\end_layout
+
+\begin_layout Plain Layout
+
+  #x.relfreq[-1] <- (x.freq+(0.5/length(x.freq))) / (length(x)+0.5)
+\end_layout
+
+\begin_layout Plain Layout
+
+  # No empty Cell correction
+\end_layout
+
+\begin_layout Plain Layout
+
+  x.relfreq[-1] <- x.freq / length(x)
+\end_layout
+
+\begin_layout Plain Layout
+
+  names(x.relfreq)[1] <- "ntrials"
+\end_layout
+
+\begin_layout Plain Layout
+
+  names(x.relfreq)[-1] <- names(x.freq)
+\end_layout
+
+\begin_layout Plain Layout
+
+  return(x.relfreq) 
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+filter <- function(x, group){
+\end_layout
+
+\begin_layout Plain Layout
+
+  groupName <- switch(group, "normal"="normal", "forcedguess"="forcedguess")
+\end_layout
+
+\begin_layout Plain Layout
+
+  x.ret <- x[x$group==groupName,]
+\end_layout
+
+\begin_layout Plain Layout
+
+  x.ret$resp <- factor(x.ret$resp, levels=if(group==1) 0:7  else  0:5)   
+\end_layout
+
+\begin_layout Plain Layout
+
+  return(x.ret) 
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+split.sessions <- function(x){
+\end_layout
+
+\begin_layout Plain Layout
+
+  return(list(words=x[x$session==0,], images=x[x$session==1,]))
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+rename.and.melt <- function(x, melt.id, variable.name){ 
+\end_layout
+
+\begin_layout Plain Layout
+
+  #  names(x)[match(paste("X",0:7,sep=""),names(x), nomatch=0)] <- as.character(0
+:7)
+\end_layout
+
+\begin_layout Plain Layout
+
+  x <- melt.data.frame(x, melt.id)
+\end_layout
+
+\begin_layout Plain Layout
+
+  names(x)[names(x)=="result_variable"]<-variable.name   
+\end_layout
+
+\begin_layout Plain Layout
+
+  return(x) 
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Model Fitting
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<ModelFitting, eval=FALSE, echo=TRUE>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+#A model is a function returning a list of functions.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+#The first element is the model's name as single element character vector
+\end_layout
+
+\begin_layout Plain Layout
+
+#The second to the third to last functions are called with an equal-length
+ factors for each: 
+\end_layout
+
+\begin_layout Plain Layout
+
+# function(resp, enc, scale, posold)
+\end_layout
+
+\begin_layout Plain Layout
+
+#and are exprected to return a same-length vector.
+\end_layout
+
+\begin_layout Plain Layout
+
+#The next to last function is a function(...) of all the previosly returned
+ vectors and is expected to return a character vector of same length as
+ its arguments representing specifying the model.
+\end_layout
+
+\begin_layout Plain Layout
+
+#The last function(data, model.filename, parameter, ...) is exprected to return
+ an mptinr fit result based on it's parameters)
+\end_layout
+
+\begin_layout Plain Layout
+
+#Model boilerplate:
+\end_layout
+
+\begin_layout Plain Layout
+
+#NAME <- function(){
+\end_layout
+
+\begin_layout Plain Layout
+
+#   a <- function(resp, enc, scale, posold){
+\end_layout
+
+\begin_layout Plain Layout
+
+#     return(resp)
+\end_layout
+
+\begin_layout Plain Layout
+
+#   }
+\end_layout
+
+\begin_layout Plain Layout
+
+#   model.description <- function(a){
+\end_layout
+
+\begin_layout Plain Layout
+
+#     return(a)
+\end_layout
+
+\begin_layout Plain Layout
+
+#   }
+\end_layout
+
+\begin_layout Plain Layout
+
+#   fit.call <- function(data, model.filename, parameter, ...){
+\end_layout
+
+\begin_layout Plain Layout
+
+#     return(fit.model(data, model.filename, ...))
+\end_layout
+
+\begin_layout Plain Layout
+
+#   }
+\end_layout
+
+\begin_layout Plain Layout
+
+#   return(list("NAME", a, model.description, fit.call))
+\end_layout
+
+\begin_layout Plain Layout
+
+# }
+\end_layout
+
+\begin_layout Plain Layout
+
+do.fitting <- function(data, ...){
+\end_layout
+
+\begin_layout Plain Layout
+
+  ret.val.list <- lapply(data, lapply, multi.gen.fit.models, ...)
+\end_layout
+
+\begin_layout Plain Layout
+
+  ret.dists <- lapply(ret.val.list, lapply, "[[", "data")
+\end_layout
+
+\begin_layout Plain Layout
+
+  ret.dists <- mapply(function(x,y) mapply(rbind, x, y), ret.dists, data)
+\end_layout
+
+\begin_layout Plain Layout
+
+  ret.pars <- lapply(ret.val.list, lapply, "[[", "fit.par")
+\end_layout
+
+\begin_layout Plain Layout
+
+  ret.comp <- lapply(ret.val.list, lapply, "[[", "model.comp")
+\end_layout
+
+\begin_layout Plain Layout
+
+  return(list(data=ret.dists, fit.par=ret.pars, model.comp=ret.comp))
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+multi.gen.fit.models <- function(data, ...){
+\end_layout
+
+\begin_layout Plain Layout
+
+  models <- list(...)
+\end_layout
+
+\begin_layout Plain Layout
+
+  model.res.list <- lapply(models, multi.gen.fit.model, data[data$model=="empirical",
+])
+\end_layout
+
+\begin_layout Plain Layout
+
+  predicted.data.list <- lapply(model.res.list, "[[", "data")
+\end_layout
+
+\begin_layout Plain Layout
+
+  predicted.data.df <- do.call(rbind, predicted.data.list)
+\end_layout
+
+\begin_layout Plain Layout
+
+  mptinr.res.list <- lapply(model.res.list, "[[", "mptinr")
+\end_layout
+
+\begin_layout Plain Layout
+
+  names(mptinr.res.list) <- vapply(models, function(x) x()[[1]], "")
+\end_layout
+
+\begin_layout Plain Layout
+
+  fit.par.list <- mapply(function(x, name) extract.multi.mptinr.results(name,
+ x), mptinr.res.list, names(mptinr.res.list))
+\end_layout
+
+\begin_layout Plain Layout
+
+  fit.par <- do.call(cbind, fit.par.list)
+\end_layout
+
+\begin_layout Plain Layout
+
+  fit.par <- cbind(code=row.names(fit.par), fit.par)
+\end_layout
+
+\begin_layout Plain Layout
+
+  select.res <- select.mpt(mptinr.res.list)
+\end_layout
+
+\begin_layout Plain Layout
+
+  return(list(data=predicted.data.df, fit.par=fit.par, model.comp=select.res))
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+multi.gen.fit.model <- function(model.gen, data.df, ..., resp=variable, enc=enc,
+ scale=scale, posold=posold, model=model, split.by=code, prob=value, ntrials=ntri
+als){
+\end_layout
+
+\begin_layout Plain Layout
+
+  model.list <- model.gen()
+\end_layout
+
+\begin_layout Plain Layout
+
+  par.vec.fun.list <- model.list[2:(length(model.list)-2)]
+\end_layout
+
+\begin_layout Plain Layout
+
+  model.func <- model.list[[length(model.list)-1]]
+\end_layout
+
+\begin_layout Plain Layout
+
+  fit.func <- model.list[[length(model.list)]]
+\end_layout
+
+\begin_layout Plain Layout
+
+  mc <- match.call()
+\end_layout
+
+\begin_layout Plain Layout
+
+  mc[[1]] <- gen.model
+\end_layout
+
+\begin_layout Plain Layout
+
+  model.file <- eval.parent(mc[c(-4,-8)])
+\end_layout
+
+\begin_layout Plain Layout
+
+  mc[[1]] <- sort.data
+\end_layout
+
+\begin_layout Plain Layout
+
+  data.df[,as.character(substitute(value))] <- data.df[,as.character(substitute(valu
+e))]*data.df[,as.character(substitute(ntrials))]
+\end_layout
+
+\begin_layout Plain Layout
+
+  sorted.df.list <- by(data.df, factor(data.df[[as.character(substitute(split.by))]]),
+ function(x, mc, model.name){
+\end_layout
+
+\begin_layout Plain Layout
+
+    mc[[3]] <- x[x[[model.name]]=="empirical",]
+\end_layout
+
+\begin_layout Plain Layout
+
+    eval.parent(mc[c(-2,-4,-8)])
+\end_layout
+
+\begin_layout Plain Layout
+
+  },
+\end_layout
+
+\begin_layout Plain Layout
+
+                       mc,
+\end_layout
+
+\begin_layout Plain Layout
+
+                       as.character(substitute(model)),
+\end_layout
+
+\begin_layout Plain Layout
+
+                       simplify=FALSE)
+\end_layout
+
+\begin_layout Plain Layout
+
+  data.mat <- vapply(sorted.df.list, function(x, value.name) x[[value.name]],
+ 1:length(model.file[model.file!=""])*1.0, as.character(substitute(value)))
+\end_layout
+
+\begin_layout Plain Layout
+
+  mptinr.res <- fit.func(data=t(data.mat), textConnection(model.file), parameter=che
+ck.mpt(textConnection(model.file))$parameters, ...)
+\end_layout
+
+\begin_layout Plain Layout
+
+  ret.df <- do.call(rbind, sorted.df.list)
+\end_layout
+
+\begin_layout Plain Layout
+
+  predicted.data.vec <- t(mptinr.res$data$predicted$individual)
+\end_layout
+
+\begin_layout Plain Layout
+
+  attr(predicted.data.vec, "dim") <- NULL
+\end_layout
+
+\begin_layout Plain Layout
+
+  ret.df[,as.character(substitute(value))] <- predicted.data.vec
+\end_layout
+
+\begin_layout Plain Layout
+
+  ret.df[,as.character(substitute(model))] <- model.list[[1]]
+\end_layout
+
+\begin_layout Plain Layout
+
+  row.names(ret.df) <- NULL
+\end_layout
+
+\begin_layout Plain Layout
+
+  return(list(data=ret.df, mptinr=mptinr.res))
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+#posold needs to be a factor with first level meaning 'left' and last level
+ meaning 'rigth'
+\end_layout
+
+\begin_layout Plain Layout
+
+#returns a ready to use character vector decribing the model for mptinr
+\end_layout
+
+\begin_layout Plain Layout
+
+gen.model <- function(model.gen, data.df, resp=variable, enc=enc, scale=scale,
+ posold=posold){
+\end_layout
+
+\begin_layout Plain Layout
+
+  mc <- match.call()
+\end_layout
+
+\begin_layout Plain Layout
+
+  mc[[1]] <- as.name("gen.datapoints")
+\end_layout
+
+\begin_layout Plain Layout
+
+  data.df <- eval.parent(mc[-2])
+\end_layout
+
+\begin_layout Plain Layout
+
+  model.list <- model.gen()
+\end_layout
+
+\begin_layout Plain Layout
+
+  par.vec.fun.list <- model.list[2:(length(model.list)-2)]
+\end_layout
+
+\begin_layout Plain Layout
+
+  model.func <- model.list[[length(model.list)-1]]
+\end_layout
+
+\begin_layout Plain Layout
+
+  par.vec.list <- lapply(par.vec.fun.list, do.call, list(resp=data.df$resp, enc=data.df$
+enc, scale=data.df$scale, posold=data.df$posold))
+\end_layout
+
+\begin_layout Plain Layout
+
+  tmp.model <- do.call(model.func, par.vec.list)
+\end_layout
+
+\begin_layout Plain Layout
+
+  #print(paste("Generated", model.list[[1]], ":"))
+\end_layout
+
+\begin_layout Plain Layout
+
+  #print(cbind(data.df, tmp.model))
+\end_layout
+
+\begin_layout Plain Layout
+
+  n.states <- length(levels(data.df$resp))
+\end_layout
+
+\begin_layout Plain Layout
+
+  final.model <- vapply(1:(nrow(data.df)/n.states), function(x, n.states, tmp.model){
+\end_layout
+
+\begin_layout Plain Layout
+
+    bounds <- ((x-1)*n.states+1):(x*n.states)
+\end_layout
+
+\begin_layout Plain Layout
+
+    return(c(tmp.model[bounds], ""))
+\end_layout
+
+\begin_layout Plain Layout
+
+  },
+\end_layout
+
+\begin_layout Plain Layout
+
+                        rep("",(n.states+1)),
+\end_layout
+
+\begin_layout Plain Layout
+
+                        n.states, tmp.model)
+\end_layout
+
+\begin_layout Plain Layout
+
+  attr(final.model, "dim") <- NULL
+\end_layout
+
+\begin_layout Plain Layout
+
+  return(final.model)
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+gen.datapoints <- function(data.df, resp=variable, enc=enc, scale=scale, posold=po
+sold){
+\end_layout
+
+\begin_layout Plain Layout
+
+  positions <- levels(factor(eval(substitute(posold), data.df)))
+\end_layout
+
+\begin_layout Plain Layout
+
+  data.df <- expand.grid(resp=levels(factor(eval(substitute(resp), data.df))),
+\end_layout
+
+\begin_layout Plain Layout
+
+                         enc=levels(factor(eval(substitute(enc), data.df))),
+\end_layout
+
+\begin_layout Plain Layout
+
+                         scale=levels(factor(eval(substitute(scale), data.df))),
+\end_layout
+
+\begin_layout Plain Layout
+
+                         posold=positions)
+\end_layout
+
+\begin_layout Plain Layout
+
+  #remove are zero encodings with posold left/rigth
+\end_layout
+
+\begin_layout Plain Layout
+
+  data.df <- data.df[!(data.df$enc==0 & data.df$posold %in% positions[c(1,length(pos
+itions))]),]
+\end_layout
+
+\begin_layout Plain Layout
+
+  #remove all encoded items without position
+\end_layout
+
+\begin_layout Plain Layout
+
+  data.df <- data.df[!(data.df$enc!=0 & !(data.df$posold %in% positions[c(1,length(p
+ositions))])),]
+\end_layout
+
+\begin_layout Plain Layout
+
+  return(sort.data(data.df, resp, enc, scale, posold))
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+sort.data <- function(data.df, resp=variable, enc=enc, scale=scale, posold=posold)
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+  order.vec = order(data.df[[as.character(substitute(posold))]], 
+\end_layout
+
+\begin_layout Plain Layout
+
+                    data.df[[as.character(substitute(scale))]], 
+\end_layout
+
+\begin_layout Plain Layout
+
+                    data.df[[as.character(substitute(enc))]], 
+\end_layout
+
+\begin_layout Plain Layout
+
+                    data.df[[as.character(substitute(resp))]])
+\end_layout
+
+\begin_layout Plain Layout
+
+  return(data.df[order.vec,])
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+extract.multi.mptinr.results <- function(model.name, mptinr.res){
+\end_layout
+
+\begin_layout Plain Layout
+
+  ret <- data.frame(mptinr.res$goodness.of.fit$individual, mptinr.res$information.crit
+eria$individual, t(mptinr.res$parameters$individual[,1,]))
+\end_layout
+
+\begin_layout Plain Layout
+
+  row.names(ret) <- row.names(mptinr.res$data$observed$individual)
+\end_layout
+
+\begin_layout Plain Layout
+
+  names(ret) <- paste(model.name, names(ret), sep="_")
+\end_layout
+
+\begin_layout Plain Layout
+
+  return(ret)
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Model specifications
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<ModelSpecifications, eval=FALSE, echo=TRUE>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+MPT2HTM <- function(){
+\end_layout
+
+\begin_layout Plain Layout
+
+  d.vec <- function(resp, enc, scale, posold, internal=FALSE){
+\end_layout
+
+\begin_layout Plain Layout
+
+    enc.states <- levels(enc)[levels(enc)!=0]
+\end_layout
+
+\begin_layout Plain Layout
+
+    d.par <- paste("d", rep(enc.states, each=length(levels(posold))), levels(posol
+d), sep="")
+\end_layout
+
+\begin_layout Plain Layout
+
+    confidence.vec <- ifelse(level(posold)==1, -level(resp)+length(levels(resp))+
+1, level(resp))
+\end_layout
+
+\begin_layout Plain Layout
+
+    ret <- ifelse(enc==0 | (!internal & confidence.vec <= length(levels(resp))/2)
+, NA, d.par[(match(enc, enc.states)-1)*length(levels(posold))+level(posold)])
+\end_layout
+
+\begin_layout Plain Layout
+
+    return(ret)
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  gr.vec <- function(resp, enc, scale, posold){
+\end_layout
+
+\begin_layout Plain Layout
+
+    d.vec <- d.vec(resp, enc, scale, posold, internal=TRUE)
+\end_layout
+
+\begin_layout Plain Layout
+
+    gr.par <- "gr"
+\end_layout
+
+\begin_layout Plain Layout
+
+    ret <- ifelse(level(resp)>length(levels(resp))/2, 
+\end_layout
+
+\begin_layout Plain Layout
+
+                  gr.par, 
+\end_layout
+
+\begin_layout Plain Layout
+
+                  comp.prob.symbol(gr.par))
+\end_layout
+
+\begin_layout Plain Layout
+
+    ret <- ifelse(is.na(d.vec), ret, paste(comp.prob.symbol(d.vec), ret, sep="*"))
+\end_layout
+
+\begin_layout Plain Layout
+
+    return(ret)
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  dmap.vec <- function(resp, enc, scale, posold){
+\end_layout
+
+\begin_layout Plain Layout
+
+    dmap.par <- paste("dm", rep(2:(length(levels(resp))/2)-1, length(levels(scale
+))), rep(levels(scale), each=length(levels(resp))/2-1), sep="")
+\end_layout
+
+\begin_layout Plain Layout
+
+    dmaps <- map.par.mpt.symbol(dmap.par, length(levels(scale)))[,c(1:(length(levels
+(resp))/2),(length(levels(resp))/2):1)]
+\end_layout
+
+\begin_layout Plain Layout
+
+    ret <- dmaps[(level(resp)-1)*length(levels(scale))+level(scale)]
+\end_layout
+
+\begin_layout Plain Layout
+
+    return(ret)
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  gmap.vec <- function(resp, enc, scale, posold){
+\end_layout
+
+\begin_layout Plain Layout
+
+    gmap.par <- paste("gm", rep(2:(length(levels(resp))/2)-1, length(levels(scale
+))), rep(levels(scale), each=length(levels(resp))/2-1), sep="")
+\end_layout
+
+\begin_layout Plain Layout
+
+    gmaps <- map.par.mpt.symbol(gmap.par, length(levels(scale)))[,c((length(levels(r
+esp))/2):1,1:(length(levels(resp))/2))]
+\end_layout
+
+\begin_layout Plain Layout
+
+    ret <- gmaps[(level(resp)-1)*length(levels(scale))+level(scale)]
+\end_layout
+
+\begin_layout Plain Layout
+
+    return(ret)
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  model.description <- function(d.vec, gr.vec, dmap.vec, gmap.vec){
+\end_layout
+
+\begin_layout Plain Layout
+
+    return(ifelse(is.na(d.vec), 
+\end_layout
+
+\begin_layout Plain Layout
+
+                  paste(gr.vec, gmap.vec, sep="*"),
+\end_layout
+
+\begin_layout Plain Layout
+
+                  paste(paste(d.vec, dmap.vec, sep="*"), paste(gr.vec, gmap.vec,
+ sep="*"), sep="+")))
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  fit.call <- function(data, model.filename, parameter, ...){
+\end_layout
+
+\begin_layout Plain Layout
+
+    return(fit.mpt(data, model.filename, ...))
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  return(list("MPT2HTM", d.vec, gr.vec, dmap.vec, gmap.vec, model.description,
+ fit.call))
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+MPT1HTM2g <- function(){
+\end_layout
+
+\begin_layout Plain Layout
+
+  d.vec <- function(resp, enc, scale, posold, internal=FALSE){
+\end_layout
+
+\begin_layout Plain Layout
+
+    enc.states <- levels(enc)[levels(enc)!=0]
+\end_layout
+
+\begin_layout Plain Layout
+
+    d.par <- paste("d", enc.states, sep="")
+\end_layout
+
+\begin_layout Plain Layout
+
+    confidence.vec <- ifelse(level(posold)==1, -level(resp)+length(levels(resp))+
+1, level(resp))
+\end_layout
+
+\begin_layout Plain Layout
+
+    ret <- ifelse(enc==0 | (!internal & confidence.vec <= length(levels(resp))/2)
+, NA, d.par[match(enc, enc.states)])
+\end_layout
+
+\begin_layout Plain Layout
+
+    return(ret)
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  gr.vec <- function(resp, enc, scale, posold){
+\end_layout
+
+\begin_layout Plain Layout
+
+    d.vec <- d.vec(resp, enc, scale, posold, internal=TRUE)
+\end_layout
+
+\begin_layout Plain Layout
+
+    gr.par <- paste("gr", levels(scale), sep="")
+\end_layout
+
+\begin_layout Plain Layout
+
+    ret <- ifelse(level(resp)>length(levels(resp))/2, 
+\end_layout
+
+\begin_layout Plain Layout
+
+                  gr.par[level(scale)], 
+\end_layout
+
+\begin_layout Plain Layout
+
+                  comp.prob.symbol(gr.par[level(scale)]))
+\end_layout
+
+\begin_layout Plain Layout
+
+    ret <- ifelse(is.na(d.vec), ret, paste(comp.prob.symbol(d.vec), ret, sep="*"))
+\end_layout
+
+\begin_layout Plain Layout
+
+    return(ret)
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  dmap.vec <- function(resp, enc, scale, posold){
+\end_layout
+
+\begin_layout Plain Layout
+
+    dmap.par <- paste("dm", rep(2:(length(levels(resp))/2)-1, length(levels(scale
+))), rep(levels(scale), each=length(levels(resp))/2-1), sep="")
+\end_layout
+
+\begin_layout Plain Layout
+
+    dmaps <- map.par.mpt.symbol(dmap.par, length(levels(scale)))[,c(1:(length(levels
+(resp))/2),(length(levels(resp))/2):1)]
+\end_layout
+
+\begin_layout Plain Layout
+
+    ret <- dmaps[(level(resp)-1)*length(levels(scale))+level(scale)]
+\end_layout
+
+\begin_layout Plain Layout
+
+    return(ret)
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  gmap.vec <- function(resp, enc, scale, posold){
+\end_layout
+
+\begin_layout Plain Layout
+
+    gmap.par <- paste("gm", rep(2:(length(levels(resp))/2)-1, length(levels(scale
+))), rep(levels(scale), each=length(levels(resp))/2-1), sep="")
+\end_layout
+
+\begin_layout Plain Layout
+
+    gmaps <- map.par.mpt.symbol(gmap.par, length(levels(scale)))[,c((length(levels(r
+esp))/2):1,1:(length(levels(resp))/2))]
+\end_layout
+
+\begin_layout Plain Layout
+
+    ret <- gmaps[(level(resp)-1)*length(levels(scale))+level(scale)]
+\end_layout
+
+\begin_layout Plain Layout
+
+    return(ret)
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  model.description <- function(d.vec, gr.vec, dmap.vec, gmap.vec){
+\end_layout
+
+\begin_layout Plain Layout
+
+    return(ifelse(is.na(d.vec), 
+\end_layout
+
+\begin_layout Plain Layout
+
+                  paste(gr.vec, gmap.vec, sep="*"),
+\end_layout
+
+\begin_layout Plain Layout
+
+                  paste(paste(d.vec, dmap.vec, sep="*"), paste(gr.vec, gmap.vec,
+ sep="*"), sep="+")))
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  fit.call <- function(data, model.filename, parameter, ...){
+\end_layout
+
+\begin_layout Plain Layout
+
+    return(fit.mpt(data, model.filename, ...))
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  return(list("MPT1HTM2g", d.vec, gr.vec, dmap.vec, gmap.vec, model.description,
+ fit.call))
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+EVSDT <- function(){
+\end_layout
+
+\begin_layout Plain Layout
+
+  mu.vec <- function(resp, enc, scale, posold){
+\end_layout
+
+\begin_layout Plain Layout
+
+    enc.states <- levels(enc)[levels(enc)!=0]
+\end_layout
+
+\begin_layout Plain Layout
+
+    mu.par <- paste("mu", enc.states, sep="")
+\end_layout
+
+\begin_layout Plain Layout
+
+    ret <- ifelse(enc==0, "0", mu.par[match(enc, enc.states)])
+\end_layout
+
+\begin_layout Plain Layout
+
+    ret <- ifelse(level(posold)==1, paste("-", ret, sep=""), ret)
+\end_layout
+
+\begin_layout Plain Layout
+
+    return(ret)
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  low.bound.vec <- function(resp, enc, scale, posold){
+\end_layout
+
+\begin_layout Plain Layout
+
+    n.states <- length(levels(resp))
+\end_layout
+
+\begin_layout Plain Layout
+
+    crit.par <- sdt.crit.par(n.states, scale)
+\end_layout
+
+\begin_layout Plain Layout
+
+    ret <- ifelse(level(resp)==1, "-Inf", crit.par[(level(scale)-1)*(n.states)
+ + level(resp)])
+\end_layout
+
+\begin_layout Plain Layout
+
+    return(ret)
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  upper.bound.vec <- function(resp, enc, scale, posold){
+\end_layout
+
+\begin_layout Plain Layout
+
+    n.states <- length(levels(resp))
+\end_layout
+
+\begin_layout Plain Layout
+
+    crit.par <- sdt.crit.par(n.states, scale)
+\end_layout
+
+\begin_layout Plain Layout
+
+    ret <- ifelse(level(resp)==n.states, "Inf", crit.par[(level(scale)-1)*(n.states
+) + level(resp) + 1])
+\end_layout
+
+\begin_layout Plain Layout
+
+    return(ret)
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  model.description <- function(mu.vec, low.bound.vec, upper.bound.vec){
+\end_layout
+
+\begin_layout Plain Layout
+
+    return(paste("pnorm((", upper.bound.vec, "-1*", mu.vec, ")/sqrt(2))-pnorm((",
+ low.bound.vec, "-1*", mu.vec, ")/sqrt(2))", sep=""))
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  fit.call <- function(data, model.filename, parameter, ...){
+\end_layout
+
+\begin_layout Plain Layout
+
+    param.order <- parameter
+\end_layout
+
+\begin_layout Plain Layout
+
+    lower.bound <- rep(-Inf, length(param.order))
+\end_layout
+
+\begin_layout Plain Layout
+
+    upper.bound <- rep(Inf, length(param.order))
+\end_layout
+
+\begin_layout Plain Layout
+
+    lower.bound[grep("c[^1].*", param.order)] <- 0
+\end_layout
+
+\begin_layout Plain Layout
+
+    return(fit.model(data, model.filename, lower.bound=lower.bound, upper.bound=upper.
+bound, ...))
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  return(list("EVSDT", mu.vec, low.bound.vec, upper.bound.vec, model.description,
+ fit.call))
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+UVSDT <- function(){
+\end_layout
+
+\begin_layout Plain Layout
+
+  mu.vec <- function(resp, enc, scale, posold){
+\end_layout
+
+\begin_layout Plain Layout
+
+    enc.states <- levels(enc)[levels(enc)!=0]
+\end_layout
+
+\begin_layout Plain Layout
+
+    mu.par <- paste("mu", enc.states, sep="")
+\end_layout
+
+\begin_layout Plain Layout
+
+    ret <- ifelse(enc==0, "0", mu.par[match(enc, enc.states)])
+\end_layout
+
+\begin_layout Plain Layout
+
+    ret <- ifelse(level(posold)==1, paste("-", ret, sep=""), ret)
+\end_layout
+
+\begin_layout Plain Layout
+
+    return(ret)
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  sd.vec <- function(resp, enc, scale, posold){
+\end_layout
+
+\begin_layout Plain Layout
+
+    enc.states <- levels(enc)[levels(enc)!=0]
+\end_layout
+
+\begin_layout Plain Layout
+
+    sd.par <- paste("sd", enc.states, sep="")
+\end_layout
+
+\begin_layout Plain Layout
+
+    ret <- ifelse(enc==0, "1", sd.par[match(enc, enc.states)])
+\end_layout
+
+\begin_layout Plain Layout
+
+    return(ret)
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  low.bound.vec <- function(resp, enc, scale, posold){
+\end_layout
+
+\begin_layout Plain Layout
+
+    n.states <- length(levels(resp))
+\end_layout
+
+\begin_layout Plain Layout
+
+    crit.par <- sdt.crit.par(n.states, scale)
+\end_layout
+
+\begin_layout Plain Layout
+
+    ret <- ifelse(level(resp)==1, "-Inf", crit.par[(level(scale)-1)*(n.states)
+ + level(resp)])
+\end_layout
+
+\begin_layout Plain Layout
+
+    return(ret)
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  upper.bound.vec <- function(resp, enc, scale, posold){
+\end_layout
+
+\begin_layout Plain Layout
+
+    n.states <- length(levels(resp))
+\end_layout
+
+\begin_layout Plain Layout
+
+    crit.par <- sdt.crit.par(n.states, scale)
+\end_layout
+
+\begin_layout Plain Layout
+
+    ret <- ifelse(level(resp)==n.states, "Inf", crit.par[(level(scale)-1)*(n.states
+) + level(resp) + 1])
+\end_layout
+
+\begin_layout Plain Layout
+
+    return(ret)
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  model.description <- function(mu.vec, sd.vec, low.bound.vec, upper.bound.vec){
+\end_layout
+
+\begin_layout Plain Layout
+
+    return(paste("pnorm(", upper.bound.vec, ",", mu.vec, ",sqrt(1^2+", sd.vec,
+ "^2))-pnorm(", low.bound.vec, ",", mu.vec, ",sqrt(1^2+", sd.vec, "^2))", sep=""))
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  fit.call <- function(data, model.filename, parameter, ...){
+\end_layout
+
+\begin_layout Plain Layout
+
+    param.order <- parameter
+\end_layout
+
+\begin_layout Plain Layout
+
+    lower.bound <- rep(-Inf, length(param.order))
+\end_layout
+
+\begin_layout Plain Layout
+
+    upper.bound <- rep(Inf, length(param.order))
+\end_layout
+
+\begin_layout Plain Layout
+
+    lower.bound[grep("c[^1].*", param.order)] <- 0
+\end_layout
+
+\begin_layout Plain Layout
+
+    lower.bound[grep("sd.*", param.order)] <- 0
+\end_layout
+
+\begin_layout Plain Layout
+
+    return(fit.model(data, model.filename, use.gradient=FALSE, lower.bound=lower.boun
+d, upper.bound=upper.bound, ...))
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  return(list("UVSDT", mu.vec, sd.vec, low.bound.vec, upper.bound.vec, model.descriptio
+n, fit.call))
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+map.par.mpt.symbol <- function(map.par, n.scales){
+\end_layout
+
+\begin_layout Plain Layout
+
+  n.states.half <- length(map.par)/n.scales+1
+\end_layout
+
+\begin_layout Plain Layout
+
+  maps <- array(rep("1", n.states.half*n.scales), dim=c(n.scales, n.states.half))
+\end_layout
+
+\begin_layout Plain Layout
+
+  for(s in 1:n.scales){
+\end_layout
+
+\begin_layout Plain Layout
+
+    offset <- (s-1)*(n.states.half-1)
+\end_layout
+
+\begin_layout Plain Layout
+
+    offset.maps <- (s-1)*(n.states.half)
+\end_layout
+
+\begin_layout Plain Layout
+
+    maps[s,2:n.states.half] <- cumop.symbol(comp.prob.symbol(map.par[(offset+1):(offse
+t+n.states.half-1)]), "*", no.paren=TRUE)
+\end_layout
+
+\begin_layout Plain Layout
+
+    maps[s,2:n.states.half-1] <- paste(maps[s,2:n.states.half-1],
+\end_layout
+
+\begin_layout Plain Layout
+
+                                       map.par[(offset+1):(offset+n.states.half-1)]
+, 
+\end_layout
+
+\begin_layout Plain Layout
+
+                                       sep="*")
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  return(maps)
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+sdt.crit.par <- function(n.states, scale){
+\end_layout
+
+\begin_layout Plain Layout
+
+  crit.par <- paste("c", rep(1:(n.states-1), length(levels(scale))), rep(levels(sc
+ale), each=n.states-1), sep="")
+\end_layout
+
+\begin_layout Plain Layout
+
+  crit <- array(NA, dim=c(n.states, length(levels(scale))))
+\end_layout
+
+\begin_layout Plain Layout
+
+  for(s in 1:length(levels(scale))){
+\end_layout
+
+\begin_layout Plain Layout
+
+    offset <- (s-1)*(n.states-1)
+\end_layout
+
+\begin_layout Plain Layout
+
+    crit[2:n.states, s] <- cumop.symbol(crit.par[(offset+1):(offset+n.states-1)],
+ "+")
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  return(crit)
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+level <- function(factor){
+\end_layout
+
+\begin_layout Plain Layout
+
+  return(match(factor, levels(factor)))
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+cumop.symbol <- function(symbols, op, no.paren=FALSE){
+\end_layout
+
+\begin_layout Plain Layout
+
+  cumop <- c()
+\end_layout
+
+\begin_layout Plain Layout
+
+  for(i in 1:length(symbols)){
+\end_layout
+
+\begin_layout Plain Layout
+
+    tmp.cumop <- do.call(paste, c(as.list(symbols[1:i]), list(sep=op)))
+\end_layout
+
+\begin_layout Plain Layout
+
+    cumop[i] <- ifelse(no.paren, tmp.cumop, paste("(", tmp.cumop, ")", sep=""))
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  return(cumop)
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+comp.prob.symbol <- function(symbols){
+\end_layout
+
+\begin_layout Plain Layout
+
+  return(paste("(1-", symbols, ")", sep=""))
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+@
 \end_layout
 
 \end_inset
