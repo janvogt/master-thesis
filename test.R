@@ -716,6 +716,42 @@ plot.vps <- function(data, params){
     }
   }, data, params)
 }
+mapdists.mpt <- function(map.pars, x.states, scales){
+  n.states <- length(x.states)
+  map.pars.vec <- unlist(map.pars)
+  path.vec <- rep(1, n.states/2*2*length(scales))
+  dim(map.pars.vec) <- c(n.states/2-1, 2*length(scales))
+  dim(path.vec) <- c(n.states/2, 2*length(scales))
+  path.vec[2:(n.states/2), ] <- sapply(data.frame(map.pars.vec), function(x) cumprod(1-x))
+  path.vec[2:(n.states/2)-1, ] <- path.vec[2:(n.states/2)-1, ] * map.pars.vec
+  ret.mat.det <- sapply(data.frame(path.vec[, seq(1, by=2, along.with=scales)]), function(x) return(x[c(1:length(x),length(x):1)]))
+  ret.mat.guess <- sapply(data.frame(path.vec[, seq(2, by=2, along.with=scales)]), function(x) return(x[c(length(x):1,1:length(x))]))
+  return(list(detection=t(ret.mat.det), guessing=t(ret.mat.guess)))
+}
+
+#################
+# Executed Code #
+#################
+suppressMessages(library(plyr))
+suppressMessages(library(ggplot2))
+suppressMessages(library(reshape))
+suppressMessages(library(gridExtra))
+suppressMessages(library(MPTinR))
+suppressMessages(library(stringr))
+
+rec.data <- read.csv(file="data/Rec.csv", sep=";")
+dists.list <- emp.dists(rec.data)
+
+fit.data <- do.fitting(dists.list, EVSDT, MPT1HTM2g, UVSDT, MPT2HTM)
+dists.list <- fit.data$data
+model.param <- fit.data$fit.par
+model.comp <- fit.data$model.comp
+gsq <- exctractModelCriteria(model.param)
+
+plot.vps(dists.list, model.param)
+ggplot(data=gsq[order(gsq[, "group"],gsq[, "session"],gsq[, "EVSDT_G.Squared"]-gsq[, "MPT1HTM2g_G.Squared"]),], aes(x=seq_along(code), y=EVSDT_G.Squared-MPT1HTM2g_G.Squared, group=paste(group, session), colour=factor(paste("group:", ifelse(group==1, "'fully encoded',", "'forced guessing',"), "session:", session))))+geom_line()+geom_point()+scale_y_continuous(expression(G^2 (EVSDT) - G^2 (MPT1HTM2g)))+scale_x_continuous("participant * session")+geom_hline(aes(yintercept=0))+scale_color_discrete("", guide=guide_legend(nrow=2))+theme(legend.position="top")
+
+
 
 ########################
 # Deprecated Functions #
@@ -1116,18 +1152,7 @@ upper.bounds.mpt.2.htm <- function(x.states, enc.states, scales){
 n.param.mpt.2.htm <- function(x.states, enc.states, scales){
   return(2*length(enc.states[enc.states!=0])+1+(length(x.states)-2)*length(scales))
 }
-mapdists.mpt <- function(map.pars, x.states, scales){
-  n.states <- length(x.states)
-  map.pars.vec <- unlist(map.pars)
-  path.vec <- rep(1, n.states/2*2*length(scales))
-  dim(map.pars.vec) <- c(n.states/2-1, 2*length(scales))
-  dim(path.vec) <- c(n.states/2, 2*length(scales))
-  path.vec[2:(n.states/2), ] <- sapply(data.frame(map.pars.vec), function(x) cumprod(1-x))
-  path.vec[2:(n.states/2)-1, ] <- path.vec[2:(n.states/2)-1, ] * map.pars.vec
-  ret.mat.det <- sapply(data.frame(path.vec[, seq(1, by=2, along.with=scales)]), function(x) return(x[c(1:length(x),length(x):1)]))
-  ret.mat.guess <- sapply(data.frame(path.vec[, seq(2, by=2, along.with=scales)]), function(x) return(x[c(length(x):1,1:length(x))]))
-  return(list(detection=t(ret.mat.det), guessing=t(ret.mat.guess)))
-}
+
 mpt.2.htm <- function(parameter, x, enc, scale, posold, x.states, enc.states, scales, left.right.names){
   n.states <- length(x.states)
   if(n.states%%2 > 0) stop("x.states needs to be even.")
@@ -1310,35 +1335,10 @@ sdt.ev <- function(parameter, x, enc, scale, posold, x.states, enc.states, scale
   ret = pnorm(upper.bound.vec, mu.vec, sqrt(1^2+1^2)) - pnorm(low.bound.vec, mu.vec, sqrt(1^2+1^2))
   return(ret)
 }
-
-
-
-
-
 assert_equal<- function(test, expected, error=paste("Assertion Error:", substitute(test), "not equal to", substitute(expected))){
   print(test); print(expected);
   if(all(test != expected))  stop(error)
 }
-
-
-suppressMessages(library(plyr))
-suppressMessages(library(ggplot2))
-suppressMessages(library(reshape))
-suppressMessages(library(gridExtra))
-suppressMessages(library(MPTinR))
-suppressMessages(library(stringr))
-rec.data <- read.csv(file="data/Rec.csv", sep=";")
-dists.list <- emp.dists(rec.data)
-
-fit.data <- do.fitting(dists.list, EVSDT, MPT1HTM2g, UVSDT, MPT2HTM)
-dists.list <- fit.data$data
-model.param <- fit.data$fit.par
-model.comp <- fit.data$model.comp
-gsq <- exctractModelCriteria(model.param)
-
-plot.vps(dists.list, model.param)
-ggplot(data=gsq[order(gsq[, "group"],gsq[, "session"],gsq[, "EVSDT_G.Squared"]-gsq[, "MPT1HTM2g_G.Squared"]),], aes(x=seq_along(code), y=EVSDT_G.Squared-MPT1HTM2g_G.Squared, group=paste(group, session), colour=factor(paste("group:", ifelse(group==1, "'fully encoded',", "'forced guessing',"), "session:", session))))+geom_line()+geom_point()+scale_y_continuous(expression(G^2 (EVSDT) - G^2 (MPT1HTM2g)))+scale_x_continuous("participant * session")+geom_hline(aes(yintercept=0))+scale_color_discrete("", guide=guide_legend(nrow=2))+theme(legend.position="top")
-
 
 
 #plot.in.chunks(dists.list[[1]][[1]], 1)
@@ -1358,3 +1358,5 @@ ggplot(data=gsq[order(gsq[, "group"],gsq[, "session"],gsq[, "EVSDT_G.Squared"]-g
 #foreach.vp(dists.list[[1]][[2]], plot.vp, model.param[[1]][[2]], echo=FALSE)
 #foreach.vp(dists.list[[2]][[1]], plot.vp, model.param[[2]][[1]], echo=FALSE)
 #foreach.vp(dists.list[[2]][[2]], plot.vp, model.param[[2]][[2]], echo=FALSE)
+
+
