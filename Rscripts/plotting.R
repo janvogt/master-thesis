@@ -329,14 +329,14 @@ plot.vp <- function(data, params){
   mpts <-  plot.mpts(params)
   sdts <-  plot.sdts(params, 0 %in% data$enc)+theme(legend.position = "top")
   mpt.sdt <- arrangeGrob(mpts, sdts, ncol=1, heights=c(2/3,1/3))
-  models.fits <- arrangeGrob(plot, tableGrob(fits, gp=gpar(fontsize=20)), ncol=1, heights=c(5/6,1/6))
-  suppressWarnings(grid.arrange(mpt.sdt, models.fits, main=paste("VP:", data$code[1], "Session:", data$session[1]+1, "Group:", ifelse(0 %in% data$enc, "'forced guessing'", "'fully encoded'")), nrow=1))
+  models.fits <- arrangeGrob(plot, tableGrob(fits, gp=gpar(fontsize=16)), ncol=1, heights=c(6/7,1/7))
+  suppressWarnings(grid.arrange(mpt.sdt, models.fits, main=textGrob(paste("VP: ", data$code[1], " - Group: ", ifelse(0 %in% data$enc, "'forced guessing'", "'fully encoded'"), ", Session: ", data$session[1]+1, sep=""), gp=gpar(fontsize=30)), nrow=1))
 }
 extract.fits <- function(params){
   models.crits.levels <- get.levels.from.strings(names(params), "([^_]*)_((?:[^cmgds]|df).*)")
   models <- models.crits.levels[[1]]
   crits <- models.crits.levels[[2]]
-  crits[1:6] <- crits[c(5,4,3,6,1,2)]
+  crits[1:6] <- crits[c(4,3,5,6,1,2)]
   ret.mat <- unlist(params[paste(models, rep(crits, each=length(models)), sep="_")])
   dim(ret.mat) <- c(length(models), length(crits))
   dimnames(ret.mat) <- list(models, crits)

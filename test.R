@@ -8,19 +8,7 @@ source('Rscripts/plotting.R')
 # Executed Code #
 #################
 
-rec.data <- read.csv(file="data/Rec.csv", sep=";")
-dists.list <- emp.dists(rec.data)
-
-fit.data <- do.fitting(dists.list, EVSDT, MPT1HTM2g, UVSDT, MPT2HTM)
-dists.list <- fit.data$data
-model.param <- fit.data$fit.par
-model.comp <- fit.data$model.comp
-gsq <- exctractModelCriteria(model.param)
-
-plot.vps(dists.list, model.param)
-ggplot(data=gsq[order(gsq[, "group"],gsq[, "session"],gsq[, "EVSDT_G.Squared"]-gsq[, "MPT1HTM2g_G.Squared"]),], aes(x=seq_along(code), y=EVSDT_G.Squared-MPT1HTM2g_G.Squared, group=paste(group, session), colour=factor(paste("group:", ifelse(group==1, "'fully encoded',", "'forced guessing',"), "session:", session))))+geom_line()+geom_point()+scale_y_continuous(expression(G^2 (EVSDT) - G^2 (MPT1HTM2g)))+scale_x_continuous("participant * session")+geom_hline(aes(yintercept=0))+scale_color_discrete("", guide=guide_legend(nrow=2))+theme(legend.position="top")
-
-
+plot.vp(subset(dists.list[[1]][[1]], code=="AG1503"), model.param[[1]][[1]][1, ])
 
 ########################
 # Deprecated Functions #
@@ -67,8 +55,6 @@ prepare.data.for.mptinr <- function(data.df, resp=variable, enc=enc, scale=scale
   data.df <- data.df.sort[do.call(order, data.df.sort),]
   return(data.df)
 }
-
-
 plot.in.chunks <- function(data, vp.per.page){
   max.len <- length(levels(factor(data$code)))
   i <- 1
@@ -78,8 +64,6 @@ plot.in.chunks <- function(data, vp.per.page){
   }
   plot.data(subset(data,code%in%levels(factor(code))[i:max.len]))
 }
-
-
 plot.vp <- function(data, params){
   plot <- plot.data(data)
   mpt <-  plot.mpt.2.htm(unlist(params[grep("mpt.2.htm_par\\d+", colnames(params), perl=TRUE)]),
@@ -255,8 +239,6 @@ extract.mptinr.results <- function(model.name, mptinr.res){
   names(ret) <- paste(model.name, names(ret), sep="_")
   return(ret)
 }
-
-
 best.nlminb <- function(start.fun, start.fun.par, ..., n.optim=5){
   for(run in 1:n.optim){
     if(!exists("ret")){
@@ -399,16 +381,10 @@ test.mpt.1.htm.2g <- function(){
                             factor("right", levels=c("left", "right"))),#posold
                0.35*(1-0.57))
 }
-
-
-
 #x= Requested state of random variable, n.enc= number of encodings, n.scale= number of scales
 #parameters: [detection(left),detection(right)]*length(enc.states[enc.states!=0]), guess(right), [detect.map*(length(x.states)/2)-1, guess.map*(length(x.states)/2)-1]*n.scale
 #detect.map= 1. P(most extrem rating), 2. P(second extrem rating | not most extrem rating), 3. ...
 #guess.map= 1. P(most central rating), 2. P(second central rating | not most central rating), 3. ...
-
-
-
 rand.par.mpt.2.htm <-function(x.states, enc.states, scales){
   return(runif(2*length(enc.states[enc.states!=0])+1+(length(x.states)-2)*length(scales)))
 }
@@ -421,7 +397,6 @@ upper.bounds.mpt.2.htm <- function(x.states, enc.states, scales){
 n.param.mpt.2.htm <- function(x.states, enc.states, scales){
   return(2*length(enc.states[enc.states!=0])+1+(length(x.states)-2)*length(scales))
 }
-
 mpt.2.htm <- function(parameter, x, enc, scale, posold, x.states, enc.states, scales, left.right.names){
   n.states <- length(x.states)
   if(n.states%%2 > 0) stop("x.states needs to be even.")
@@ -454,13 +429,7 @@ mpt.2.htm <- function(parameter, x, enc, scale, posold, x.states, enc.states, sc
           guess.vec * guess.dists[(match(scale, scales)-1)*n.states + match(x, x.states)])
   return(ret)
 }
-
-
-
-
-
 #models: 
-
 #parameters: [mu, sd]*length(enc.states[enc.states!=0]), [criterion*(length(x.states)-1)]*n.scale
 #lowerBounds: c(-Inf, -Inf, ..., -Inf, 0, ...)
 #upperBounds: c(Inf, Inf, ..., Inf, Inf, ...)
@@ -533,9 +502,6 @@ sdt.uv <- function(parameter, x, enc, scale, posold, x.states, enc.states, scale
   ret = pnorm(upper.bound.vec, mu.vec, sqrt(1^2+sd.vec^2)) - pnorm(low.bound.vec, mu.vec, sqrt(1^2+sd.vec^2))
   return(ret)
 }
-
-
-
 #parameters: [mu]*length(enc.states[enc.states!=0]), [criterion*(length(x.states)-1)]*n.scale
 #lowerBounds: c(-Inf, -Inf, ..., -Inf, 0, ...)
 #upperBounds: c(Inf, Inf, ..., Inf, Inf, ...)
@@ -608,24 +574,15 @@ assert_equal<- function(test, expected, error=paste("Assertion Error:", substitu
   print(test); print(expected);
   if(all(test != expected))  stop(error)
 }
-
-
 #plot.in.chunks(dists.list[[1]][[1]], 1)
 #plot.in.chunks(dists.list[[1]][[2]], 8)
 #plot.in.chunks(dists.list[[2]][[1]], 4)
 #plot.in.chunks(dists.list[[2]][[2]], 8)
-
 #fit.models.to.vp.data(dists.list[[1]][[1]][dists.list[[1]][[1]]$code=="AG1503",])
 #fit.models.to.vp.data(dists.list[[2]][[1]][dists.list[[2]][[1]]$code=="RN0609",])
-
 #model.param <- model.parameter(dists.list)
 #dists.list <- append.predicted.data(dists.list, model.param)
-
-
-
 #foreach.vp(dists.list[[1]][[1]], plot.vp, model.param[[1]][[1]], echo=FALSE)
 #foreach.vp(dists.list[[1]][[2]], plot.vp, model.param[[1]][[2]], echo=FALSE)
 #foreach.vp(dists.list[[2]][[1]], plot.vp, model.param[[2]][[1]], echo=FALSE)
 #foreach.vp(dists.list[[2]][[2]], plot.vp, model.param[[2]][[2]], echo=FALSE)
-
-
