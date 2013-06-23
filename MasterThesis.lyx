@@ -267,6 +267,109 @@ Theory
 \end_layout
 
 \begin_layout Standard
+Results of experiments involving a finite set of behavioral categories 
+\begin_inset Formula $C_{1},C_{2},\ldots,C_{j}$
+\end_inset
+
+ can be described as set of each categories' observed frequency 
+\begin_inset Formula $D=\{N_{1},N_{2},\ldots,N_{j}\}$
+\end_inset
+
+.
+ Psychologists are usually interested in the underlying cognitive processes
+ producing that observed data pattern 
+\begin_inset Formula $D$
+\end_inset
+
+.
+ Often these processes are described verbally, experimental manipulations
+ are applied and corresponding changes in 
+\begin_inset Formula $D$
+\end_inset
+
+ are hypothesized.
+ If these hypotheses hold, that is the probability for 
+\begin_inset Formula $D$
+\end_inset
+
+ if the experimental manipulation yields no change in the underlying process
+ is smaller than some acceptable value 
+\begin_inset Formula $\alpha$
+\end_inset
+
+, the described process is seen as confirmed.
+ Problems, which arises using this approach, are that as language is rather
+ flexible it is often possible to explain unexpected results within the
+ same processes and that interacting parts of the assumed processes can
+ be difficult to link to the observable results.
+ A possible solution to these problems is the use of a formal description
+ of the assumed processes, i.e.
+ a mathematical model linking the influence of an experimental manipulation
+ to the observable data 
+\begin_inset Formula $D$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+.
+ 
+\end_layout
+
+\begin_layout Standard
+In recognition memory research it is possible to categorize the models in
+ three different classes: 
+\emph on
+discrete-state models
+\emph default
+, 
+\emph on
+continuous models,
+\emph default
+ and 
+\emph on
+combined models
+\emph default
+.
+ These classes of models are not specific to recognition memory, but are
+ applied to a wide field of cognitive research.
+ 
+\end_layout
+
+\begin_layout Subsection
+Discrete-State models
+\end_layout
+
+\begin_layout Standard
+The central assumption of discrete-state models is that cognitive process
+ in question, e.g.
+ recognition memory, can be separated in mutual exclusive states.
+ The different states are linked to each other and their transitions are
+ described in term of probabilities.
+ Many discrete-state models can be expressed as MPT models 
+\begin_inset CommandInset citation
+LatexCommand citep
+after "for a recent review"
+before "Multinomial Processing Tree;"
+key "riefer_multinomial_1988,erdfelder_multinomial_2009"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Subsection
+Latent-Strength models
+\end_layout
+
+\begin_layout Subsection
+Combined models
+\end_layout
+
+\begin_layout Standard
 Models of recognition memory
 \end_layout
 
@@ -329,6 +432,33 @@ key "province_evidence_2012"
 
 \begin_layout Standard
 hypothesis for this thesis
+\end_layout
+
+\begin_layout Standard
+Province and Rouder's
+\begin_inset CommandInset citation
+LatexCommand citeyearpar
+key "province_evidence_2012"
+
+\end_inset
+
+ results show evidence against the widely accepted superiority of continuous
+ models.
+ But on the other hand they used some specialities in their studies which
+ decrease comparability of their results considerably.
+ Namely their use of continuous and post-hoc binned rating scales and the
+ use of semantically related words for the 2AFC task complicate the interpretati
+on of their results.
+ The central research goal in this work is thus to replicate their findings.
+ 
+\end_layout
+
+\begin_layout Standard
+Role of the forced guessing condition
+\end_layout
+
+\begin_layout Standard
+scale manipulation
 \end_layout
 
 \begin_layout Section
@@ -716,9 +846,7 @@ Plotting R-code
 
 \begin_layout Chunk
 
-<<Plotting
-\lang american
->>
+<<Plotting>>
 \end_layout
 
 \begin_layout Chunk
