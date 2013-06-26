@@ -9,6 +9,7 @@
 \usepackage[style=apa,natbib=true,backend=biber]{biblatex}
 \DeclareLanguageMapping{american}{american-apa}
 \addbibresource{/Users/jan/Studium/Masterarbeit/Thesis/MasterThesis.bib}
+\AtBeginDocument{\renewcommand{\ref}[1]{\mbox{\autoref{#1}}}}
 \end_preamble
 \use_default_options true
 \begin_modules
@@ -37,7 +38,16 @@ biblatex
 \index_command default
 \paperfontsize default
 \spacing single
-\use_hyperref false
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder false
+\pdf_colorlinks false
+\pdf_backref false
+\pdf_pdfusetitle true
 \papersize a4paper
 \use_geometry false
 \use_amsmath 1
@@ -204,62 +214,66 @@ Who has not experienced it: a perceived stranger approaches you with a warm
  In most of these situations the truth will stay undetermined, but it is
  for sure, that for each role there are two possibilities.
  The person recognizing you can do that correctly, in recognition memory
- research we call that a 
+ research this is called a 
 \emph on
 hit
 \emph default
-, or mistakenly, we call that a 
+, or mistakenly, this is called a 
 \emph on
 false alert
 \emph default
 .
  You on the other hand not recognizing the person can be because it is a
- stranger, we call that 
+ stranger, this is called 
 \emph on
 correct rejection
 \emph default
-, or you could be wrongly not recognize a known person, we call that a 
+, or you could be wrongly not recognize a known person, this is called a
+ 
 \emph on
 miss
 \emph default
 .
- But has the recognizing person the superior recognition memory capabilities
- does he or she just tend to 
-\begin_inset Quotes eld
-\end_inset
-
-recognize
-\begin_inset Quotes erd
-\end_inset
-
- other people? As it turns out that is not an easy question to answer and
- is the central question of the field of recognition memory research.
+ But does the person recognizing you have a superior recognition memory
+ ability or are you just more conservative in deciding wether you know one
+ or not? Without any theory about the underlying processes this question
+ can not be answered.
 \end_layout
 
 \begin_layout Standard
-To generalize this introductory situation one's system of recognition memory
- can yield for different outcomes: Identifying a known stimulus as such
-\emph on
- 
-\emph default
-(hit), identifying a unknown stimulus as known (false alert), identifying
- known stimulus as unknown (miss), and identifying a unknown stimulus as
- such (correct rejection).
- Having this fourfold outcome pattern recognition memory is one process
- like many others in all fields of science.
- 
+To generalize from this introductory example consider the other person from
+ both peoples point of view as any item that could be known or not.
+ Hit and miss translate identifying an known item as old or new, respectively
+ and correct rejection and false alert translate to identifying an unknown
+ item as new or old, respectively.
+ The statistically experienced reader might easily see the fourfold pattern
+ of two item types (known and unknown) and two response options (old and
+ new) and conclude to answer the problem memory ability versus response
+ bias via the overall probability to answer with old being the response
+ bias and the odds ratio of answering old for known items over answering
+ old for unknown ones as the memory ability.
+ But although this would lead to an answer it is obvious that the parameter
+ do not fulfill reasonable assumptions about the two processes.
+ For example it it does not make sense that memory is dependent on response
+ bias, but in this model it would be: Consider someone with perfect memory
+ that is being able to remember everything.
+ This person would identify every known item as known.
+ But despite perfect memory the proposed odds ratio as memory indicator
+ would vary based on that person's tendency to falsely identify unknown
+ items as old, that is the memory indicator would increase as much as the
+ person tends to identify items as unknown in general.
+ A good memory indicator should identify the actual memory performance without
+ being influenced by the individual preference for one or the other answer.
 \end_layout
 
 \begin_layout Standard
-Similarity to general statistical analysis
-\end_layout
-
-\begin_layout Standard
-Response bias and Memory strength
-\end_layout
-
-\begin_layout Standard
-necessity for a model
+Mathematical modeling aims to disentangle these processes and by describing
+ the underlying processes in a formal predictable fashion that allows to
+ select competing models based on quantitative indicators, measure the influence
+ of experimental treatments on specific subprocesses, and predict models
+ idiosyncratic data patterns.
+ This thesis uses all these abilities to compare two competing model classes
+ for their ability to account for observed recognition memory data.
 \end_layout
 
 \begin_layout Section
@@ -267,34 +281,87 @@ Theory
 \end_layout
 
 \begin_layout Standard
-Results of experiments involving a finite set of behavioral categories 
-\begin_inset Formula $C_{1},C_{2},\ldots,C_{j}$
+In the literature several models of recognition memory are discussed
+\begin_inset CommandInset citation
+LatexCommand citep
+after "for a recent overview"
+before "see"
+key "snodgrass_pragmatics_1988,klauer_flexibility_2011"
+
 \end_inset
 
- can be described as set of each categories' observed frequency 
+.
+ The most prominent ones are models based on the theory of signal detection
+ 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "green_signal_1966"
+
+\end_inset
+
+ and high threshold models 
+\begin_inset CommandInset citation
+LatexCommand citep
+before "e.g. "
+key "blackwell_neural_1963,snodgrass_pragmatics_1988"
+
+\end_inset
+
+.
+ The main difference of these models is the assumption underlying the nature
+ of the memory process.
+ However, both models inherently distinguish two types of processes, memory
+ processes and response processes.
+ That is, it is generally agreed upon that memory researchers need models
+ to measure the quantities of interest.
+ 
+\end_layout
+
+\begin_layout Standard
+Results of experiments involving a finite set of behavioral categories 
+\begin_inset Formula $C_{1},C_{2},\ldots,C_{J}$
+\end_inset
+
+ can be described exhaustively as a set of each categories' observed frequency
+ 
 \begin_inset Formula $D=\{N_{1},N_{2},\ldots,N_{j}\}$
 \end_inset
 
 .
- Psychologists are usually interested in the underlying cognitive processes
- producing that observed data pattern 
+ Under the assumption that these frequencies are mutually independent and
+ identically distributed there is a probability 
+\begin_inset Formula $p_{j}$
+\end_inset
+
+ for observing category 
+\begin_inset Formula $C_{j}$
+\end_inset
+
+.
+ The probability for finding a dataset under a given set of probabilities
+ for each category is given as 
+\begin_inset Formula $P(D\vert p_{1},p_{2},\ldots,p_{J})=\sum_{i=1}^{J}(N_{i})!\prod_{i=1}^{J}\frac{p_{i}^{N_{i}}}{N_{i}!}$
+\end_inset
+
+.
+ Psychologists are usually interested in the generating cognitive processes
+ of the observed data pattern 
 \begin_inset Formula $D$
 \end_inset
 
 .
- Often these processes are described verbally, experimental manipulations
- are applied and corresponding changes in 
+ Often the assumed processes and their relationships are described verbally,
+ appropriate experimental manipulations are applied and corresponding changes
+ in 
 \begin_inset Formula $D$
 \end_inset
 
  are hypothesized.
- If these hypotheses hold, that is the probability for 
-\begin_inset Formula $D$
-\end_inset
-
- if the experimental manipulation yields no change in the underlying process
- is smaller than some acceptable value 
-\begin_inset Formula $\alpha$
+ If the null hypothesis is rejected, i.e.
+ the probability for the found data in the experimental group under the
+ assumption of equal probabilities for the categories to the control group
+ is smaller than an acceptable error level 
+\begin_inset Formula $P(D_{EG}\vert p_{1,}p_{2},\ldots,p_{J})<\alpha$
 \end_inset
 
 , the described process is seen as confirmed.
@@ -311,6 +378,740 @@ Results of experiments involving a finite set of behavioral categories
 
 .
  
+\end_layout
+
+\begin_layout Subsection
+Latent-Strength models
+\end_layout
+
+\begin_layout Standard
+Latent strength models assume that all stimuli vary normally distributed
+ on a continuous familiarity scale.
+ Studying items shifts this distribution to greater familiarity values.
+ Responses are made based on a cutoff criterion, that is items with familiarity
+ above this criteria are classified as known and items below as unknown.
+ Memory strength is captured as the amount the distribution of studied items
+ is shifted.
+ Response tendency is captured in the position of the cutoff criterion -
+ the higher the cutoff criteria the lower the probability for classifying
+ items as known (i.e.
+ the more conservative the response bias).
+ As the mean and standard deviation of unknown items can be, without loss
+ of generality, set to 0 and 1, respectively, the most general form of this
+ model has parameter 
+\begin_inset Formula $\theta=\{\mu,\sigma,c\}$
+\end_inset
+
+ with 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ being the mean and standard deviation of studied items and 
+\begin_inset Formula $c$
+\end_inset
+
+ being the cutoff criterion.
+ Let 
+\begin_inset Formula $\Phi(x)$
+\end_inset
+
+ denote the cumulative density function of the standard normal distribution,
+ the probability for a hit and a false alert are then given as
+\begin_inset Formula 
+\begin{align*}
+P(\text{"known"}\vert\theta,\text{old item}) & =1-\Phi\left(\frac{c-\mu}{\sigma}\right)\\
+P(\text{"known"}\vert\theta,\text{new item}) & =1-\Phi(c)
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Responses to 
+\begin_inset Formula $n$
+\end_inset
+
+-step confidence rating scales are assumed to be based on 
+\begin_inset Formula $n-1$
+\end_inset
+
+ cutoff criteria with increasing values for higher confidence judgements.
+ The models parameter are then given as 
+\begin_inset Formula $\theta=\{\mu,\sigma,c_{1},c_{2},\ldots,c_{n-1}\}$
+\end_inset
+
+.
+ Let 
+\begin_inset Formula $X$
+\end_inset
+
+ be the observed confidence rating.
+ The probability for response 
+\begin_inset Formula $j\in\{1,2,\ldots,n\}$
+\end_inset
+
+ is then given as
+\begin_inset Formula 
+\begin{eqnarray*}
+P(X=j\vert\theta,\text{old item}) & = & \Phi\left(\frac{u_{j}-\mu}{\sigma}\right)-\Phi\left(\frac{l_{j}-\mu}{\sigma}\right)\\
+P(X=j\vert\theta,\text{new item}) & = & \Phi\left(u_{j}\right)-\Phi\left(l_{j}\right)
+\end{eqnarray*}
+
+\end_inset
+
+With 
+\begin_inset Formula $u_{j}$
+\end_inset
+
+, 
+\begin_inset Formula $l_{j}$
+\end_inset
+
+ representing the upper and lower bound, respectively, for rating 
+\begin_inset Formula $j$
+\end_inset
+
+ given as 
+\begin_inset Formula $u_{j}=\begin{cases}
+\infty, & j=n\\
+c_{j}, & j<n
+\end{cases}$
+\end_inset
+
+ and 
+\begin_inset Formula $l_{j}=\begin{cases}
+-\infty, & j=1\\
+c_{j-1}, & j>1
+\end{cases}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+In 2AFC tasks the responses are based on the difference of each of the two
+ items' familiarity.
+ Let 
+\begin_inset Formula $L$
+\end_inset
+
+, 
+\begin_inset Formula $R$
+\end_inset
+
+ denote the familiarity of the left and right item, respectively, then the
+ difference is given as 
+\begin_inset Formula $D_{LR}=R-L$
+\end_inset
+
+.
+ As the distribution of old items is given as 
+\begin_inset Formula $\mathcal{N}(\mu,\sigma)$
+\end_inset
+
+, the distribution of new items as 
+\begin_inset Formula $\mathcal{N}$
+\end_inset
+
+, and both random variables are independent the difference is also normally
+ distributed: 
+\begin_inset Formula 
+\begin{eqnarray*}
+D_{LR,\text{old item left}} & = & \mathcal{N}\left(-\mu,\sqrt{1+\sigma^{2}}\right)\\
+D_{LR,\text{old item rigth}} & = & \mathcal{N}\left(\mu,\sqrt{1+\sigma^{2}}\right)
+\end{eqnarray*}
+
+\end_inset
+
+The decision on a 2AFC trial is determined as the difference value is smaller
+ or higher for left or right answers, respectively, than a cutoff criterion.
+ The extension for 
+\begin_inset Formula $n$
+\end_inset
+
+-step 2AFC confidence rating scales is straightforward and equivalent to
+ the extension from known-unknown decisions to 
+\begin_inset Formula $n$
+\end_inset
+
+-step confidence ratings.
+ Ratings 
+\begin_inset Formula $j\leq\frac{n}{2}$
+\end_inset
+
+ indicate that the left item is classified as known with smaller ratings
+ meaning higher confidence and ratings 
+\begin_inset Formula $j>\frac{n}{2}$
+\end_inset
+
+ indicate that the right item is classified as known with higher ratings
+ meaning higher confidence.
+ The probability for response 
+\begin_inset Formula $j$
+\end_inset
+
+ is given as 
+\begin_inset Formula 
+\begin{eqnarray*}
+P(X=j\vert\theta,\text{old item left}) & = & \Phi\left(\frac{u_{j}+\mu}{\sqrt{1+\sigma^{2}}}\right)-\Phi\left(\frac{l_{j}+\mu}{\sqrt{1+\sigma^{2}}}\right)\\
+P(X=j\vert\theta,\text{new item rigth}) & = & \Phi\left(\frac{u_{j}-\mu}{\sqrt{1+\sigma^{2}}}\right)-\Phi\left(\frac{l_{j}-\mu}{\sqrt{1+\sigma^{2}}}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In this thesis the equal-variance signal detection theory (EVSDT) model
+ is used, which is a special case of the before described unequal-variance
+ signal detection theory (UVSDT) for 2AFC confidence rating tasks, with
+ the restriction that all variances are equal and are set, without loss
+ of generality, to be equal one.
+ Different encoding strengths are expected to influence the memory parameter
+ 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and the different scales are expected to influence the cutoff criteria
+ 
+\begin_inset Formula $c_{i}$
+\end_inset
+
+.
+ Thus, for 
+\begin_inset Formula $e$
+\end_inset
+
+ encoding strengths, 
+\begin_inset Formula $s$
+\end_inset
+
+ scales and 
+\begin_inset Formula $n$
+\end_inset
+
+-step 2AFC confidence ratings the here used model has parameters 
+\begin_inset Formula $\theta=\{\mu_{1},\ldots,\mu_{e},c_{1,1},\ldots,c_{n-1,1},\ldots,c_{1,s},\ldots,c_{n-1,s}\}$
+\end_inset
+
+ with parameter space 
+\begin_inset Formula $\mathbb{R}^{e+s(n-1)}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Discrete-State models
+\end_layout
+
+\begin_layout Standard
+Discrete-state models assume that observed behavior classes are a function
+ of combinations of 
+\begin_inset Formula $n$
+\end_inset
+
+ discrete cognitive states 
+\begin_inset Formula $S=\{S_{1},S_{2},\ldots,S_{n}\}$
+\end_inset
+
+.
+ Each state is hereby reached with a certain probability that depends on
+ the previous state.
+ Recognition memory behavior is assumed to stem from two central states:
+ 
+\begin_inset Formula $S_{1}$
+\end_inset
+
+, 
+\begin_inset Formula $S_{2}$
+\end_inset
+
+: detect item successfully as old or new, respectively, with probability
+ 
+\begin_inset Formula $d_{s}=P(S_{1}\vert\text{old item})$
+\end_inset
+
+, and 
+\begin_inset Formula $d_{n}=P(S_{2}\vert\text{new item})$
+\end_inset
+
+, 
+\begin_inset Formula $S_{3}$
+\end_inset
+
+: guess the item to be known with probability 
+\begin_inset Formula $g=P\left(S_{3}\big\vert\left(S_{1}\cup S_{2}\right){}^{C}\right)$
+\end_inset
+
+.
+ Studying items is captured in a higher 
+\begin_inset Formula $d_{s}$
+\end_inset
+
+.
+ Response bias is captured 
+\begin_inset Formula $g$
+\end_inset
+
+ with lower values meaning a more conservative response strategy.
+ The model has parameters 
+\begin_inset Formula $\theta=\{d_{s},d_{n},g\}$
+\end_inset
+
+ and can be imagined as tree of binary branches for entering a particular
+ state with probability 
+\begin_inset Formula $p$
+\end_inset
+
+ or not with its counter probability 
+\begin_inset Formula $1-p$
+\end_inset
+
+.
+ Probabilities along branches are multiplied and each branch ends in an
+ observable behavior class.
+ Thus, the probability for each observable behavior is the sum of all single
+ branch probabilities ending in this behavior category.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+P(\text{"known"}\vert\theta,\text{old item}) & = & d_{s}+(1-d_{s})g\\
+P(\text{"known"}\vert\theta,\text{new item}) & = & (1-d_{n})g
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Responses to 
+\begin_inset Formula $m$
+\end_inset
+
+-step confidence rating scales have been discussed extensively (source).
+ The early assumption that detect states lead invariably to the highest
+ confidence rating could not be supported sufficiently by empirical data
+ (source).
+ Recent literature suggests that each state has a corresponding response
+ mapping function that assigns each possible response 
+\begin_inset Formula $j\in\{1,2,\ldots,m\}$
+\end_inset
+
+ a probability for a given cognitive state.
+ Thus, the model needs to be extended by a family of mapping functions 
+\begin_inset Formula $\left(\text{m}_{s}(x)\right){}_{s\in S}$
+\end_inset
+
+, which assign for a given cognitive state 
+\begin_inset Formula $s$
+\end_inset
+
+ each possible rating 
+\begin_inset Formula $x$
+\end_inset
+
+ a probability.
+ Let 
+\begin_inset Formula $X$
+\end_inset
+
+ denote the observed response.
+ The probability for response 
+\begin_inset Formula $j$
+\end_inset
+
+ is then given as:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+P(X=j\vert\theta,\text{old item}) & = & d_{s}\text{m}_{S_{1}}(j)+(1-d_{s})g\text{m}_{S_{3}}(j)\\
+P(X=j\vert\theta,\text{new item}) & = & d_{n}\text{m}_{S_{2}}(j)+(1-d_{n})g\text{m}_{S_{3}}(j)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In 2AFC tasks states 
+\begin_inset Formula $S_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $S_{2}$
+\end_inset
+
+ are not more distinguishable because and old and a new item is always presented
+ simultaneously, also there is no possibility to have a tendency towards
+ answering known or unknown.
+ Thus a new set of states for 2AFC tasks is necessary 
+\begin_inset Formula $S^{*}=\{S_{1}^{*},S_{2}^{*},\ldots,S_{n}^{*}\}$
+\end_inset
+
+.
+ For recognition memory data these are namely: 
+\begin_inset Formula $S_{1}^{*}$
+\end_inset
+
+, 
+\begin_inset Formula $S_{2}^{*}$
+\end_inset
+
+: for detecting any of the two items' status if the correct one is on the
+ left or right side, respectively - which are equivalently to 
+\begin_inset Formula $S_{1}\cup S_{2}$
+\end_inset
+
+ if the old item is shown on the respective side - and 
+\begin_inset Formula $S_{3}$
+\end_inset
+
+: guessing that the old item is on the 
+\emph on
+right
+\emph default
+ side, without loss of generality.
+ Parameters 
+\begin_inset Formula $d_{l}=P(S_{1}^{*}\vert\text{old item left})$
+\end_inset
+
+, 
+\begin_inset Formula $d_{r}=P(S_{2}^{*}\vert\text{old item right})$
+\end_inset
+
+, and 
+\begin_inset Formula $g_{r}=P\left(S_{3}^{*}\big\vert\left(S_{1}^{*}\cup S_{2}^{*}\right){}^{C}\right)$
+\end_inset
+
+ are also redefined.
+ Together with a new family of mapping functions 
+\begin_inset Formula $\left(\text{m}_{s}^{*}(x)\right){}_{s\in S^{*}}$
+\end_inset
+
+, the probability for rating 
+\begin_inset Formula $j$
+\end_inset
+
+ if ratings 
+\begin_inset Formula $j\leq\frac{m}{2}$
+\end_inset
+
+ indicate that the left item is classified as known with smaller ratings
+ meaning higher confidence and ratings 
+\begin_inset Formula $j>\frac{m}{2}$
+\end_inset
+
+ indicate that the right item is classified as known with higher ratings
+ meaning higher confidence, is given as:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+P(X=j\vert\theta,\text{old item left}) & = & d_{l}\text{m}_{S_{1}^{*}}^{*}(j)+(1-d_{l})g_{r}\text{m}_{S_{3}^{*}}^{*}(j)\\
+P(X=j\vert\theta,\text{new item rigth}) & = & d_{r}\text{m}_{S_{2}^{*}}^{*}(j)+(1-d_{r})g_{r}\text{m}_{S_{3}^{*}}^{*}(j)
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Maping für 1-gr.
+ Entwerder mapping funtion umschreiben oder guessing integrieren
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Response mapping in this general way introduces a great amount of flexibility.
+ All three states map freely on the full response scale, which nets to 
+\begin_inset Formula $3(m-1)$
+\end_inset
+
+ degrees of freedom for response mapping only.
+ Thus it is necessary to restrict the mapping functions reasonably.
+ It can be argued that if a detect state is entered the response can not
+ be on the 
+\begin_inset Quotes eld
+\end_inset
+
+wrong
+\begin_inset Quotes erd
+\end_inset
+
+ side of the scale (e.g.
+ 
+\begin_inset Formula $j\leq\frac{m}{2}$
+\end_inset
+
+ if the old item is on the left hand side is detected), thus the mapping
+ functions for detect states can be restricted to zero probability for the
+ 
+\begin_inset Quotes eld
+\end_inset
+
+wrong
+\begin_inset Quotes erd
+\end_inset
+
+ responses.
+ This eliminates 
+\begin_inset Formula $2\frac{m}{2}=m$
+\end_inset
+
+ degrees of freedom.
+ Furthermore adding the symmetry constraints used by 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "province_evidence_2012"
+
+\end_inset
+
+ - namely 
+\begin_inset Formula $\text{m}_{S_{2}^{*}}^{*}(x)=\text{m}_{S_{1}^{*}}^{*}(m-x+1)$
+\end_inset
+
+ that is the mapping for detection on the left hand side is identical to
+ mapping on the right side and 
+\begin_inset Formula $m_{S_{2}^{*}}^{*}(x)=m_{S_{2}^{*}}^{*}(m-x+1)$
+\end_inset
+
+ that is the mapping for the guessing is mirrored on the scales center -
+ eliminates 
+\begin_inset Formula $\frac{m}{2}-1$
+\end_inset
+
+ df for equal detection mapping and 
+\begin_inset Formula $\frac{m}{2}$
+\end_inset
+
+ df for guessing mapping symmetry.
+ With all these restrictions response mapping 
+\begin_inset Quotes eld
+\end_inset
+
+costs
+\begin_inset Quotes erd
+\end_inset
+
+ for all states 
+\begin_inset Formula $3(m-1)-m-(\frac{m}{2}-1)-\frac{m}{2}=m-2$
+\end_inset
+
+ degrees of freedom.
+ The trivial and in this thesis used mapping functions are 
+\begin_inset Formula $\text{m}_{S_{1}^{*}}^{*}(j)\begin{cases}
+\prod_{n=1}^{\frac{m}{2}-1}(1-p_{ns})^{\mathbf{1}_{\{x>n\}}(j)}*p_{ns}^{\mathbf{1}_{\{x=n\}}(j)}, & j\leq\frac{m}{2}\\
+0 & j>\frac{m}{2}
+\end{cases}$
+\end_inset
+
+ for detect states and 
+\begin_inset Formula $\text{m}_{s}(j)\begin{cases}
+\prod_{n=1}^{\frac{m}{2}-1}(1-p_{ns})^{\mathbf{1}_{\{x<n\}}(\frac{m}{2}-j)}*p_{ns}^{\mathbf{1}_{\{x=n\}}(\frac{m}{2}-j)}, & j\leq\frac{m}{2}\\
+\text{m}_{s}(m-j+1) & j>\frac{m}{2}
+\end{cases}$
+\end_inset
+
+ for guessing states.
+ 
+\end_layout
+
+\begin_layout Standard
+In this thesis the 1 high-threshold model (1HTM) is used, which is a special
+ case of the before described 2 high-threshold model (2HTM) for 2AFC confidence
+ rating tasks, with the restriction that there is only one parameter 
+\begin_inset Formula $d$
+\end_inset
+
+ for detection and 
+\begin_inset Formula $d=d_{l}=d_{r}$
+\end_inset
+
+.
+ Different encoding strengths are expected to influence the memory parameter
+ 
+\begin_inset Formula $d$
+\end_inset
+
+ and different scales are expected to influence response mapping parameter
+ and guessing bias 
+\begin_inset Formula $g_{r}$
+\end_inset
+
+.
+ 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Model parameter
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Model selection
+\end_layout
+
+\begin_layout Standard
+Bot presented models have, so far, proofed to be good account for recognition
+ memory data.
+ Models are designed to disentangle cognitive processes underlying observed
+ data.
+\end_layout
+
+\begin_layout Standard
+Model appropriateness is often based on model fit and parsimony.
+\end_layout
+
+\begin_layout Standard
+It is widely accepted that MPT models do not account adequately for recognition
+ memory data 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "yonelinas_receiver_2007,wixted_dual-process_2007"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+SDT models are more flexible 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "klauer_flexibility_2011"
+
+\end_inset
+
+ but also fit the data better.
+\end_layout
+
+\begin_layout Standard
+but newer arguments challenge these findings 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "broder_recognition_2009"
+
+\end_inset
+
+ and these arguments are supported by emprical data from 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "province_evidence_2012"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+...
+\end_layout
+
+\begin_layout Standard
+Experimental manipulations of the assumed processes should map to the to
+ the respective parameters of the model.
+\end_layout
+
+\begin_layout Standard
+In recognition memory models response processes are manipulated (Citations)
+\end_layout
+
+\begin_layout Standard
+This can be done by obtaining confidence ratings for the classifications:
+ the proportion of hits per false alerts increases with higher confidence.
+ That is participants are more conservative with their answers with increasing
+ confidence.
+\end_layout
+
+\begin_layout Standard
+two alternative forced choice (2AFC) rating scales are a straightforward
+ extension to this principle.
+ 
+\end_layout
+
+\begin_layout Standard
+Response mapping manipulation
+\end_layout
+
+\begin_layout Standard
+Strong memories are hard to scale 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "mickes_strong_2011"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Encoding strength manipulation via time or repeated presentation+
+\end_layout
+
+\begin_layout Standard
+Description of models
+\end_layout
+
+\begin_layout Standard
+All models are making strong assumptions about underlying and unobservable
+ processes generating the observable data.
+ Additionally to the likelihood for the found data given a specific model
+ it is necessary to evaluate the models ability to appropriately reacting
+ to treatment manipulation aiming at specific parameters of the models.
+\end_layout
+
+\begin_layout Standard
+Models differ in their ability to account for data
+\end_layout
+
+\begin_layout Standard
+Necessity for more data point (ROC plots)
+\end_layout
+
+\begin_layout Standard
+Options: besrate payoff responce scale
+\end_layout
+
+\begin_layout Standard
+Responce scale options yes/no vs.
+ 2AFC
+\end_layout
+
+\begin_layout Standard
+models
 \end_layout
 
 \begin_layout Standard
@@ -339,34 +1140,77 @@ combined models
 \end_layout
 
 \begin_layout Subsection
-Discrete-State models
+Combined models
 \end_layout
 
 \begin_layout Standard
-The central assumption of discrete-state models is that cognitive process
- in question, e.g.
- recognition memory, can be separated in mutual exclusive states.
- The different states are linked to each other and their transitions are
- described in term of probabilities.
- Many discrete-state models can be expressed as MPT models 
-\begin_inset CommandInset citation
-LatexCommand citep
-after "for a recent review"
-before "Multinomial Processing Tree;"
-key "riefer_multinomial_1988,erdfelder_multinomial_2009"
+??
+\end_layout
 
+\begin_layout Subsection
+(Fitting process)
+\end_layout
+
+\begin_layout Standard
+Model fitting means finding the parameters for the models that maximise
+ the likelyhood of the found data.
+\end_layout
+
+\begin_layout Standard
+The models parameter can be estimated basted on the observed data.
+\end_layout
+
+\begin_layout Standard
+Estimation is based on maximizing the likelihood for the the given data
+ under the fitted model.
+\end_layout
+
+\begin_layout Standard
+need for a likelihood function for data and model parameter 
+\begin_inset Formula $L(D;\theta)$
 \end_inset
 
-.
+
+\end_layout
+
+\begin_layout Standard
+maximizing the likelihood function leads to maximum likelihood parameter
+ estimates 
+\begin_inset Formula $\hat{\theta}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $L(D;\hat{\theta})$
+\end_inset
+
+ is the goodness of fit indicator for that model.
+\end_layout
+
+\begin_layout Standard
+Good fit can be achieved by the appropriateness of the model or by flexible
+ models.
+\end_layout
+
+\begin_layout Subsection
+Model Fit
+\end_layout
+
+\begin_layout Standard
+Model fit is the likelihood for the data under the best parameter estimates
+ of the model.
  
 \end_layout
 
-\begin_layout Subsection
-Latent-Strength models
+\begin_layout Standard
+A better model fit means that the model is the better account for the observed
+ data pattern.
 \end_layout
 
-\begin_layout Subsection
-Combined models
+\begin_layout Standard
+But models 
 \end_layout
 
 \begin_layout Standard
@@ -410,13 +1254,6 @@ key "province_evidence_2012"
 \end_inset
 
  are great! 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "broder_recognition_2009"
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -446,11 +1283,12 @@ key "province_evidence_2012"
  models.
  But on the other hand they used some specialities in their studies which
  decrease comparability of their results considerably.
- Namely their use of continuous and post-hoc binned rating scales and the
- use of semantically related words for the 2AFC task complicate the interpretati
-on of their results.
- The central research goal in this work is thus to replicate their findings.
- 
+ Namely their use of continuous and post-hoc binned rating scales in experiment
+ one and two, the asymmetric response scale manipulation in experiment two
+ and the use of highly associated words as distractors in the 2AFC task
+ in experiment three complicate the interpretation of their results.
+ The central research goal in this work is thus to replicate their findings
+ with a more comparable design.
 \end_layout
 
 \begin_layout Standard
@@ -461,6 +1299,70 @@ Role of the forced guessing condition
 scale manipulation
 \end_layout
 
+\begin_layout Standard
+Recognition memory is the ability to recognize previously seen items as
+ such.
+ The central principle is that there are four response options: hit, false
+ alert, correct rejection and miss.
+ It is not trivial to separate actual memory performance from the tendency
+ to answer in a specific way.
+ It is necessary to determine the way these processes are interlinked to
+ produce the observable result.
+ This is done using mathematical models linking different treatments to
+ the respective outcomes.
+ 
+\end_layout
+
+\begin_layout Standard
+One class of models are the discrete state models
+\end_layout
+
+\begin_layout Standard
+2AFC if both are detected as new? What to answer?
+\end_layout
+
+\begin_layout Standard
+Pictures are easier to learn and recognize than words (Paivio, 1971, 1986).
+\end_layout
+
+\begin_layout Subsection
+Hypothesis
+\end_layout
+
+\begin_layout Standard
+Encoding strength manipulation influences the memory parameters of the model
+ but not the response tendency and response mapping parameters.
+\end_layout
+
+\begin_layout Standard
+Scale manipulation influences the response mapping parameters but not the
+ memory parameters.
+ No assumption for the guessing parameters.
+\end_layout
+
+\begin_layout Standard
+Verbal and visual data have different memory parameters but equal response
+ tendency and response mapping parameters.
+\end_layout
+
+\begin_layout Standard
+replication: In the forced guessing group discrete-state model provides
+ the better fit to the data in contrast to latent strength model
+\end_layout
+
+\begin_layout Standard
+without forced guessing trials there is no clear preference for the discrete
+ state-models.
+\end_layout
+
+\begin_layout Standard
+Maybe: model mimicry
+\end_layout
+
+\begin_layout Standard
+Maybe: model landscaping
+\end_layout
+
 \begin_layout Section
 Methods
 \end_layout
@@ -469,8 +1371,32 @@ Methods
 Subjects
 \end_layout
 
+\begin_layout Chunk
+
+<<Demographics, echo=FALSE>>=
+\end_layout
+
+\begin_layout Chunk
+
+@
+\end_layout
+
 \begin_layout Standard
-Participants were recruited in courses, via email list, and bulletin offer.
+The 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{nrow(demographics.df)}
+\end_layout
+
+\end_inset
+
+ participants with were recruited in courses, via email list, and bulletin
+ offer.
  Participants were offered VP hours
 \begin_inset Foot
 status open
@@ -484,7 +1410,11 @@ Versuchspersonen Stunden: Psychology students have to take part in research
 
 , their individual results, a copy of the completed thesis, and the merit-based
  chance of getting 50€, 30€ or 20€ as the 1st, 2nd, and 3rd place, respectively.
- 
+ The sample consisted mostly of young (
+\emph on
+Mdn
+\emph default
+=
 \begin_inset ERT
 status open
 
@@ -492,24 +1422,372 @@ status open
 
 
 \backslash
-Sexpr{1:10}
+Sexpr{median(demographics.df$age)}
 \end_layout
 
 \end_inset
 
- sad 
+, range=
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{min(demographics.df$age)}
+\end_layout
+
+\end_inset
+
+-
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{max(demographics.df$age)}
+\end_layout
+
+\end_inset
+
+) psychology (
+\emph on
+n
+\emph default
+=
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{length(grep("(sycholo|SYCHOLO)", demographics.df$occupdesc))}
+\end_layout
+
+\end_inset
+
+) students (
+\emph on
+n
+\emph default
+=
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{length(demographics.df$occup[demographics.df$occup=="student"])}
+\end_layout
+
+\end_inset
+
+).
+ The first 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{nrow(subset(demographics.df, group=="normal"))}
+\end_layout
+
+\end_inset
+
+ subjects were assigned to Group 1 
+\begin_inset Quotes eld
+\end_inset
+
+fully encoded
+\begin_inset Quotes erd
+\end_inset
+
+ the rest (
+\emph on
+n
+\emph default
+=
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{nrow(subset(demographics.df, group=="forcedguess"))}
+\end_layout
+
+\end_inset
+
+) were assigned to Group 2 
+\begin_inset Quotes eld
+\end_inset
+
+forced guessing
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Each participant were invited for two session: Session 1 with verbal items
+ and session 2 with visual items.
+\end_layout
+
+\begin_layout Subsection
+Materials
 \end_layout
 
 \begin_layout Standard
+The paradigm was implemented as Python program.
+ Verbal stimuli for the first sessions of bot groups were neutral german
+ nouns taken from 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "lahl_using_2009"
+
+\end_inset
+
+ ranging from 4 to 8 letters in length.
+ According to the ratings obtained by 
+\begin_inset CommandInset citation
+LatexCommand citeauthor
+key "lahl_using_2009"
+
+\end_inset
+
+, the words were all of medium valence (ranging from 3.5 to 6.5 on an 11-point
+ scale) and low in arousal (ranging from 0.5 to 4.5 on an 11-point scale).
+ For Group 1 I used 644 nouns that were of approximately equal word frequency
+ in common German, as indicated by log frequency ratings obtained for each
+ word via WordGen 
+\begin_inset CommandInset citation
+LatexCommand citep
+before "ranging from 0.3 to 2.9;"
+key "duyck_wordgen:_2004"
+
+\end_inset
+
+.
+ For Group 2 I used 857 nouns, that were of approximately equal word frequency
+ in common German, as indicated by frequency classes obtained for each word
+ from DeReWo
+\begin_inset CommandInset citation
+LatexCommand citep
+before "ranging from 10 to 16; "
+key "institut_fur_deutsche_sprache_programmbereich_korpuslinguistik_korpusbasierte_2013"
+
+\end_inset
+
+.
+ Visual stimuli for both sessions were 525 black and white line drawings
+ taken from 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "szekely_timed_2003"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Responses were collected using 8-steps and 6-steps two alternative forced
+ choice (2AFC) rating scales in the in the in the fully encoded group and
+ the forced guessing group, respectively.
+ Each side of the scale was labeled 
+\emph on
+left
+\emph default
+ and 
+\emph on
+right
+\emph default
+, respectively and vertically centered on the screen and horizontally centered
+ above each half of the scale one item was shown.
+ The two central buttons on each side were labeled with the character 
+\emph on
+1
+\emph default
+ and the more peripheral buttons were labeled with increasing numbers (see
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Rating-scales"
+
+\end_inset
+
+).
+ In the fully encoded group either the left or the right item of each trial
+ has been shown before the other one was a lure.
+ In the forced guessing group where trials added in that none of the two
+ items has been shown before (i.e.
+ the answer could not be based on recognition of an old item).
+ In the first sessions of both groups, in which verbal items where to be
+ memorized, the numbers more peripheral numbers increased either by one
+ or by four for the 
+\begin_inset Quotes eld
+\end_inset
+
+low-risk
+\begin_inset Quotes erd
+\end_inset
+
+, and 
+\begin_inset Quotes eld
+\end_inset
+
+high-risk
+\begin_inset Quotes erd
+\end_inset
+
+ rating scales, respectively, which resulted in 1, 2, 3, 4; 1, 5, 9, 13
+ for the fully encoded group and 1, 2, 3; 1, 5, 9 for the forced guessing
+ group each low-risk and high-risk scales, respectively.
+\end_layout
+
+\begin_layout Standard
+Each participant was asked to generate an individual VP-code based on a
+ given structure for anomy identification.
+ Socio-demographic data was collected subsequently to each session.
+ In order to be able to get the monetary reward and their individual data,
+ participants had to give their e-mail addresses.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Rating scales
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Rating-scales"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Procedures
+\end_layout
+
+\begin_layout Subsection
+Design
+\end_layout
+
+\begin_layout Standard
+The main treatment factors were the encoding strength that is how often
+ a word has been shown in the learning phase, the position of the learned
+ item in the 2AFC-rating task, the response scale used in the 2AFC task.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:experimental-factors"
+
+\end_inset
+
+shows all factor combinations, resulting data cells and degrees of freedom.
+ All factor combinations are applied in a within subject factorial design.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Tadaa
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:experimental-factors"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
 \begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="4">
-<features tabularvalignment="middle">
+<lyxtabular version="3" rows="8" columns="13">
+<features booktabs="true" tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0pt">
+<column alignment="center" valignment="top" width="0pt">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell multirow="3" alignment="center" valignment="middle" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Grp.
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="3" alignment="left" valignment="middle" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Session
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+encoding
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -518,7 +1796,16 @@ Sexpr{1:10}
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+positions
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -527,7 +1814,16 @@ Sexpr{1:10}
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+scale
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -536,18 +1832,54 @@ Sexpr{1:10}
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-dfgd
+factor comb.
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="3" alignment="left" valignment="middle" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+steps
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="3" alignment="left" valignment="middle" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+cells
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="3" alignment="left" valignment="middle" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+df
 \end_layout
 
 \end_inset
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell multirow="4" alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -556,7 +1888,7 @@ dfgd
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell multirow="4" alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -565,11 +1897,130 @@ dfgd
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+levels
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+levels
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+levels
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+trials
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="4" alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="4" alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="4" alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="3" alignment="center" valignment="middle" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Verbal
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
 \end_layout
 
 \end_inset
@@ -578,6 +2029,444 @@ dfgd
 \begin_inset Text
 
 \begin_layout Plain Layout
+(1x, 4x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(L, R)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(low, high risk)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+36
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+64
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+56
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Visual
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(1x, 3x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(L, R)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(low risk)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+62
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+32
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+28
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="3" alignment="center" valignment="middle" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="3" alignment="center" valignment="middle" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Verbal
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(0x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(None)
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="3" alignment="left" valignment="middle" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="3" alignment="center" valignment="middle" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(low, high risk)
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="3" alignment="center" valignment="middle" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+10
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="3" alignment="center" valignment="middle" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+36
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="3" alignment="center" valignment="middle" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="3" alignment="center" valignment="middle" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+60
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="3" alignment="center" valignment="middle" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+50
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="4" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(1x, 4x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(L, R)
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="4" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="4" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="4" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="4" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="4" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="4" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="4" alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 
 \end_layout
 
@@ -585,7 +2474,7 @@ dfgd
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell multirow="4" alignment="center" valignment="middle" bottomline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -594,7 +2483,117 @@ dfgd
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell multirow="3" alignment="center" valignment="middle" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Visual
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(0x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(None)
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="3" alignment="left" valignment="middle" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="3" alignment="center" valignment="middle" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(low risk)
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="3" alignment="center" valignment="middle" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="3" alignment="center" valignment="middle" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+50
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="3" alignment="center" valignment="middle" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="3" alignment="center" valignment="middle" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+30
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="3" alignment="center" valignment="middle" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+25
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="center" valignment="top" bottomline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -603,7 +2602,7 @@ dfgd
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell multirow="4" alignment="center" valignment="top" bottomline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -612,7 +2611,97 @@ dfgd
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(1x, 3x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(L, R)
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="4" alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="4" alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="4" alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="4" alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="4" alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="4" alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="4" alignment="center" valignment="top" bottomline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -629,12 +2718,13 @@ dfgd
 
 \end_layout
 
-\begin_layout Subsection
-Procedures
+\begin_layout Plain Layout
+
 \end_layout
 
-\begin_layout Subsection
-Design
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -655,7 +2745,7 @@ Results
 
 \begin_layout Chunk
 
-<<dataSetup, cache=TRUE, echo=FALSE, eval=TRUE>>=
+<<DataSetup, cache=TRUE, echo=FALSE, eval=TRUE>>=
 \end_layout
 
 \begin_layout Chunk
@@ -752,7 +2842,8 @@ options "plain"
 \end_layout
 
 \begin_layout Section
-Appendix
+\start_of_appendix
+Appendices
 \end_layout
 
 \begin_layout Subsection
@@ -852,6 +2943,10 @@ Plotting R-code
 \begin_layout Chunk
 
 @
+\end_layout
+
+\begin_layout Chunk
+
 \end_layout
 
 \end_body
