@@ -478,20 +478,28 @@ With
 \end_inset
 
  given as 
-\begin_inset Formula $u_{j}=\begin{cases}
+\begin_inset Formula 
+\[
+u_{j}=\begin{cases}
 \infty, & j=n\\
 c_{j}, & j<n
-\end{cases}$
+\end{cases},
+\]
+
 \end_inset
 
- and 
-\begin_inset Formula $l_{j}=\begin{cases}
+and 
+\begin_inset Formula 
+\[
+l_{j}=\begin{cases}
 -\infty, & j=1\\
 c_{j-1}, & j>1
-\end{cases}$
+\end{cases}.
+\]
+
 \end_inset
 
-.
+
 \end_layout
 
 \begin_layout Standard
@@ -708,20 +716,30 @@ Responses to
 \begin_inset Formula $j\in\{1,2,\ldots,m\}$
 \end_inset
 
- a probability for a given cognitive state.
- Thus, the model needs to be extended by a family of mapping functions 
-\begin_inset Formula $\left(\text{m}_{s}(x)\right){}_{s\in S}$
+, with greater values meaning higher confidence, a probability for a given
+ cognitive state.
+ The family of mapping functions can be denoted as 
+\begin_inset Formula $\left(\text{map}_{s}(x)\right){}_{s\in S}$
 \end_inset
 
-, which assign for a given cognitive state 
+ which assign, given cognitive state 
 \begin_inset Formula $s$
 \end_inset
 
- each possible rating 
-\begin_inset Formula $x$
+, each possible rating 
+\begin_inset Formula $x\in\{1,2,\ldots,\frac{m}{2}\}$
 \end_inset
 
- a probability.
+ a certain probability.
+ Since response bias parameter 
+\begin_inset Formula $g$
+\end_inset
+
+ can be expressed as 
+\begin_inset Formula $g=\sum_{i=\frac{m}{2}+1}^{m}\text{map}_{S_{3}}(i)$
+\end_inset
+
+ it is now redundant and thus omitted.
  Let 
 \begin_inset Formula $X$
 \end_inset
@@ -735,10 +753,22 @@ Responses to
 \end_layout
 
 \begin_layout Standard
+For straight 
+\begin_inset Formula $m$
+\end_inset
+
+ the response scale can be split in two equal parts, which are then equivalent
+ to classical responses known - upper half - and unknown - lower half.
+ Thus, the mapping functions only map responses to the half of the scale
+ the state would have resulted in a classical non-rating task.
+ 
+\end_layout
+
+\begin_layout Standard
 \begin_inset Formula 
 \begin{eqnarray*}
-P(X=j\vert\theta,\text{old item}) & = & d_{s}\text{m}_{S_{1}}(j)+(1-d_{s})g\text{m}_{S_{3}}(j)\\
-P(X=j\vert\theta,\text{new item}) & = & d_{n}\text{m}_{S_{2}}(j)+(1-d_{n})g\text{m}_{S_{3}}(j)
+P(X=j\vert\theta,\text{old item}) & = & d_{s}\text{map}_{S_{1}}(j)+(1-d_{s})\text{map}_{S_{3}}(j)\\
+P(X=j\vert\theta,\text{new item}) & = & d_{n}\text{map}_{S_{2}}(j)+(1-d_{n})\text{map}_{S_{3}}(j)
 \end{eqnarray*}
 
 \end_inset
@@ -755,9 +785,9 @@ In 2AFC tasks states
 \begin_inset Formula $S_{2}$
 \end_inset
 
- are not more distinguishable because and old and a new item is always presented
- simultaneously, also there is no possibility to have a tendency towards
- answering known or unknown.
+ are not anymore distinguishable because and old and a new item is always
+ presented simultaneously, also there is no possibility to have a tendency
+ towards answering known or unknown.
  Thus a new set of states for 2AFC tasks is necessary 
 \begin_inset Formula $S^{*}=\{S_{1}^{*},S_{2}^{*},\ldots,S_{n}^{*}\}$
 \end_inset
@@ -785,7 +815,7 @@ In 2AFC tasks states
 right
 \emph default
  side, without loss of generality.
- Parameters 
+ Additionally parameters 
 \begin_inset Formula $d_{l}=P(S_{1}^{*}\vert\text{old item left})$
 \end_inset
 
@@ -794,15 +824,15 @@ right
 \end_inset
 
 , and 
-\begin_inset Formula $g_{r}=P\left(S_{3}^{*}\big\vert\left(S_{1}^{*}\cup S_{2}^{*}\right){}^{C}\right)$
+\begin_inset Formula $g_{r}=P\left(S_{3}^{*}\big\vert\left(S_{1}^{*}\cup S_{2}^{*}\right){}^{C}\right)=\sum_{i=\frac{m}{2}+1}^{m}\text{map}_{S_{3}^{*}}^{*}(i)$
 \end_inset
 
- are also redefined.
- Together with a new family of mapping functions 
-\begin_inset Formula $\left(\text{m}_{s}^{*}(x)\right){}_{s\in S^{*}}$
+, and the new family of mapping functions 
+\begin_inset Formula $\left(\text{map}_{s}^{*}(x)\right){}_{s\in S^{*}}$
 \end_inset
 
-, the probability for rating 
+ are defined.
+ The probability for rating 
 \begin_inset Formula $j$
 \end_inset
 
@@ -821,28 +851,10 @@ right
 
 \begin_layout Standard
 \begin_inset Formula 
-\[
-\]
-
-\end_inset
-
-
-\begin_inset Formula 
 \begin{eqnarray*}
-P(X=j\vert\theta,\text{old item left}) & = & d_{l}\text{m}_{S_{1}^{*}}^{*}(j)+(1-d_{l})g_{r}\text{m}_{S_{3}^{*}}^{*}(j)\\
-P(X=j\vert\theta,\text{new item rigth}) & = & d_{r}\text{m}_{S_{2}^{*}}^{*}(j)+(1-d_{r})g_{r}\text{m}_{S_{3}^{*}}^{*}(j)
+P(X=j\vert\theta,\text{old item left}) & = & d_{l}\text{map}_{S_{1}^{*}}^{*}(j)+(1-d_{l})\text{map}_{S_{3}^{*}}^{*}(j)\\
+P(X=j\vert\theta,\text{new item rigth}) & = & d_{r}\text{map}_{S_{2}^{*}}^{*}(j)+(1-d_{r})\text{map}_{S_{3}^{*}}^{*}(j)
 \end{eqnarray*}
-
-\end_inset
-
-
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-Maping für 1-gr.
- Entwerder mapping funtion umschreiben oder guessing integrieren
-\end_layout
 
 \end_inset
 
@@ -895,21 +907,25 @@ key "province_evidence_2012"
 \end_inset
 
  - namely 
-\begin_inset Formula $\text{m}_{S_{2}^{*}}^{*}(x)=\text{m}_{S_{1}^{*}}^{*}(m-x+1)$
+\begin_inset Formula $\text{map}_{S_{2}^{*}}^{*}(x)=\text{map}_{S_{1}^{*}}^{*}(m-x+1)$
 \end_inset
 
  that is the mapping for detection on the left hand side is identical to
  mapping on the right side and 
-\begin_inset Formula $m_{S_{2}^{*}}^{*}(x)=m_{S_{2}^{*}}^{*}(m-x+1)$
+\begin_inset Formula 
+\[
+\left(\frac{map_{S_{2}^{*}}^{*}(x)}{(1-g_{r})}=\frac{\text{map}_{S_{2}^{*}}^{*}(m-x+1)}{g_{r}}\right)_{x\in\left\{ 1,2,\ldots,\frac{m}{2}\right\} }
+\]
+
 \end_inset
 
- that is the mapping for the guessing is mirrored on the scales center -
- eliminates 
+ that is the mapping for the guessing is a weighted point reflection on
+ the scales center - eliminates 
 \begin_inset Formula $\frac{m}{2}-1$
 \end_inset
 
  df for equal detection mapping and 
-\begin_inset Formula $\frac{m}{2}$
+\begin_inset Formula $\frac{m}{2}-1$
 \end_inset
 
  df for guessing mapping symmetry.
@@ -926,22 +942,46 @@ costs
 \end_inset
 
  degrees of freedom.
- The trivial and in this thesis used mapping functions are 
-\begin_inset Formula $\text{m}_{S_{1}^{*}}^{*}(j)\begin{cases}
-\prod_{n=1}^{\frac{m}{2}-1}(1-p_{ns})^{\mathbf{1}_{\{x>n\}}(j)}*p_{ns}^{\mathbf{1}_{\{x=n\}}(j)}, & j\leq\frac{m}{2}\\
+ Trivial and in this thesis used mapping functions fulfilling the criteria
+ are 
+\begin_inset Formula 
+\[
+\text{map}_{S_{1}^{*}}^{*}(j)=\begin{cases}
+\prod_{i=1}^{\frac{m}{2}-1}(1-p_{d,i})^{\mathbf{1}_{\{x>i\}}(j)}p_{d,i}^{\mathbf{1}_{\{x=i\}}(j)}, & j\leq\frac{m}{2}\\
 0 & j>\frac{m}{2}
-\end{cases}$
+\end{cases},
+\]
+
 \end_inset
 
- for detect states and 
-\begin_inset Formula $\text{m}_{s}(j)\begin{cases}
-\prod_{n=1}^{\frac{m}{2}-1}(1-p_{ns})^{\mathbf{1}_{\{x<n\}}(\frac{m}{2}-j)}*p_{ns}^{\mathbf{1}_{\{x=n\}}(\frac{m}{2}-j)}, & j\leq\frac{m}{2}\\
-\text{m}_{s}(m-j+1) & j>\frac{m}{2}
-\end{cases}$
-\end_inset
-
- for guessing states.
  
+\begin_inset Formula 
+\[
+\text{map}_{S_{2}^{*}}^{*}(j)=\text{map}_{S_{1}^{*}}^{*}(m-j+1),
+\]
+
+\end_inset
+
+for detect states with parameters 
+\begin_inset Formula $\{p_{d,1},p_{d,2},\ldots,p_{d,\frac{m}{2}-1}\}$
+\end_inset
+
+, and 
+\begin_inset Formula 
+\[
+\text{map}_{S_{3}^{*}}^{*}(j)=\begin{cases}
+(1-g_{r})\prod_{i=1}^{\frac{m}{2}-1}(1-p_{g,i})^{\mathbf{1}_{\{x>i\}}(\frac{m}{2}-j+1)}p_{g,i}^{\mathbf{1}_{\{x=i\}}(\frac{m}{2}-j+1)}, & j\leq\frac{m}{2}\\
+g_{r}\prod_{i=1}^{\frac{m}{2}-1}(1-p_{g,i})^{\mathbf{1}_{\{x>i\}}(j-\frac{m}{2})}p_{g,i}^{\mathbf{1}_{\{x=i\}}(j-\frac{m}{2})}, & j>\frac{m}{2}
+\end{cases}
+\]
+
+\end_inset
+
+ for guessing states with parameters 
+\begin_inset Formula $\{g_{r},p_{g,1},p_{g,2},\ldots,p_{g,\frac{m}{2}-1}\}$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -962,22 +1002,53 @@ In this thesis the 1 high-threshold model (1HTM) is used, which is a special
 \end_inset
 
  and different scales are expected to influence response mapping parameter
- and guessing bias 
+ 
+\begin_inset Formula $p_{d,i}$
+\end_inset
+
+, 
 \begin_inset Formula $g_{r}$
 \end_inset
 
-.
- 
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-Model parameter
-\end_layout
-
+, 
+\begin_inset Formula $p_{g,i}$
 \end_inset
 
+.
+ Thus, for 
+\begin_inset Formula $e$
+\end_inset
 
+ encoding strengths, 
+\begin_inset Formula $s$
+\end_inset
+
+ scales and 
+\begin_inset Formula $n$
+\end_inset
+
+-step 2AFC confidence ratings the here used model has parameters
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\lang english
+ 
+\begin_inset Formula $\theta=\{d_{1},\ldots,d_{e},p_{d,1,1},\ldots,p_{d,\frac{m}{2}-1,1},g_{r,s},p_{g,1,1},\ldots,p_{g,\frac{m}{2}-1,1},p_{d,1,s},\ldots,p_{d,\frac{m}{2}-1,s},g_{r,s},p_{g,1,s},\ldots,p_{g,\frac{m}{2}-1,s}\}$
+\end_inset
+
+ with parameter space 
+\begin_inset Formula $[0,1]^{e+s(\frac{m}{2}-1)}$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
