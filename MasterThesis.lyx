@@ -985,9 +985,82 @@ Model selection
 \end_layout
 
 \begin_layout Standard
+What is the best model for the observed data is the central question question
+ of mathematical modeling.
+ But what does 
+\emph on
+best
+\emph default
+ mean? Is it the maximal probability for the observed data? If so, then
+ the probability estimates from observed data is the best.
+ But they are of little interest for other data then the particular dataset
+ they were obtained from.
+ 
+\end_layout
+
+\begin_layout Standard
+Disentangeling relevant processes is key.
+ -> generalizable, paremter of relevance, 
+\end_layout
+
+\begin_layout Standard
+So being a good model has something to do with generalizability.
+ But what? Or what is generalizability? Is it the predictions for other
+ data sets? In general yes, but as parameter estimates are allowed to vary
+ these predicitons are very broad.
+ So we need smaller confidence intervals of the parameter? that certainly
+ makes sense.
+ 
+\end_layout
+
+\begin_layout Standard
+Is it how the models extract the underlying processes from the data? How
+ can we messure how good that is -> parameter validation.
+ 
+\end_layout
+
+\begin_layout Standard
+Models should also condense data.
+ Why? Because the more flexible a model is the greater the probability of
+ having irrelevant parameter.All parameters should be properly validated
+ -> scale manipulation for response mapping.
+\end_layout
+
+\begin_layout Standard
+The risk of having irrelevant parameters could be extended to functional
+ form of the model.
+ the number of parameters is not alone crucial to the model flexibility.
+ 
+\end_layout
+
+\begin_layout Standard
+Mode flexibility is difficult to measure.
+ MDL being mathematically the best method.
+ model landscaping, model mimicry are indicators for flexibility in comparison
+ to other models.
+ 
+\end_layout
+
+\begin_layout Standard
+model flexibility is especially important when models with good fit are
+ also assumed to be more flexible.
+\end_layout
+
+\begin_layout Standard
+Very convincing arguments are when the less flexible model obtains better
+ fits.
+ Especially when the parameters are valid - but because parameter assumptions
+ can be wrong that is less important.
+\end_layout
+
+\begin_layout Standard
+this is what province rouder showed.
+\end_layout
+
+\begin_layout Standard
 Bot presented models have, so far, proofed to be good account for recognition
  memory data.
- Models are designed to disentangle cognitive processes underlying observed
+ Models are designed to disentangle cognitive processes' underlying observed
  data.
 \end_layout
 
@@ -1140,14 +1213,6 @@ combined models
 \end_layout
 
 \begin_layout Subsection
-Combined models
-\end_layout
-
-\begin_layout Standard
-??
-\end_layout
-
-\begin_layout Subsection
 (Fitting process)
 \end_layout
 
@@ -1211,22 +1276,6 @@ A better model fit means that the model is the better account for the observed
 
 \begin_layout Standard
 But models 
-\end_layout
-
-\begin_layout Standard
-Models of recognition memory
-\end_layout
-
-\begin_layout Standard
-Continious models
-\end_layout
-
-\begin_layout Standard
-discrete state models
-\end_layout
-
-\begin_layout Standard
-combined models
 \end_layout
 
 \begin_layout Standard
@@ -1329,38 +1378,86 @@ Pictures are easier to learn and recognize than words (Paivio, 1971, 1986).
 Hypothesis
 \end_layout
 
-\begin_layout Standard
-Encoding strength manipulation influences the memory parameters of the model
- but not the response tendency and response mapping parameters.
+\begin_layout Enumerate
+Manipulation of encoding strength shows increase in correct responses.
+ These changes should be captured by memory performance parameters (congruent
+ validity) of the models under consideration and should not influence any
+ other parameters divergent validity.
+ Thus, for the two different encoding strengths in all experiments it is
+ hypothesized to change the memory parameter (i.e.
+ 
+\begin_inset Formula $\mu$
+\end_inset
+
+, 
+\begin_inset Formula $d$
+\end_inset
+
+ in EVSTD and 1HTM, respectively).
+ (No influence on others? Test?)
+\end_layout
+
+\begin_layout Enumerate
+Manipulation of the response scale should affect the mapping of responses.
+ These changes should be captured by response mapping parameters (congruent
+ validity) of the models under consideration and not influence any other
+ parameter (divergent validity).
+ Thus, for the two dofferent response scales in the first sessions it is
+ hypothesized to change the response mapping parameter (i.e.
+ 
+\begin_inset Formula $c_{1},\ldots,c_{\frac{n}{2}-1},c_{\frac{n}{2}+1},\ldots,c_{n-1}$
+\end_inset
+
+; 
+\begin_inset Formula $p_{d,1},\ldots,p_{d,\frac{n}{2}-1},\ldots,p_{g_{r},\frac{n}{2}-1}$
+\end_inset
+
+ in EVSDT and 1HTM, respectively).
+ Guessing (i.e.
+ 
+\begin_inset Formula $c_{\frac{n}{2}}$
+\end_inset
+
+, 
+\begin_inset Formula $g_{r}$
+\end_inset
+
+ in EVSDT and 1HTM, respectively) bias should be unaffected.
+\end_layout
+
+\begin_layout Enumerate
+Better fit for 1HTM found by
+\begin_inset CommandInset citation
+LatexCommand citet
+key "province_evidence_2012"
+
+\end_inset
+
+should be replicated.
+ 1HTM model should yield better fit than EVSDT
 \end_layout
 
 \begin_layout Standard
-Scale manipulation influences the response mapping parameters but not the
- memory parameters.
- No assumption for the guessing parameters.
+Explorative:
 \end_layout
 
-\begin_layout Standard
-Verbal and visual data have different memory parameters but equal response
- tendency and response mapping parameters.
+\begin_layout Enumerate
+Differences in memory parameters within subject between words and line drawings
+ as memorized items.
+ Are there differences in other parameters as well?
 \end_layout
 
-\begin_layout Standard
-replication: In the forced guessing group discrete-state model provides
- the better fit to the data in contrast to latent strength model
+\begin_layout Enumerate
+Role of the zero repetition trials, that are responses to trials that had
+ two new words in an 2AFC trial.
 \end_layout
 
-\begin_layout Standard
-without forced guessing trials there is no clear preference for the discrete
- state-models.
+\begin_layout Enumerate
+Model mimicry of EVSDT and 1HTM
 \end_layout
 
-\begin_layout Standard
-Maybe: model mimicry
-\end_layout
-
-\begin_layout Standard
-Maybe: model landscaping
+\begin_layout Enumerate
+Model landscaping of EVSDT and 1HTM
 \end_layout
 
 \begin_layout Section
