@@ -1056,393 +1056,227 @@ Model selection
 \end_layout
 
 \begin_layout Standard
-What is the best model for the observed data is the central question question
- of mathematical modeling.
- But what does 
+Consider we have 
+\begin_inset Formula $n$
+\end_inset
+
+ competing models 
+\begin_inset Formula $M=\{m_{1},m_{2},\ldots,m_{n}\}$
+\end_inset
+
+, which is the best? To answer this question we need to define what 
 \emph on
 best
 \emph default
- mean? Is it the maximal probability for the observed data? If so, then
- the probability estimates from observed data is the best.
- But they are of little interest for other data then the particular dataset
- they were obtained from.
+ means.
+ Whereas it is not trivial to state what is best it is easy to state what
+ not.
+ If we define the best model as the one that describes the data the closest,
+ that is the found data is most likely if this model is true: 
+\begin_inset Formula $P(D\vert m_{best})=\max\left(\bigcup_{m\in M}P(D|m)\right)$
+\end_inset
+
+ then the best model we could define is the data itself.
+ But without any information reduction we would not need any model after
+ all.
+ Defining the best model as the one which reduces the information the most
+ is not reasonable because the perfect case would be to say nothing at all
+ about the data, that is we would not have needed even to conducted the
+ research if that would be it's goal.
+ It becomes clear that 
+\emph on
+best
+\series bold
  
+\series default
+\emph default
+has to be a tradeoff between a models ability to fit data and it's flexibility.
+ The much fit as possible with as much flexibility as necessary.
 \end_layout
 
 \begin_layout Standard
-Disentangeling relevant processes is key.
- -> generalizable, paremter of relevance, 
+It follows immediately that if model 
+\begin_inset Formula $m_{a}$
+\end_inset
+
+ has less flexibility and greater fit than 
+\begin_inset Formula $m_{b}$
+\end_inset
+
+, the latter can not be the best model.
+ But this leaves to open problems: (a) how is flexibility measured in general
+ and (b) how is this measure related to fit, which is important to select
+ models in cases with trade-offs, for example model 
+\begin_inset Formula $m_{a}$
+\end_inset
+
+ has better fit but also greater flexibility than 
+\begin_inset Formula $m_{b}$
+\end_inset
+
+.
+ To measure flexibility various methods have been proposed.
 \end_layout
 
-\begin_layout Standard
-So being a good model has something to do with generalizability.
- But what? Or what is generalizability? Is it the predictions for other
- data sets? In general yes, but as parameter estimates are allowed to vary
- these predicitons are very broad.
- So we need smaller confidence intervals of the parameter? that certainly
- makes sense.
+\begin_layout Quotation
+Some of the principled techniques in use are cross-validation methods, bootstrap
+ simulations to assess model mimicry, and the use of model-selection indices
+ such as AIC and BIC.
+ Model-selection indices are used most frequently in applications of the
+ present [recognition memory] models.
  
+\begin_inset CommandInset citation
+LatexCommand citep
+after "p. 431"
+key "klauer_flexibility_2011"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-Is it how the models extract the underlying processes from the data? How
- can we messure how good that is -> parameter validation.
+Mathematically it is most reasonable to measure flexibility as the ability
+ of a model to account for every possible data pattern.
+ This understanding is reflected in indices based on the principle of minimum
+ description length (MDL such as the normalized maximum likelihood index
  
+\begin_inset CommandInset citation
+LatexCommand citep
+before "NML;"
+key "myung_model_2006"
+
+\end_inset
+
+.
+ These indices are used only rarely because they are difficult to compute
+ even for modern computers.
+ For recognition memory they are just recently applied to binary response
+ data
+\begin_inset CommandInset citation
+LatexCommand citep
+key "klauer_flexibility_2011"
+
+\end_inset
+
+but have yet to be extended for confidence ratings.
+ It can be said that current state-of-art techniques are the AIC and BIC
+ indices, which evaluate flexibility primarily on the number of a models
+ parameter.
+ This does not take into account that parameter can vary in their influence
+ to the predicted data, such as cognitive processes can vary in their influence
+ to observed data.
+ AIC and BIC overly punish models which have parameters that yield only
+ small influences to the predicted data and thus selections made on the
+ basis of AIC and BIC tend to choose models which have parameters that have
+ great influence on predicted data.
 \end_layout
 
 \begin_layout Standard
-Models should also condense data.
- Why? Because the more flexible a model is the greater the probability of
- having irrelevant parameter.All parameters should be properly validated
- -> scale manipulation for response mapping.
-\end_layout
-
-\begin_layout Standard
-The risk of having irrelevant parameters could be extended to functional
- form of the model.
- the number of parameters is not alone crucial to the model flexibility.
- 
-\end_layout
-
-\begin_layout Standard
-Mode flexibility is difficult to measure.
- MDL being mathematically the best method.
- model landscaping, model mimicry are indicators for flexibility in comparison
- to other models.
- 
-\end_layout
-
-\begin_layout Standard
-model flexibility is especially important when models with good fit are
- also assumed to be more flexible.
-\end_layout
-
-\begin_layout Standard
-Very convincing arguments are when the less flexible model obtains better
- fits.
- Especially when the parameters are valid - but because parameter assumptions
- can be wrong that is less important.
-\end_layout
-
-\begin_layout Standard
-this is what province rouder showed.
-\end_layout
-
-\begin_layout Standard
-Bot presented models have, so far, proofed to be good account for recognition
- memory data.
- Models are designed to disentangle cognitive processes' underlying observed
- data.
-\end_layout
-
-\begin_layout Standard
-Model appropriateness is often based on model fit and parsimony.
-\end_layout
-
-\begin_layout Standard
-It is widely accepted that MPT models do not account adequately for recognition
- memory data 
+Regarding the two models under consideration in this work this seems to
+ be the case.
+ The discrete-state models, such as the 1HTM, constantly yield good but
+ worse fit than the continuous models, such as EVSDT.
+ Having the same number of parameters AIC and BIC turn out in favor of of
+ the continuous models.
+ Summarizing these results many concluded that discrete-state models do
+ not account adequately for recognition memory data 
 \begin_inset CommandInset citation
 LatexCommand citep
 key "yonelinas_receiver_2007,wixted_dual-process_2007"
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-SDT models are more flexible 
+.
+ But as we know from more sophisticated flexibility measures 
 \begin_inset CommandInset citation
-LatexCommand cite
+LatexCommand citep
+before "e.g. "
 key "klauer_flexibility_2011"
 
 \end_inset
 
- but also fit the data better.
-\end_layout
-
-\begin_layout Standard
-but newer arguments challenge these findings 
+ discrete state models are less flexible in their functional form - so it
+ might be that the lack of fit is due to the smaller flexibility.
+ So it could be that the actual underlying processes are superiorly captured
+ by discrete-state models and the predominance of continuous models is due
+ to their ability to fit random data.
+ Recent findings underpin these considerations: 
 \begin_inset CommandInset citation
-LatexCommand cite
+LatexCommand citet
 key "broder_recognition_2009"
 
 \end_inset
 
- and these arguments are supported by emprical data from 
+ showed that for payoff or base-rate manipulated response biases discrete-state
+ models fare better then continuous models.
+ For confidence ratings 
 \begin_inset CommandInset citation
-LatexCommand cite
+LatexCommand citet
 key "province_evidence_2012"
 
 \end_inset
 
-.
-\end_layout
-
-\begin_layout Standard
-...
-\end_layout
-
-\begin_layout Standard
-Experimental manipulations of the assumed processes should map to the to
- the respective parameters of the model.
-\end_layout
-
-\begin_layout Standard
-In recognition memory models response processes are manipulated (Citations)
-\end_layout
-
-\begin_layout Standard
-This can be done by obtaining confidence ratings for the classifications:
- the proportion of hits per false alerts increases with higher confidence.
- That is participants are more conservative with their answers with increasing
- confidence.
-\end_layout
-
-\begin_layout Standard
-two alternative forced choice (2AFC) rating scales are a straightforward
- extension to this principle.
- 
-\end_layout
-
-\begin_layout Standard
-Response mapping manipulation
-\end_layout
-
-\begin_layout Standard
-Strong memories are hard to scale 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "mickes_strong_2011"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Encoding strength manipulation via time or repeated presentation+
-\end_layout
-
-\begin_layout Standard
-Description of models
-\end_layout
-
-\begin_layout Standard
-All models are making strong assumptions about underlying and unobservable
- processes generating the observable data.
- Additionally to the likelihood for the found data given a specific model
- it is necessary to evaluate the models ability to appropriately reacting
- to treatment manipulation aiming at specific parameters of the models.
-\end_layout
-
-\begin_layout Standard
-Models differ in their ability to account for data
-\end_layout
-
-\begin_layout Standard
-Necessity for more data point (ROC plots)
-\end_layout
-
-\begin_layout Standard
-Options: besrate payoff responce scale
-\end_layout
-
-\begin_layout Standard
-Responce scale options yes/no vs.
- 2AFC
-\end_layout
-
-\begin_layout Standard
-models
-\end_layout
-
-\begin_layout Standard
-.
- 
-\end_layout
-
-\begin_layout Standard
-In recognition memory research it is possible to categorize the models in
- three different classes: 
+ showed that the tenuous assumption that reaching a detect state leads to
+ highest confidence responses (certainty assumption) could be the reason
+ for discrete-state models' inferiority.
+ They suggest 
 \emph on
-discrete-state models
+conditional independence
 \emph default
-, 
-\emph on
-continuous models,
-\emph default
- and 
-\emph on
-combined models
-\emph default
-.
- These classes of models are not specific to recognition memory, but are
- applied to a wide field of cognitive research.
- 
-\end_layout
-
-\begin_layout Subsection
-(Fitting process)
-\end_layout
-
-\begin_layout Standard
-Model fitting means finding the parameters for the models that maximise
- the likelyhood of the found data.
-\end_layout
-
-\begin_layout Standard
-The models parameter can be estimated basted on the observed data.
-\end_layout
-
-\begin_layout Standard
-Estimation is based on maximizing the likelihood for the the given data
- under the fitted model.
-\end_layout
-
-\begin_layout Standard
-need for a likelihood function for data and model parameter 
-\begin_inset Formula $L(D;\theta)$
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-maximizing the likelihood function leads to maximum likelihood parameter
- estimates 
-\begin_inset Formula $\hat{\theta}$
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula $L(D;\hat{\theta})$
-\end_inset
-
- is the goodness of fit indicator for that model.
-\end_layout
-
-\begin_layout Standard
-Good fit can be achieved by the appropriateness of the model or by flexible
+, that is once a certain state is entered the distribution for responses
+ is determined.
+ Using this principle they showed strong evidence in favor of discrete-state
  models.
 \end_layout
 
 \begin_layout Subsection
-Model Fit
-\end_layout
-
-\begin_layout Standard
-Model fit is the likelihood for the data under the best parameter estimates
- of the model.
- 
-\end_layout
-
-\begin_layout Standard
-A better model fit means that the model is the better account for the observed
- data pattern.
-\end_layout
-
-\begin_layout Standard
-But models 
-\end_layout
-
-\begin_layout Standard
-fitting process
-\end_layout
-
-\begin_layout Standard
-model comparison
-\end_layout
-
-\begin_layout Standard
-latent strength vs.
- discrete state
-\end_layout
-
-\begin_layout Standard
-genereal
+Interpreting recent findings
 \end_layout
 
 \begin_layout Standard
 \begin_inset CommandInset citation
-LatexCommand citet
+LatexCommand citeauthor
 key "province_evidence_2012"
 
 \end_inset
 
- are great! 
-\end_layout
-
-\begin_layout Standard
-weaknesses of 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "province_evidence_2012"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-hypothesis for this thesis
-\end_layout
-
-\begin_layout Standard
-Province and Rouder's
+'s
 \begin_inset CommandInset citation
 LatexCommand citeyearpar
 key "province_evidence_2012"
 
 \end_inset
 
- results show evidence against the widely accepted superiority of continuous
- models.
- But on the other hand they used some specialities in their studies which
- decrease comparability of their results considerably.
- Namely their use of continuous and post-hoc binned rating scales in experiment
- one and two, the asymmetric response scale manipulation in experiment two
- and the use of highly associated words as distractors in the 2AFC task
- in experiment three complicate the interpretation of their results.
- The central research goal in this work is thus to replicate their findings
- with a more comparable design.
+ paper was groundbreaking for the new consideration of discrete-state models
+ for recognition memory.
+ But the used methodology has some peculiarities which complicate comparing
+ their results with earlier findings.
+ Namely their use of continuous rating scales with post-hoc binning in experimen
+t one and two.
+ The asymmetric payoff scheme, which aimed to let participants scale their
+ responses more towards the center, with immediate feedback in experiment
+ two.
+ Usage of highly associated words as distractors in the 2AFC task in experiment
+ three.
+ Although it is unclear in which way these features contributed to their
+ results, theoretically the conditional independence should be sufficient.
+ The main goal of this thesis is thus to replicate 
+\begin_inset CommandInset citation
+LatexCommand citeauthor
+key "province_evidence_2012"
+
+\end_inset
+
+'s findings with a more comparable paradigm.
 \end_layout
 
 \begin_layout Standard
-Role of the forced guessing condition
-\end_layout
-
-\begin_layout Standard
-scale manipulation
-\end_layout
-
-\begin_layout Standard
-Recognition memory is the ability to recognize previously seen items as
- such.
- The central principle is that there are four response options: hit, false
- alert, correct rejection and miss.
- It is not trivial to separate actual memory performance from the tendency
- to answer in a specific way.
- It is necessary to determine the way these processes are interlinked to
- produce the observable result.
- This is done using mathematical models linking different treatments to
- the respective outcomes.
- 
-\end_layout
-
-\begin_layout Standard
-One class of models are the discrete state models
-\end_layout
-
-\begin_layout Standard
-2AFC if both are detected as new? What to answer?
-\end_layout
-
-\begin_layout Standard
-Pictures are easier to learn and recognize than words (Paivio, 1971, 1986).
+Additionally experimental manipulation of the assumed processes should on
+ one hand be reflected in the corresponding parameters and on the other
+ hand can decrease models with wrong assumptions fit.
+ Assuming that the increased fit should also be attributed to the correctness
+ of the model, encoding strength as well as mapping is manipulated.
 \end_layout
 
 \begin_layout Subsection
@@ -1529,6 +1363,369 @@ Model mimicry of EVSDT and 1HTM
 
 \begin_layout Enumerate
 Model landscaping of EVSDT and 1HTM
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Comment
+status collapsed
+
+\begin_layout Plain Layout
+Is it the maximal probability for the observed data? If so, then the probability
+ estimates from observed data is the best.
+ But they are of little interest for other data then the particular dataset
+ they were obtained from.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+Disentangeling relevant processes is key.
+ -> generalizable, paremter of relevance, 
+\end_layout
+
+\begin_layout Plain Layout
+So being a good model has something to do with generalizability.
+ But what? Or what is generalizability? Is it the predictions for other
+ data sets? In general yes, but as parameter estimates are allowed to vary
+ these predictions are very broad.
+ So we need smaller confidence intervals of the parameter? that certainly
+ makes sense.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+Is it how the models extract the underlying processes from the data? How
+ can we messure how good that is -> parameter validation.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+Models should also condense data.
+ Why? Because the more flexible a model is the greater the probability of
+ having irrelevant parameter.All parameters should be properly validated
+ -> scale manipulation for response mapping.
+\end_layout
+
+\begin_layout Plain Layout
+The risk of having irrelevant parameters could be extended to functional
+ form of the model.
+ the number of parameters is not alone crucial to the model flexibility.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+Mode flexibility is difficult to measure.
+ MDL being mathematically the best method.
+ model landscaping, model mimicry are indicators for flexibility in comparison
+ to other models.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+model flexibility is especially important when models with good fit are
+ also assumed to be more flexible.
+\end_layout
+
+\begin_layout Plain Layout
+Very convincing arguments are when the less flexible model obtains better
+ fits.
+ Especially when the parameters are valid - but because parameter assumptions
+ can be wrong that is less important.
+\end_layout
+
+\begin_layout Plain Layout
+this is what province rouder showed.
+\end_layout
+
+\begin_layout Plain Layout
+Bot presented models have, so far, proofed to be good account for recognition
+ memory data.
+ Models are designed to disentangle cognitive processes' underlying observed
+ data.
+\end_layout
+
+\begin_layout Plain Layout
+Model appropriateness is often based on model fit and parsimony.
+\end_layout
+
+\begin_layout Plain Layout
+SDT models are more flexible but also fit the data better.
+\end_layout
+
+\begin_layout Plain Layout
+but newer arguments challenge these findings 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "broder_recognition_2009"
+
+\end_inset
+
+ and these arguments are supported by emprical data from 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "province_evidence_2012"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Plain Layout
+...
+\end_layout
+
+\begin_layout Plain Layout
+Experimental manipulations of the assumed processes should map to the to
+ the respective parameters of the model.
+\end_layout
+
+\begin_layout Plain Layout
+In recognition memory models response processes are manipulated (Citations)
+\end_layout
+
+\begin_layout Plain Layout
+This can be done by obtaining confidence ratings for the classifications:
+ the proportion of hits per false alerts increases with higher confidence.
+ That is participants are more conservative with their answers with increasing
+ confidence.
+\end_layout
+
+\begin_layout Plain Layout
+two alternative forced choice (2AFC) rating scales are a straightforward
+ extension to this principle.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+Response mapping manipulation
+\end_layout
+
+\begin_layout Plain Layout
+Encoding strength manipulation via time or repeated presentation+
+\end_layout
+
+\begin_layout Plain Layout
+Description of models
+\end_layout
+
+\begin_layout Plain Layout
+All models are making strong assumptions about underlying and unobservable
+ processes generating the observable data.
+ Additionally to the likelihood for the found data given a specific model
+ it is necessary to evaluate the models ability to appropriately reacting
+ to treatment manipulation aiming at specific parameters of the models.
+\end_layout
+
+\begin_layout Plain Layout
+Models differ in their ability to account for data
+\end_layout
+
+\begin_layout Plain Layout
+Necessity for more data point (ROC plots)
+\end_layout
+
+\begin_layout Plain Layout
+Options: besrate payoff responce scale
+\end_layout
+
+\begin_layout Plain Layout
+Responce scale options yes/no vs.
+ 2AFC
+\end_layout
+
+\begin_layout Plain Layout
+models
+\end_layout
+
+\begin_layout Plain Layout
+.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+In recognition memory research it is possible to categorize the models in
+ three different classes: 
+\emph on
+discrete-state models
+\emph default
+, 
+\emph on
+continuous models,
+\emph default
+ and 
+\emph on
+combined models
+\emph default
+.
+ These classes of models are not specific to recognition memory, but are
+ applied to a wide field of cognitive research.
+ Namely their use of continuous and post-hoc binned rating scales in experiment
+ one and two, the asymmetric response scale manipulation in experiment two
+ and the use of highly associated words as distractors in the 2AFC task
+ in experiment three complicate the interpretation of their results.
+ The central research goal in this work is thus to replicate their findings
+ with a more comparable design.
+\end_layout
+
+\begin_layout Subsection
+(Fitting process)
+\end_layout
+
+\begin_layout Plain Layout
+Model fitting means finding the parameters for the models that maximise
+ the likelyhood of the found data.
+\end_layout
+
+\begin_layout Plain Layout
+The models parameter can be estimated basted on the observed data.
+\end_layout
+
+\begin_layout Plain Layout
+Estimation is based on maximizing the likelihood for the the given data
+ under the fitted model.
+\end_layout
+
+\begin_layout Plain Layout
+need for a likelihood function for data and model parameter 
+\begin_inset Formula $L(D;\theta)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+maximizing the likelihood function leads to maximum likelihood parameter
+ estimates 
+\begin_inset Formula $\hat{\theta}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula $L(D;\hat{\theta})$
+\end_inset
+
+ is the goodness of fit indicator for that model.
+\end_layout
+
+\begin_layout Plain Layout
+Good fit can be achieved by the appropriateness of the model or by flexible
+ models.
+\end_layout
+
+\begin_layout Subsection
+Model Fit
+\end_layout
+
+\begin_layout Plain Layout
+Model fit is the likelihood for the data under the best parameter estimates
+ of the model.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+A better model fit means that the model is the better account for the observed
+ data pattern.
+\end_layout
+
+\begin_layout Plain Layout
+But models 
+\end_layout
+
+\begin_layout Plain Layout
+fitting process
+\end_layout
+
+\begin_layout Plain Layout
+model comparison
+\end_layout
+
+\begin_layout Plain Layout
+latent strength vs.
+ discrete state
+\end_layout
+
+\begin_layout Plain Layout
+genereal
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset CommandInset citation
+LatexCommand citet
+key "province_evidence_2012"
+
+\end_inset
+
+ are great! 
+\end_layout
+
+\begin_layout Plain Layout
+weaknesses of 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "province_evidence_2012"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+hypothesis for this thesis
+\end_layout
+
+\begin_layout Plain Layout
+Province and Rouder's
+\begin_inset CommandInset citation
+LatexCommand citeyearpar
+key "province_evidence_2012"
+
+\end_inset
+
+ results show evidence against the widely accepted superiority of continuous
+ models.
+ But on the other hand they used some specialities in their studies which
+ decrease comparability of their results considerably.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+Role of the forced guessing condition
+\end_layout
+
+\begin_layout Plain Layout
+scale manipulation
+\end_layout
+
+\begin_layout Plain Layout
+Recognition memory is the ability to recognize previously seen items as
+ such.
+ The central principle is that there are four response options: hit, false
+ alert, correct rejection and miss.
+ It is not trivial to separate actual memory performance from the tendency
+ to answer in a specific way.
+ It is necessary to determine the way these processes are interlinked to
+ produce the observable result.
+ This is done using mathematical models linking different treatments to
+ the respective outcomes.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+One class of models are the discrete state models
+\end_layout
+
+\begin_layout Plain Layout
+2AFC if both are detected as new? What to answer?
+\end_layout
+
+\begin_layout Plain Layout
+Pictures are easier to learn and recognize than words (Paivio, 1971, 1986).
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -2970,7 +3167,22 @@ Conclusions
 \end_layout
 
 \begin_layout Standard
-...
+Zero repetition
+\end_layout
+
+\begin_layout Standard
+Experimental situation
+\end_layout
+
+\begin_layout Standard
+Strong memories are hard to scale 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "mickes_strong_2011"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
