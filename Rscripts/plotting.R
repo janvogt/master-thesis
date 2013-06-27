@@ -366,3 +366,14 @@ mapdists.mpt <- function(map.pars, x.states, scales){
   ret.mat.guess <- sapply(data.frame(path.vec[, seq(2, by=2, along.with=scales)]), function(x) return(x[c(length(x):1,1:length(x))]))
   return(list(detection=t(ret.mat.det), guessing=t(ret.mat.guess)))
 }
+plot.g.sq.diff <- function(g.sq.multi.res){
+  n <- unlist(g.sq.multi.res[[2]][3])
+  base <- g.sq.multi.res[[1]][1:n,2]
+  comp <- g.sq.multi.res[[1]][1:n,3]
+  wins <- g.sq.multi.res[[1]][1:n,5]
+  diff <- g.sq.multi.res[[1]][1:n,4]
+  lim <- c(min(c(base, comp)),max(c(base, comp)))
+  line <- coef(lm(comp~base))
+  extremes <- g.sq.multi.res[[1]][c(which(g.sq.multi.res[[1]][4]==max(diff)), which(g.sq.multi.res[[1]][4]==min(diff))),]
+  return(qplot(base, comp, geom="point", colour=wins)+geom_abline(intercept = 0, slope = 1, colour="grey")+geom_abline(intercept = line[1], slope = line[2])+annotate("text", x=extremes[,2], y=extremes[,3], label=extremes[,1], hjust=c(0.5,0.5), vjust=c(-0.5,1.5), angle=45)+theme(legend.position = "top")+scale_x_continuous(names(g.sq.multi.res[[1]])[2],limits=lim)+scale_y_continuous(names(g.sq.multi.res[[1]])[3], limits=lim))
+}

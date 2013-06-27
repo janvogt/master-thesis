@@ -15,6 +15,7 @@
 \begin_modules
 knitr
 biblatex
+logicalmkup
 \end_modules
 \maintain_unincluded_children false
 \language american
@@ -1732,18 +1733,35 @@ Pictures are easier to learn and recognize than words (Paivio, 1971, 1986).
 Methods
 \end_layout
 
-\begin_layout Subsection
-Subjects
+\begin_layout Standard
+The best model is not necessarily the one that better s the data, as it
+ is also important that a model's range of predictions closely follows the
+ observations made and that it can produce accurate predictions regarding
+ future observations (Roberts & Pashler, 2000) (for discussions on derent
+ model selection approaches, see Myung, Forster, & Browne, 2000;Wagenmakers
+ & Waldorp, 2006),
 \end_layout
 
 \begin_layout Chunk
 
-<<Demographics, echo=FALSE>>=
+<<Demographics, echo=FALSE>>= 
 \end_layout
 
 \begin_layout Chunk
 
 @
+\end_layout
+
+\begin_layout Subsection
+Experiment 1
+\end_layout
+
+\begin_layout Subsubsection
+Subjects
+\end_layout
+
+\begin_layout Chunk
+
 \end_layout
 
 \begin_layout Standard
@@ -1904,7 +1922,7 @@ forced guessing
  and session 2 with visual items.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Materials
 \end_layout
 
@@ -2062,11 +2080,11 @@ name "fig:Rating-scales"
 
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Procedures
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Design
 \end_layout
 
@@ -3083,13 +3101,13 @@ Visual
 
 \end_layout
 
-\begin_layout Plain Layout
-
-\end_layout
-
 \end_inset
 
 
+\end_layout
+
+\begin_layout Subsection
+Experiment 2
 \end_layout
 
 \begin_layout Section
@@ -3097,15 +3115,81 @@ Results
 \end_layout
 
 \begin_layout Standard
-...nnn
+The observed frequency for the confidence levels under each unique factor
+ combination is calculated.
+ The obtained category frequencies are then fit in R 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "r_core_team_r:_2013"
+
+\end_inset
+
+ using the package MPTinR
+\begin_inset CommandInset citation
+LatexCommand citep
+key "singmann_mptinr:_2013"
+
+\end_inset
+
+ to the unrestricted and various restricted versions of the MPT1HTM and
+ EVSDT models.
+ Internally this is done via the 
+\begin_inset Flex Code
+status collapsed
+
+\begin_layout Plain Layout
+nlminb
 \end_layout
 
-\begin_layout Chunk
+\end_inset
 
-\end_layout
+ function that uses the PORT optimization routine 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "gay_usage_1990"
 
-\begin_layout Chunk
+\end_inset
 
+.
+ The obtained fits are then evaluated using 
+\begin_inset Formula $G^{2}$
+\end_inset
+
+-values, that are 
+\begin_inset Formula $\chi^{2}$
+\end_inset
+
+-distributed with the difference of the number of free data points and the
+ number of parameters of the model as df and thus allow null-hypothesis
+ testing.
+ For nested models (i.e.
+ models which are obtained via equality restriction parameters) the difference
+ in 
+\begin_inset Formula $G^{2}$
+\end_inset
+
+-values is also 
+\begin_inset Formula $\chi^{2}$
+\end_inset
+
+-distributed with the difference in parameters as df 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "riefer_multinomial_1988"
+
+\end_inset
+
+.
+ For evaluating the overall fit of a model across participants, the sum
+ of all individual 
+\begin_inset Formula $G^{2}$
+\end_inset
+
+-values is 
+\begin_inset Formula $\chi^{2}$
+\end_inset
+
+-distributed with the sum of all individual df.
 \end_layout
 
 \begin_layout Chunk
@@ -3116,6 +3200,1830 @@ Results
 \begin_layout Chunk
 
 @
+\end_layout
+
+\begin_layout Standard
+First the effects of the experimental manipulations are presented for each
+ experiment individually.
+ Then the equivalent models (plus scale manipulation) to the ones used by
+ 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "province_evidence_2012"
+
+\end_inset
+
+ are compared.
+ Lastly the stability of each participants superior model across words and
+ pictures as memorized items is presented.
+\end_layout
+
+\begin_layout Subsection
+Experiment 1
+\end_layout
+
+\begin_layout Chunk
+
+<<LoadExp1, cache=FALSE, echo=TRUE, eval=TRUE>>=
+\end_layout
+
+\begin_layout Chunk
+
+@
+\end_layout
+
+\begin_layout Standard
+The most general MPT1HTM model provided a good account for both sessions
+ and summed across all participants 
+\begin_inset Formula $G^{2}$
+\end_inset
+
+(
+\end_layout
+
+\begin_layout Subsubsection
+Effects of manipulation
+\end_layout
+
+\begin_layout Chunk
+
+<<Res01, cache=FALSE, echo=TRUE, eval=TRUE>>=
+\end_layout
+
+\begin_layout Chunk
+
+@
+\end_layout
+
+\begin_layout Standard
+In this experiment repetition of items in the learning phase was varied
+ in both sessions.
+ In session one additionally two response scales were used.
+ In the first session the memorized items were word and in the second pictures.
+ First we check if different repetitions influenced memory...
+\end_layout
+
+\begin_layout Paragraph
+Encoding strength
+\end_layout
+
+\begin_layout Standard
+The MPT1HTM model with equal memory parameter across both encoding strengths
+ restricted to be equal could be rejected 
+\begin_inset Formula $G^{2}$
+\end_inset
+
+(
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{select.ses1[select.ses1$model=="MPT1HTM(res.d.enc)","df.sum"]}
+\end_layout
+
+\end_inset
+
+) = 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(select.ses1[select.ses1$model=="MPT1HTM(res.d.enc)","G.Squared.sum"])}
+\end_layout
+
+\end_inset
+
+, 
+\emph on
+p
+\emph default
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{print.p(select.ses1[select.ses1$model=="MPT1HTM(res.d.enc)","p.sum"])}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Formula $G^{2}$
+\end_inset
+
+(
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{select.ses2[select.ses2$model=="MPT1HTM(res.d.enc)","df.sum"]}
+\end_layout
+
+\end_inset
+
+) = 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(select.ses2[select.ses2$model=="MPT1HTM(res.d.enc)","G.Squared.sum"])}
+\end_layout
+
+\end_inset
+
+, 
+\emph on
+p
+\emph default
+ 
+\lang american
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{print.p(select.ses2[select.ses2$model=="MPT1HTM(res.d.enc)","p.sum"])}
+\end_layout
+
+\end_inset
+
+, for Session 1 and Session 2, respectively.
+ This model was also individually rejected for 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{select.ses1[select.ses1$model=="MPT1HTM(res.d.enc)","p.smaller.05"]}
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{select.ses2[select.ses2$model=="MPT1HTM(res.d.enc)","p.smaller.05"]}
+\end_layout
+
+\end_inset
+
+ out of 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{n.part.ses1}
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{n.part.ses2}
+\end_layout
+
+\end_inset
+
+ participants, in Session 1 and 2, respectively, with p < .05, thus the overall
+ rejection is not based on a few extreme values.
+ Different memory parameters for each level of encoding strength are necessary
+ to properly account for the data.
+ The same pattern, yet even more distinct, is found for the EVSDT model.
+ The version with memory parameter restricted to be equal across different
+ encoding strengths could be rejected with 
+\begin_inset Formula $G^{2}$
+\end_inset
+
+(
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{select.ses1[select.ses1$model=="EVSDT(res.mu.enc)","df.sum"]}
+\end_layout
+
+\end_inset
+
+) = 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(select.ses1[select.ses1$model=="EVSDT(res.mu.enc)","G.Squared.sum"])}
+\end_layout
+
+\end_inset
+
+, 
+\emph on
+p
+\emph default
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{print.p(select.ses1[select.ses1$model=="EVSDT(res.mu.enc)","p.sum"])}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Formula $G^{2}$
+\end_inset
+
+(
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{select.ses2[select.ses2$model=="EVSDT(res.mu.enc)","df.sum"]}
+\end_layout
+
+\end_inset
+
+) = 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(select.ses2[select.ses2$model=="EVSDT(res.mu.enc)","G.Squared.sum"])}
+\end_layout
+
+\end_inset
+
+, 
+\emph on
+p
+\emph default
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{print.p(select.ses2[select.ses2$model=="EVSDT(res.mu.enc)","p.sum"])}
+\end_layout
+
+\end_inset
+
+, for Session 1 and Session2, respectively.
+ Individually it was rejected for 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{select.ses1[select.ses1$model=="EVSDT(res.mu.enc)","p.smaller.05"]}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{select.ses2[select.ses2$model=="EVSDT(res.mu.enc)","p.smaller.05"]}
+\end_layout
+
+\end_inset
+
+ participants, in Session 1 and Session 2, respectively.
+ Subsequently the version of both models with memory parameter restricted
+ to be equal are excluded from further analysis.
+\end_layout
+
+\begin_layout Paragraph
+Scale
+\end_layout
+
+\begin_layout Standard
+The models with memory parameter restricted to be equal across the different
+ scales used in Session 1 were more parsimonious without reducing fit 
+\begin_inset Formula $G^{2}$
+\end_inset
+
+(
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{comp1mpt[[1]][comp1mpt[[1]]$code=="sum", "df.diff"]}
+\end_layout
+
+\end_inset
+
+) = 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(comp1mpt[[1]][comp1mpt[[1]]$code=="sum", "G.Squared.diff"], digits=2)}
+\end_layout
+
+\end_inset
+
+, 
+\emph on
+p
+\emph default
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{print.p(comp1mpt[[1]][comp1mpt[[1]]$code=="sum", "p"])}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Formula $G^{2}$
+\end_inset
+
+(
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{comp1sdt[[1]][comp1sdt[[1]]$code=="sum", "df.diff"]}
+\end_layout
+
+\end_inset
+
+) = 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(comp1sdt[[1]][comp1sdt[[1]]$code=="sum", "G.Squared.diff"], digits=2)}
+\end_layout
+
+\end_inset
+
+, 
+\emph on
+p
+\emph default
+ 
+\lang american
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{print.p(comp1sdt[[1]][comp1sdt[[1]]$code=="sum", "p"])}
+\end_layout
+
+\end_inset
+
+, for MPT1HTM and EVSDT, respectively.
+ The null that both models are equal in terms of GoF holds also on individual
+ level with 
+\emph on
+p 
+\emph default
+< .05 only for
+\emph on
+ 
+\emph default
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{comp1mpt[[2]]}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{comp1sdt[[2]]}
+\end_layout
+
+\end_inset
+
+ participants out of 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{n.part.ses1}
+\end_layout
+
+\end_inset
+
+, for MPT1HTM and EVSDT, respectively.
+ Based on these findings further analysis is done using the more parsimonious
+ versions of MPT1HTM and EVSDT with memory parameter restricted to be equal
+ across scales.
+\end_layout
+
+\begin_layout Standard
+To check wether the scale manipulation has any influence at all the MPT1HTM
+ and EVSDT models are further restricted to have their mapping parameter
+ and cutoff criteria, respectively, restricted to be equal across the different
+ scales.
+ These fully restricted versions which assume no influence of the scale
+ manipulation had to be rejected: 
+\begin_inset Formula $G^{2}$
+\end_inset
+
+(
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{comp2mpt[[1]][comp2mpt[[1]]$code=="sum", "df.diff"]}
+\end_layout
+
+\end_inset
+
+) = 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(comp2mpt[[1]][comp2mpt[[1]]$code=="sum", "G.Squared.diff"])}
+\end_layout
+
+\end_inset
+
+, 
+\emph on
+p
+\emph default
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{print.p(comp2mpt[[1]][comp2mpt[[1]]$code=="sum", "p"])}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Formula $G^{2}$
+\end_inset
+
+(
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{comp2sdt[[1]][comp2sdt[[1]]$code=="sum", "df.diff"]}
+\end_layout
+
+\end_inset
+
+) = 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(comp2sdt[[1]][comp2sdt[[1]]$code=="sum", "G.Squared.diff"])}
+\end_layout
+
+\end_inset
+
+ 
+\emph on
+p
+\emph default
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{print.p(comp2sdt[[1]][comp2sdt[[1]]$code=="sum", "p"])}
+\end_layout
+
+\end_inset
+
+, for MPT1HTM and EVSDT, respectively.
+ Individually these models were rejected at 
+\emph on
+p
+\emph default
+ < .05 for 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{comp2mpt[[2]]}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{comp2sdt[[2]]}
+\end_layout
+
+\end_inset
+
+ participants, for MPT1HTM and EVSDT, respectively.
+\end_layout
+
+\begin_layout Subsubsection
+Model comparison
+\end_layout
+
+\begin_layout Chunk
+
+<<Res02, cache=FALSE, echo=TRUE, eval=TRUE>>=
+\end_layout
+
+\begin_layout Chunk
+
+@
+\end_layout
+
+\begin_layout Standard
+The restricted versions of MPT1HTM and EVSDT with the best and parsimonious
+ account for the data (i.e.
+ the versions with only memory parameters restricted to be equal across
+ scales), are compared against each other.
+ Since both models have equal number of parameters (
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{select.ses1[select.ses1$model=="MPT1HTM(res.d.scale)", "n.parameters"]}
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{select.ses2[select.ses2$model=="MPT1HTM(res.d.scale)", "n.parameters"]}
+\end_layout
+
+\end_inset
+
+ for Session 1, 2 respectively) classical selection criteria like AIC and
+ BIC are merely a function of fit, hence the 
+\begin_inset Formula $G^{2}$
+\end_inset
+
+-statistics are used directly.
+ The differences are not conclusive (
+\emph on
+Mdn
+\emph default
+: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(sum.diff.ses1["Median"], digits=2)}
+\end_layout
+
+\end_inset
+
+, range: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(sum.diff.ses1["Min."], digits=2)}
+\end_layout
+
+\end_inset
+
+-
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(sum.diff.ses1["Max."], digits=2)}
+\end_layout
+
+\end_inset
+
+, and 
+\emph on
+Mdn
+\emph default
+: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(sum.diff.ses2["Median"], digits=2)}
+\end_layout
+
+\end_inset
+
+, range:
+ 
+\lang american
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(sum.diff.ses2["Min."], digits=2)}
+\end_layout
+
+\end_inset
+
+-
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(sum.diff.ses2["Max."], digits=2)}
+\end_layout
+
+\end_inset
+
+, for Session 1 and 2, respectively, greater values imply preference for
+ MPT1HTM).
+ Individually accounted for 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{diff.ses1[[2]]["n.wins_MPT1HTM(res.d.scale)"]}
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{diff.ses2[[2]]["n.wins_MPT1HTM(res.d.scale)"]}
+\end_layout
+
+\end_inset
+
+ out of 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{n.part.ses1}
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{n.part.ses2}
+\end_layout
+
+\end_inset
+
+ participants in Session 1 and 2, respectively, the MPT1HTM model better
+ for the data.
+ This further supports the overall impression that the models in this experiment
+ performed approximately equally well.
+\end_layout
+
+\begin_layout Chunk
+
+<<Res02p1, cache=FALSE, echo=TRUE, eval=TRUE>>=
+\end_layout
+
+\begin_layout Chunk
+
+@
+\end_layout
+
+\begin_layout Chunk
+
+<<Res02p2, cache=FALSE, echo=TRUE, eval=TRUE>>=
+\end_layout
+
+\begin_layout Chunk
+
+@
+\end_layout
+
+\begin_layout Subsubsection
+Stability of individual best model
+\end_layout
+
+\begin_layout Chunk
+
+<<Res03, cache=FALSE, echo=TRUE, eval=TRUE>>=
+\end_layout
+
+\begin_layout Chunk
+
+@
+\end_layout
+
+\begin_layout Standard
+Session 1 and Session 2 has been completed by 
+\emph on
+n
+\emph default
+=
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{stab.diff[[2]]["n.both.ses"]}
+\end_layout
+
+\end_inset
+
+ participants.
+ In each session every participant's data was best captured with either
+ the MPT1HTM or the EVSDT model.
+ Across session this best model was stable for 
+\emph on
+n
+\emph default
+=
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{stab.diff[[2]]["n.stable"]}
+\end_layout
+
+\end_inset
+
+ participants and thus just about the randomly expected rate of 50%.
+\end_layout
+
+\begin_layout Subsection
+Experiment 2
+\end_layout
+
+\begin_layout Chunk
+
+<<LoadExp2, cache=FALSE, echo=TRUE, eval=TRUE>>=
+\end_layout
+
+\begin_layout Chunk
+
+@
+\end_layout
+
+\begin_layout Standard
+The most general MPT1HTM model provided a good account for both sessions
+ and summed across all participants 
+\begin_inset Formula $G^{2}$
+\end_inset
+
+(
+\end_layout
+
+\begin_layout Subsubsection
+Effects of manipulation
+\end_layout
+
+\begin_layout Chunk
+
+<<Res01, cache=FALSE, echo=TRUE, eval=TRUE>>=
+\end_layout
+
+\begin_layout Chunk
+
+@
+\end_layout
+
+\begin_layout Standard
+In this experiment repetition of items in the learning phase was varied
+ in both sessions.
+ In session one additionally two response scales were used.
+ In the first session the memorized items were word and in the second pictures.
+ First we check if different repetitions influenced memory...
+\end_layout
+
+\begin_layout Paragraph
+Encoding strength
+\end_layout
+
+\begin_layout Standard
+The MPT1HTM model with equal memory parameter across both encoding strengths
+ restricted to be equal could be rejected 
+\begin_inset Formula $G^{2}$
+\end_inset
+
+(
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{select.ses1[select.ses1$model=="MPT1HTM(res.d.enc)","df.sum"]}
+\end_layout
+
+\end_inset
+
+) = 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(select.ses1[select.ses1$model=="MPT1HTM(res.d.enc)","G.Squared.sum"])}
+\end_layout
+
+\end_inset
+
+, 
+\emph on
+p
+\emph default
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{print.p(select.ses1[select.ses1$model=="MPT1HTM(res.d.enc)","p.sum"])}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Formula $G^{2}$
+\end_inset
+
+(
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{select.ses2[select.ses2$model=="MPT1HTM(res.d.enc)","df.sum"]}
+\end_layout
+
+\end_inset
+
+) = 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(select.ses2[select.ses2$model=="MPT1HTM(res.d.enc)","G.Squared.sum"])}
+\end_layout
+
+\end_inset
+
+, 
+\emph on
+p
+\emph default
+ 
+\lang american
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{print.p(select.ses2[select.ses2$model=="MPT1HTM(res.d.enc)","p.sum"])}
+\end_layout
+
+\end_inset
+
+, for Session 1 and Session 2, respectively.
+ This model was also individually rejected for 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{select.ses1[select.ses1$model=="MPT1HTM(res.d.enc)","p.smaller.05"]}
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{select.ses2[select.ses2$model=="MPT1HTM(res.d.enc)","p.smaller.05"]}
+\end_layout
+
+\end_inset
+
+ out of 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{n.part.ses1}
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{n.part.ses2}
+\end_layout
+
+\end_inset
+
+ participants, in Session 1 and 2, respectively, with p < .05, thus the overall
+ rejection is not based on a few extreme values.
+ Different memory parameters for each level of encoding strength are necessary
+ to properly account for the data.
+ The same pattern, yet even more distinct, is found for the EVSDT model.
+ The version with memory parameter restricted to be equal across different
+ encoding strengths could be rejected with 
+\begin_inset Formula $G^{2}$
+\end_inset
+
+(
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{select.ses1[select.ses1$model=="EVSDT(res.mu.enc)","df.sum"]}
+\end_layout
+
+\end_inset
+
+) = 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(select.ses1[select.ses1$model=="EVSDT(res.mu.enc)","G.Squared.sum"])}
+\end_layout
+
+\end_inset
+
+, 
+\emph on
+p
+\emph default
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{print.p(select.ses1[select.ses1$model=="EVSDT(res.mu.enc)","p.sum"])}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Formula $G^{2}$
+\end_inset
+
+(
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{select.ses2[select.ses2$model=="EVSDT(res.mu.enc)","df.sum"]}
+\end_layout
+
+\end_inset
+
+) = 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(select.ses2[select.ses2$model=="EVSDT(res.mu.enc)","G.Squared.sum"])}
+\end_layout
+
+\end_inset
+
+, 
+\emph on
+p
+\emph default
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{print.p(select.ses2[select.ses2$model=="EVSDT(res.mu.enc)","p.sum"])}
+\end_layout
+
+\end_inset
+
+, for Session 1 and Session2, respectively.
+ Individually it was rejected for 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{select.ses1[select.ses1$model=="EVSDT(res.mu.enc)","p.smaller.05"]}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{select.ses2[select.ses2$model=="EVSDT(res.mu.enc)","p.smaller.05"]}
+\end_layout
+
+\end_inset
+
+ participants, in Session 1 and Session 2, respectively.
+ Subsequently the version of both models with memory parameter restricted
+ to be equal are excluded from further analysis.
+\end_layout
+
+\begin_layout Paragraph
+Scale
+\end_layout
+
+\begin_layout Standard
+The models with memory parameter restricted to be equal across the different
+ scales used in Session 1 were more parsimonious without reducing fit 
+\begin_inset Formula $G^{2}$
+\end_inset
+
+(
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{comp1mpt[[1]][comp1mpt[[1]]$code=="sum", "df.diff"]}
+\end_layout
+
+\end_inset
+
+) = 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(comp1mpt[[1]][comp1mpt[[1]]$code=="sum", "G.Squared.diff"], digits=2)}
+\end_layout
+
+\end_inset
+
+, 
+\emph on
+p
+\emph default
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{print.p(comp1mpt[[1]][comp1mpt[[1]]$code=="sum", "p"])}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Formula $G^{2}$
+\end_inset
+
+(
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{comp1sdt[[1]][comp1sdt[[1]]$code=="sum", "df.diff"]}
+\end_layout
+
+\end_inset
+
+) = 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(comp1sdt[[1]][comp1sdt[[1]]$code=="sum", "G.Squared.diff"], digits=2)}
+\end_layout
+
+\end_inset
+
+, 
+\emph on
+p
+\emph default
+ 
+\lang american
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{print.p(comp1sdt[[1]][comp1sdt[[1]]$code=="sum", "p"])}
+\end_layout
+
+\end_inset
+
+, for MPT1HTM and EVSDT, respectively.
+ The null that both models are equal in terms of GoF holds also on individual
+ level with 
+\emph on
+p 
+\emph default
+< .05 only for
+\emph on
+ 
+\emph default
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{comp1mpt[[2]]}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{comp1sdt[[2]]}
+\end_layout
+
+\end_inset
+
+ participants out of 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{n.part.ses1}
+\end_layout
+
+\end_inset
+
+, for MPT1HTM and EVSDT, respectively.
+ Based on these findings further analysis is done using the more parsimonious
+ versions of MPT1HTM and EVSDT with memory parameter restricted to be equal
+ across scales.
+\end_layout
+
+\begin_layout Standard
+To check wether the scale manipulation has any influence at all the MPT1HTM
+ and EVSDT models are further restricted to have their mapping parameter
+ and cutoff criteria, respectively, restricted to be equal across the different
+ scales.
+ These fully restricted versions which assume no influence of the scale
+ manipulation had to be rejected: 
+\begin_inset Formula $G^{2}$
+\end_inset
+
+(
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{comp2mpt[[1]][comp2mpt[[1]]$code=="sum", "df.diff"]}
+\end_layout
+
+\end_inset
+
+) = 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(comp2mpt[[1]][comp2mpt[[1]]$code=="sum", "G.Squared.diff"])}
+\end_layout
+
+\end_inset
+
+, 
+\emph on
+p
+\emph default
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{print.p(comp2mpt[[1]][comp2mpt[[1]]$code=="sum", "p"])}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Formula $G^{2}$
+\end_inset
+
+(
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{comp2sdt[[1]][comp2sdt[[1]]$code=="sum", "df.diff"]}
+\end_layout
+
+\end_inset
+
+) = 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(comp2sdt[[1]][comp2sdt[[1]]$code=="sum", "G.Squared.diff"])}
+\end_layout
+
+\end_inset
+
+ 
+\emph on
+p
+\emph default
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{print.p(comp2sdt[[1]][comp2sdt[[1]]$code=="sum", "p"])}
+\end_layout
+
+\end_inset
+
+, for MPT1HTM and EVSDT, respectively.
+ Individually these models were rejected at 
+\emph on
+p
+\emph default
+ < .05 for 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{comp2mpt[[2]]}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{comp2sdt[[2]]}
+\end_layout
+
+\end_inset
+
+ participants, for MPT1HTM and EVSDT, respectively.
+\end_layout
+
+\begin_layout Subsubsection
+Model comparison
+\end_layout
+
+\begin_layout Chunk
+
+<<Res02, cache=FALSE, echo=TRUE, eval=TRUE>>=
+\end_layout
+
+\begin_layout Chunk
+
+@
+\end_layout
+
+\begin_layout Standard
+The restricted versions of MPT1HTM and EVSDT with the best and parsimonious
+ account for the data (i.e.
+ the versions with only memory parameters restricted to be equal across
+ scales), are compared against each other.
+ Since both models have equal number of parameters (
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{select.ses1[select.ses1$model=="MPT1HTM(res.d.scale)", "n.parameters"]}
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{select.ses2[select.ses2$model=="MPT1HTM(res.d.scale)", "n.parameters"]}
+\end_layout
+
+\end_inset
+
+ for Session 1, 2 respectively) classical selection criteria like AIC and
+ BIC are merely a function of fit, hence the 
+\begin_inset Formula $G^{2}$
+\end_inset
+
+-statistics are used directly.
+ The differences are not conclusive (
+\emph on
+Mdn
+\emph default
+: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(sum.diff.ses1["Median"], digits=2)}
+\end_layout
+
+\end_inset
+
+, range: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(sum.diff.ses1["Min."], digits=2)}
+\end_layout
+
+\end_inset
+
+-
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(sum.diff.ses1["Max."], digits=2)}
+\end_layout
+
+\end_inset
+
+, and 
+\emph on
+Mdn
+\emph default
+: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(sum.diff.ses2["Median"], digits=2)}
+\end_layout
+
+\end_inset
+
+, range:
+ 
+\lang american
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(sum.diff.ses2["Min."], digits=2)}
+\end_layout
+
+\end_inset
+
+-
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(sum.diff.ses2["Max."], digits=2)}
+\end_layout
+
+\end_inset
+
+, for Session 1 and 2, respectively, greater values imply preference for
+ MPT1HTM).
+ Individually accounted for 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{diff.ses1[[2]]["n.wins_MPT1HTM(res.d.scale)"]}
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{diff.ses2[[2]]["n.wins_MPT1HTM(res.d.scale)"]}
+\end_layout
+
+\end_inset
+
+ out of 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{n.part.ses1}
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{n.part.ses2}
+\end_layout
+
+\end_inset
+
+ participants in Session 1 and 2, respectively, the MPT1HTM model better
+ for the data.
+ This further supports the overall impression that the models in this experiment
+ performed approximately equally well.
+\end_layout
+
+\begin_layout Chunk
+
+<<Res02p1, cache=FALSE, echo=TRUE, eval=TRUE>>=
+\end_layout
+
+\begin_layout Chunk
+
+@
+\end_layout
+
+\begin_layout Chunk
+
+<<Res02p2, cache=FALSE, echo=TRUE, eval=TRUE>>=
+\end_layout
+
+\begin_layout Chunk
+
+@
+\end_layout
+
+\begin_layout Subsubsection
+Stability of individual best model
+\end_layout
+
+\begin_layout Chunk
+
+<<Res03, cache=FALSE, echo=TRUE, eval=TRUE>>=
+\end_layout
+
+\begin_layout Chunk
+
+@
+\end_layout
+
+\begin_layout Standard
+Session 1 and Session 2 has been completed by 
+\emph on
+n
+\emph default
+=
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{stab.diff[[2]]["n.both.ses"]}
+\end_layout
+
+\end_inset
+
+ participants.
+ In each session every participant's data was best captured with either
+ the MPT1HTM or the EVSDT model.
+ Across session this best model was stable for 
+\emph on
+n
+\emph default
+=
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{stab.diff[[2]]["n.stable"]}
+\end_layout
+
+\end_inset
+
+ participants and thus just about the randomly expected rate of 50%.
+\end_layout
+
+\begin_layout Section
+Conclusions
+\end_layout
+
+\begin_layout Chunk
+
+\end_layout
+
+\begin_layout Chunk
+
 \end_layout
 
 \begin_layout Standard
@@ -3160,10 +5068,6 @@ m_{Gij}=\begin{cases}
 \end_inset
 
 
-\end_layout
-
-\begin_layout Section
-Conclusions
 \end_layout
 
 \begin_layout Standard
@@ -3240,7 +5144,7 @@ Participants' plots
 
 \begin_layout Chunk
 
-<<AllPlots, eval=TRUE, echo=FALSE, cache=TRUE, warning=FALSE, fig.width=21*0.75,
+<<AllPlots, eval=FALSE, echo=FALSE, cache=FALSE, warning=FALSE, fig.width=21*0.75,
  fig.height=29*0.75>>=
 \end_layout
 

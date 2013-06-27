@@ -7,12 +7,149 @@ source('Rscripts/plotting.R')
 #################
 # Executed Code #
 #################
+rec.data <- read.csv(file="data/Rec.csv", sep=";")
+dists.list <- emp.dists(rec.data)
+fit.data <- do.fitting(dists.list, MPT1HTM(), MPT1HTM(TRUE), MPT1HTM(FALSE, TRUE), MPT1HTM(FALSE, TRUE, TRUE), EVSDT(), EVSDT(TRUE), EVSDT(FALSE, TRUE), EVSDT(FALSE, TRUE, TRUE))
+a <- multi.gen.fit.model(MPT1HTM(), subset(dists.list[[1]][[1]], code=="AG1503"))
+b <- multi.gen.fit.model(MPT1HTM(TRUE), subset(dists.list[[1]][[1]], code=="AG1503"))
+c <- multi.gen.fit.model(MPT1HTM(TRUE, TRUE), subset(dists.list[[1]][[1]], code=="AG1503"))
+d <- multi.gen.fit.model(MPT1HTM(FALSE, TRUE), subset(dists.list[[1]][[1]], code=="AG1503"))
+
+a <- multi.gen.fit.model(EVSDT(), subset(dists.list[[1]][[1]], code=="AG1503"))
+b <- multi.gen.fit.model(EVSDT(TRUE), subset(dists.list[[1]][[1]], code=="AG1503"))
+c <- multi.gen.fit.model(EVSDT(TRUE, TRUE), subset(dists.list[[1]][[1]], code=="AG1503"))
+d <- multi.gen.fit.model(EVSDT(FALSE, TRUE), subset(dists.list[[1]][[1]], code=="AG1503"))
+
+select.mpt(list(a$mptinr, b$mptinr, c$mptinr, d$mptinr))
+
+demographics.df <- read.csv(file="data/Demographics.csv", sep=";")
+min(demographics.df$age)
+mean(demographics.df$age)
+table(demographics.df$occup)
+table(demographics.df$occupdesc[demographics.df$occup=="student"])
 
 plot.vp(subset(dists.list[[1]][[1]], code=="AG1503"), model.param[[1]][[1]][1, ])
 
 ########################
 # Deprecated Functions #
 ########################
+MPT1HTM2g <- function(){
+  d.vec <- function(resp, enc, scale, posold, internal=FALSE){
+    enc.states <- levels(enc)[levels(enc)!=0]
+    d.par <- paste("d", enc.states, sep=".")
+    confidence.vec <- ifelse(level(posold)==1, -level(resp)+length(levels(resp))+1, level(resp))
+    ret <- ifelse(enc==0 | (!internal & confidence.vec <= length(levels(resp))/2), NA, d.par[match(enc, enc.states)])
+    return(ret)
+  }
+  gr.vec <- function(resp, enc, scale, posold){
+    d.vec <- d.vec(resp, enc, scale, posold, internal=TRUE)
+    gr.par <- paste("gr", levels(scale), sep=".")
+    ret <- ifelse(level(resp)>length(levels(resp))/2, 
+                  gr.par[level(scale)], 
+                  comp.prob.symbol(gr.par[level(scale)]))
+    ret <- ifelse(is.na(d.vec), ret, paste(comp.prob.symbol(d.vec), ret, sep="*"))
+    return(ret)
+  }
+  dmap.vec <- function(resp, enc, scale, posold){
+    dmap.par <- paste("md", rep(2:(length(levels(resp))/2)-1, length(levels(scale))), rep(levels(scale), each=length(levels(resp))/2-1), sep=".")
+    dmaps <- map.par.mpt.symbol(dmap.par, length(levels(scale)))[,c(1:(length(levels(resp))/2),(length(levels(resp))/2):1)]
+    ret <- dmaps[(level(resp)-1)*length(levels(scale))+level(scale)]
+    return(ret)
+  }
+  gmap.vec <- function(resp, enc, scale, posold){
+    gmap.par <- paste("mg", rep(2:(length(levels(resp))/2)-1, length(levels(scale))), rep(levels(scale), each=length(levels(resp))/2-1), sep=".")
+    gmaps <- map.par.mpt.symbol(gmap.par, length(levels(scale)))[,c((length(levels(resp))/2):1,1:(length(levels(resp))/2))]
+    ret <- gmaps[(level(resp)-1)*length(levels(scale))+level(scale)]
+    return(ret)
+  }
+  model.description <- function(d.vec, gr.vec, dmap.vec, gmap.vec){
+    return(ifelse(is.na(d.vec), 
+                  paste(gr.vec, gmap.vec, sep="*"),
+                  paste(paste(d.vec, dmap.vec, sep="*"), paste(gr.vec, gmap.vec, sep="*"), sep="+")))
+  }
+  fit.call <- function(data, model.filename, parameter, ...){
+    return(fit.mpt(data, model.filename, ...))
+  }
+  return(list("MPT1HTM2g", d.vec, gr.vec, dmap.vec, gmap.vec, model.description, fit.call))
+}
+MPT2HTM <- function(){
+  d.vec <- function(resp, enc, scale, posold, internal=FALSE){
+    enc.states <- levels(enc)[levels(enc)!=0]
+    d.par <- paste("d", rep(enc.states, each=length(levels(posold))), levels(posold), sep=".")
+    confidence.vec <- ifelse(level(posold)==1, -level(resp)+length(levels(resp))+1, level(resp))
+    ret <- ifelse(enc==0 | (!internal & confidence.vec <= length(levels(resp))/2), NA, d.par[(match(enc, enc.states)-1)*length(levels(posold))+level(posold)])
+    return(ret)
+  }
+  gr.vec <- function(resp, enc, scale, posold){
+    d.vec <- d.vec(resp, enc, scale, posold, internal=TRUE)
+    gr.par <- "gr"
+    ret <- ifelse(level(resp)>length(levels(resp))/2, 
+                  gr.par, 
+                  comp.prob.symbol(gr.par))
+    ret <- ifelse(is.na(d.vec), ret, paste(comp.prob.symbol(d.vec), ret, sep="*"))
+    return(ret)
+  }
+  dmap.vec <- function(resp, enc, scale, posold){
+    dmap.par <- paste("md", rep(2:(length(levels(resp))/2)-1, length(levels(scale))), rep(levels(scale), each=length(levels(resp))/2-1), sep=".")
+    dmaps <- map.par.mpt.symbol(dmap.par, length(levels(scale)))[,c(1:(length(levels(resp))/2),(length(levels(resp))/2):1)]
+    ret <- dmaps[(level(resp)-1)*length(levels(scale))+level(scale)]
+    return(ret)
+  }
+  gmap.vec <- function(resp, enc, scale, posold){
+    gmap.par <- paste("mg", rep(2:(length(levels(resp))/2)-1, length(levels(scale))), rep(levels(scale), each=length(levels(resp))/2-1), sep=".")
+    gmaps <- map.par.mpt.symbol(gmap.par, length(levels(scale)))[,c((length(levels(resp))/2):1,1:(length(levels(resp))/2))]
+    ret <- gmaps[(level(resp)-1)*length(levels(scale))+level(scale)]
+    return(ret)
+  }
+  model.description <- function(d.vec, gr.vec, dmap.vec, gmap.vec){
+    return(ifelse(is.na(d.vec), 
+                  paste(gr.vec, gmap.vec, sep="*"),
+                  paste(paste(d.vec, dmap.vec, sep="*"), paste(gr.vec, gmap.vec, sep="*"), sep="+")))
+  }
+  fit.call <- function(data, model.filename, parameter, ...){
+    return(fit.mpt(data, model.filename, ...))
+  }
+  return(list("MPT2HTM", d.vec, gr.vec, dmap.vec, gmap.vec, model.description, fit.call))
+}
+UVSDT <- function(restrictions=NULL){
+  mu.vec <- function(resp, enc, scale, posold){
+    enc.states <- levels(enc)[levels(enc)!=0]
+    mu.par <- paste("mu", enc.states, sep=".")
+    ret <- ifelse(enc==0, "0", mu.par[match(enc, enc.states)])
+    ret <- ifelse(level(posold)==1, paste("-", ret, sep=""), ret)
+    return(ret)
+  }
+  sd.vec <- function(resp, enc, scale, posold){
+    enc.states <- levels(enc)[levels(enc)!=0]
+    sd.par <- paste("sd", enc.states, sep=".")
+    ret <- ifelse(enc==0, "1", sd.par[match(enc, enc.states)])
+    return(ret)
+  }
+  low.bound.vec <- function(resp, enc, scale, posold){
+    n.states <- length(levels(resp))
+    crit.par <- sdt.crit.par(n.states, scale)
+    ret <- ifelse(level(resp)==1, "-Inf", crit.par[(level(scale)-1)*(n.states) + level(resp)])
+    return(ret)
+  }
+  upper.bound.vec <- function(resp, enc, scale, posold){
+    n.states <- length(levels(resp))
+    crit.par <- sdt.crit.par(n.states, scale)
+    ret <- ifelse(level(resp)==n.states, "Inf", crit.par[(level(scale)-1)*(n.states) + level(resp) + 1])
+    return(ret)
+  }
+  model.description <- function(mu.vec, sd.vec, low.bound.vec, upper.bound.vec){
+    return(paste("pnorm(", upper.bound.vec, ",", mu.vec, ",sqrt(1^2+", sd.vec, "^2))-pnorm(", low.bound.vec, ",", mu.vec, ",sqrt(1^2+", sd.vec, "^2))", sep=""))
+  }
+  fit.call <- function(data, model.filename, parameter, ...){
+    param.order <- parameter
+    lower.bound <- rep(-Inf, length(param.order))
+    upper.bound <- rep(Inf, length(param.order))
+    lower.bound[grep("c\\.[^1].*", param.order)] <- 0
+    lower.bound[grep("sd\\..*", param.order)] <- 0
+    return(fit.model(data, model.filename, restrictions, use.gradient=FALSE, lower.bound=lower.bound, upper.bound=upper.bound, ...))
+  }
+  return(list("UVSDT", mu.vec, sd.vec, low.bound.vec, upper.bound.vec, model.description, fit.call))
+}
 #Accepts a model and a data.frame to fit. Returns the a data.frame with the predicted data.
 gen.fit.model <- function(model.gen, data.df, ..., resp=variable, enc=enc, scale=scale, posold=posold, prob=value, model=model){
   original.data.df <- data.df

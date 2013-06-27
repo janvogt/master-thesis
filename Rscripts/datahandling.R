@@ -36,3 +36,18 @@ rename.and.melt <- function(x, melt.id, variable.name){
   names(x)[names(x)=="result_variable"]<-variable.name   
   return(x) 
 }
+print.p <- function(x){
+  if(x < 0.001)
+    return("< .001")
+  if(x < 0.01)
+    return("< .01")
+  if(x < 0.05)
+    return("< .05")
+  if(x < 0.1)
+    return(paste("= .0", round(x*100), sep=""))
+  if(x <1)
+    return(paste("= .", round(x*100), sep=""))
+  if(x == 1)
+    return("= 1.00")
+  return(paste("= ", as.character(round(x, digits=2), sep="")))
+}
