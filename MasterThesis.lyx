@@ -386,9 +386,15 @@ Latent-Strength models
 \end_layout
 
 \begin_layout Standard
-Latent strength models assume that all stimuli vary normally distributed
- on a continuous familiarity scale.
- Studying items shifts this distribution to greater familiarity values.
+Latent strength models assume that all stimuli vary along a familiarity
+ scale.
+ Its is usually assumed (although this is to some extent arbitrary) that
+ the familiarity of items follows a normal distribution.
+ When a set of items is presented to an individual during a study phase,
+ it is assumed that this leads to an increase of familiarity.
+ This familiarity increase for the studied items is represented by a distributio
+n that assumes larger values on average (it is shifted to the right) than
+ the distribution of non-studied items.
  Responses are made based on a cutoff criterion, that is items with familiarity
  above this criteria are classified as known and items below as unknown.
  Memory strength is captured as the amount the distribution of studied items
@@ -397,35 +403,39 @@ Latent strength models assume that all stimuli vary normally distributed
  the higher the cutoff criteria the lower the probability for classifying
  items as known (i.e.
  the more conservative the response bias).
- As the mean and standard deviation of unknown items can be, without loss
- of generality, set to 0 and 1, respectively, the most general form of this
- model has parameter 
-\begin_inset Formula $\theta=\{\mu,\sigma,c\}$
+ The most general form of this model has a parameter set 
+\begin_inset Formula $\theta=\{\mu_{o},\mu_{n},\sigma_{o},\sigma_{n},c\}$
 \end_inset
 
  with 
-\begin_inset Formula $\mu$
+\begin_inset Formula $\{\mu_{o},\sigma_{o}\}$
 \end_inset
 
  and 
-\begin_inset Formula $\sigma$
+\begin_inset Formula $\{\mu_{n},\sigma_{n}\}$
 \end_inset
 
- being the mean and standard deviation of studied items and 
+being the mean and standard deviation of old and new items, respectively,
+ and 
 \begin_inset Formula $c$
 \end_inset
 
- being the cutoff criterion.
- Let 
+ being the response criterion.
+ Without loss of generality, the mean and standard deviation of unknown
+ items can be set to 0 and 1, respectively.
+\end_layout
+
+\begin_layout Standard
+Let 
 \begin_inset Formula $\Phi(x)$
 \end_inset
 
- denote the cumulative density function of the standard normal distribution,
- the probability for a hit and a false alert are then given as
+ denote the cumulative distribution function of the standard normal distribution
+, the probability for a hit and a false alert are then given as
 \begin_inset Formula 
 \begin{align*}
-P(\text{"known"}\vert\theta,\text{old item}) & =1-\Phi\left(\frac{c-\mu}{\sigma}\right)\\
-P(\text{"known"}\vert\theta,\text{new item}) & =1-\Phi(c)
+P(\text{"old"}\vert\theta,\text{old item}) & =\Phi\left(\frac{\mu_{o}-c}{\sigma_{o}}\right)\\
+P(\text{"old"}\vert\theta,\text{new item}) & =\Phi(-c)
 \end{align*}
 
 \end_inset
@@ -435,141 +445,64 @@ P(\text{"known"}\vert\theta,\text{new item}) & =1-\Phi(c)
 
 \begin_layout Standard
 Responses to 
-\begin_inset Formula $n$
+\begin_inset Formula $M$
 \end_inset
 
--step confidence rating scales are assumed to be based on 
-\begin_inset Formula $n-1$
+-step bipolar confidence rating scales (
+\begin_inset Formula $M$
 \end_inset
 
- cutoff criteria with increasing values for higher confidence judgements.
+ being an even integer), going from 
+\begin_inset Formula $m=1$
+\end_inset
+
+ (
+\emph on
+Sure New
+\emph default
+) and 
+\begin_inset Formula $m=M$
+\end_inset
+
+ (
+\emph on
+Sure Old
+\emph default
+), are assumed to be based on 
+\begin_inset Formula $M+1$
+\end_inset
+
+ ordered cutoff criteria.
  The models parameter are then given as 
-\begin_inset Formula $\theta=\{\mu,\sigma,c_{1},c_{2},\ldots,c_{n-1}\}$
+\begin_inset Formula $\theta=\{\mu,\sigma,c_{0},c_{1},\ldots,c_{M}\}$
 \end_inset
 
-.
+, with 
+\begin_inset Formula $c_{0}=-\infty<c_{1}<...<c_{M}=+\infty$
+\end_inset
+
+ .
  Let 
-\begin_inset Formula $X$
+\begin_inset Formula $m$
 \end_inset
 
- be the observed confidence rating.
- The probability for response 
-\begin_inset Formula $j\in\{1,2,\ldots,n\}$
+ be the observed confidence rating (
+\begin_inset Formula $1\leq m\leq M$
 \end_inset
 
- is then given as
-\begin_inset Formula 
-\begin{eqnarray*}
-P(X=j\vert\theta,\text{old item}) & = & \Phi\left(\frac{u_{j}-\mu}{\sigma}\right)-\Phi\left(\frac{l_{j}-\mu}{\sigma}\right)\\
-P(X=j\vert\theta,\text{new item}) & = & \Phi\left(u_{j}\right)-\Phi\left(l_{j}\right)
-\end{eqnarray*}
-
+).
+ The probability of response rating 
+\begin_inset Formula $m$
 \end_inset
 
-With 
-\begin_inset Formula $u_{j}$
-\end_inset
-
-, 
-\begin_inset Formula $l_{j}$
-\end_inset
-
- representing the upper and lower bound, respectively, for rating 
-\begin_inset Formula $j$
-\end_inset
-
- given as 
-\begin_inset Formula 
-\[
-u_{j}=\begin{cases}
-\infty, & j=n\\
-c_{j}, & j<n
-\end{cases},
-\]
-
-\end_inset
-
-and 
-\begin_inset Formula 
-\[
-l_{j}=\begin{cases}
--\infty, & j=1\\
-c_{j-1}, & j>1
-\end{cases}.
-\]
-
-\end_inset
-
-
+ being given to an old and new item are respectively 
 \end_layout
 
 \begin_layout Standard
-In 2AFC tasks the responses are based on the difference of each of the two
- items' familiarity.
- Let 
-\begin_inset Formula $L$
-\end_inset
-
-, 
-\begin_inset Formula $R$
-\end_inset
-
- denote the familiarity of the left and right item, respectively, then the
- difference is given as 
-\begin_inset Formula $D_{LR}=R-L$
-\end_inset
-
-.
- As the distribution of old items is given as 
-\begin_inset Formula $\mathcal{N}(\mu,\sigma)$
-\end_inset
-
-, the distribution of new items as 
-\begin_inset Formula $\mathcal{N}$
-\end_inset
-
-, and both random variables are independent the difference is also normally
- distributed: 
 \begin_inset Formula 
 \begin{eqnarray*}
-D_{LR,\text{old item left}} & = & \mathcal{N}\left(-\mu,\sqrt{1+\sigma^{2}}\right)\\
-D_{LR,\text{old item rigth}} & = & \mathcal{N}\left(\mu,\sqrt{1+\sigma^{2}}\right)
-\end{eqnarray*}
-
-\end_inset
-
-The decision on a 2AFC trial is determined as the difference value is smaller
- or higher for left or right answers, respectively, than a cutoff criterion.
- The extension for 
-\begin_inset Formula $n$
-\end_inset
-
--step 2AFC confidence rating scales is straightforward and equivalent to
- the extension from known-unknown decisions to 
-\begin_inset Formula $n$
-\end_inset
-
--step confidence ratings.
- Ratings 
-\begin_inset Formula $j\leq\frac{n}{2}$
-\end_inset
-
- indicate that the left item is classified as known with smaller ratings
- meaning higher confidence and ratings 
-\begin_inset Formula $j>\frac{n}{2}$
-\end_inset
-
- indicate that the right item is classified as known with higher ratings
- meaning higher confidence.
- The probability for response 
-\begin_inset Formula $j$
-\end_inset
-
- is given as 
-\begin_inset Formula 
-\begin{eqnarray*}
-P(X=j\vert\theta,\text{old item left}) & = & \Phi\left(\frac{u_{j}+\mu}{\sqrt{1+\sigma^{2}}}\right)-\Phi\left(\frac{l_{j}+\mu}{\sqrt{1+\sigma^{2}}}\right)\\
-P(X=j\vert\theta,\text{new item rigth}) & = & \Phi\left(\frac{u_{j}-\mu}{\sqrt{1+\sigma^{2}}}\right)-\Phi\left(\frac{l_{j}-\mu}{\sqrt{1+\sigma^{2}}}\right)
+P(m\vert\theta,\text{old item}) & = & \Phi\left(\frac{c_{m}-\mu}{\sigma}\right)-\Phi\left(\frac{c_{m-1}-\mu}{\sigma}\right)\\
+P(m\vert\theta,\text{new item}) & = & \Phi\left(c_{m}\right)-\Phi\left(c_{m-1}\right)
 \end{eqnarray*}
 
 \end_inset
@@ -578,43 +511,85 @@ P(X=j\vert\theta,\text{new item rigth}) & = & \Phi\left(\frac{u_{j}-\mu}{\sqrt{1
 \end_layout
 
 \begin_layout Standard
-In this thesis the equal-variance signal detection theory (EVSDT) model
- is used, which is a special case of the before described unequal-variance
- signal detection theory (UVSDT) for 2AFC confidence rating tasks, with
- the restriction that all variances are equal and are set, without loss
- of generality, to be equal one.
- Different encoding strengths are expected to influence the memory parameter
- 
+In a two-alternative forced-choice (2AFC) task two items are presented on
+ each trial (e.g., one item on the left and the other on the right side),
+ and the individual's task is to indicate which of the two corresponds to
+ the old item.
+ It is assumed that individuals choose the item with the largest familiarity
+ value.
+ The model can conceptualized in terms of distributions representing the
+ difference in familiarity between the two items, let us say the difference
+ between the item on the left and the item on the right.
+ When the old item is on the left, the familiarity difference follows a
+ normal distribution with mean 
 \begin_inset Formula $\mu$
 \end_inset
 
- and the different scales are expected to influence the cutoff criteria
- 
-\begin_inset Formula $c_{i}$
+ and standard deviation
+\begin_inset Formula $\sqrt{1+\sigma^{2}}$
 \end_inset
 
 .
- Thus, for 
-\begin_inset Formula $e$
+ When the old item is on the right, the familiarity difference follows a
+ normal distribution with mean 
+\begin_inset Formula $-\mu$
 \end_inset
 
- encoding strengths, 
-\begin_inset Formula $s$
-\end_inset
-
- scales and 
-\begin_inset Formula $n$
-\end_inset
-
--step 2AFC confidence ratings the here used model has parameters 
-\begin_inset Formula $\theta=\{\mu_{1},\ldots,\mu_{e},c_{1,1},\ldots,c_{n-1,1},\ldots,c_{1,s},\ldots,c_{n-1,s}\}$
-\end_inset
-
- with parameter space 
-\begin_inset Formula $\mathbb{R}^{e+s(n-1)}$
+ and standard deviation 
+\begin_inset Formula $\sqrt{1+\sigma^{2}}$
 \end_inset
 
 .
+ We could also consider a case in which none of the items is old, a case
+ in which the difference distribution has mean 0 and standard deviation
+ of 
+\begin_inset Formula $\sqrt{2}$
+\end_inset
+
+.
+ Now, let us consider a 
+\begin_inset Formula $M$
+\end_inset
+
+-step bipolar confidence rating scales going from 
+\begin_inset Formula $m=1$
+\end_inset
+
+ (
+\emph on
+Sure Left
+\emph default
+) and 
+\begin_inset Formula $m=M$
+\end_inset
+
+ (
+\emph on
+Sure Right
+\emph default
+).
+ The probability of response rating 
+\begin_inset Formula $m$
+\end_inset
+
+ being given to a left-old and right-old item are respectively 
+\begin_inset Formula 
+\begin{eqnarray*}
+P(m\vert\theta,\text{left}) & = & \Phi\left(\frac{c_{m}-\mu}{\sqrt{1+\sigma^{2}}}\right)-\Phi\left(\frac{c_{m-1}-\mu}{\sqrt{1+\sigma^{2}}}\right)\\
+P(m\vert\theta,\text{rigth}) & = & \Phi\left(\frac{c_{m}+\mu}{\sqrt{1+\sigma^{2}}}\right)-\Phi\left(\frac{c_{m-1}+\mu}{\sqrt{1+\sigma^{2}}}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In this thesis I will focus on the equal-variance SDT model, in which
+\begin_inset Formula $\sigma_{o}$
+\end_inset
+
+ is also fixed to 1.
 \end_layout
 
 \begin_layout Subsection
@@ -622,80 +597,116 @@ Discrete-State models
 \end_layout
 
 \begin_layout Standard
-Discrete-state models assume that observed behavior classes are a function
- of combinations of 
-\begin_inset Formula $n$
-\end_inset
-
- discrete cognitive states 
-\begin_inset Formula $S=\{S_{1},S_{2},\ldots,S_{n}\}$
-\end_inset
-
-.
- Each state is hereby reached with a certain probability that depends on
- the previous state.
- Recognition memory behavior is assumed to stem from two central states:
- 
+Discrete-state models assume that observed responses result from a mixture
+ of discrete mental states which are entered or not depending on the probabilist
+ic occurrence of specific cognitive processes.
+ In a old-new recognition task, it is assumed that old items either enter
+ a certainty state (
 \begin_inset Formula $S_{1}$
 \end_inset
 
-, 
+) with probability 
+\begin_inset Formula $d_{o}$
+\end_inset
+
+ or an uncertainty (
 \begin_inset Formula $S_{2}$
 \end_inset
 
-: detect item successfully as old or new, respectively, with probability
- 
-\begin_inset Formula $d_{s}=P(S_{1}\vert\text{old item})$
+) state with probability 
+\begin_inset Formula $1-d_{o}$
 \end_inset
 
-, and 
-\begin_inset Formula $d_{n}=P(S_{2}\vert\text{new item})$
+.
+ When in state 
+\begin_inset Formula $S_{1}$
 \end_inset
 
-, 
+, the old items are invariably recognized (response 
+\begin_inset Quotes eld
+\end_inset
+
+old
+\begin_inset Quotes erd
+\end_inset
+
+).
+ New items enter certainty state 
 \begin_inset Formula $S_{3}$
 \end_inset
 
-: guess the item to be known with probability 
-\begin_inset Formula $g=P\left(S_{3}\big\vert\left(S_{1}\cup S_{2}\right){}^{C}\right)$
+ with probability 
+\begin_inset Formula $d_{n}$
+\end_inset
+
+ or the uncertainty state 
+\begin_inset Formula $S_{2}$
+\end_inset
+
+ with probability 
+\begin_inset Formula $1-d_{n}$
 \end_inset
 
 .
- Studying items is captured in a higher 
-\begin_inset Formula $d_{s}$
+ New items in state 
+\begin_inset Formula $S_{3}$
 \end_inset
 
-.
- Response bias is captured 
+ are invariably rejected (response 
+\begin_inset Quotes eld
+\end_inset
+
+new
+\begin_inset Quotes erd
+\end_inset
+
+).
+ When items enter the uncertainty state 
+\begin_inset Formula $S_{2}$
+\end_inset
+
+, their status cannot be ascertained and hence a guessing process ensues.
+ Response 
+\begin_inset Quotes eld
+\end_inset
+
+old
+\begin_inset Quotes erd
+\end_inset
+
+ is given with probability 
 \begin_inset Formula $g$
 \end_inset
 
- with lower values meaning a more conservative response strategy.
- The model has parameters 
-\begin_inset Formula $\theta=\{d_{s},d_{n},g\}$
+ and response 
+\begin_inset Quotes eld
 \end_inset
 
- and can be imagined as tree of binary branches for entering a particular
- state with probability 
-\begin_inset Formula $p$
+new
+\begin_inset Quotes erd
 \end_inset
 
- or not with its counter probability 
-\begin_inset Formula $1-p$
+ is given with probability 
+\begin_inset Formula $1-g$
 \end_inset
 
 .
- Probabilities along branches are multiplied and each branch ends in an
- observable behavior class.
- Thus, the probability for each observable behavior is the sum of all single
- branch probabilities ending in this behavior category.
+ The probability of response 
+\begin_inset Quotes eld
+\end_inset
+
+old
+\begin_inset Quotes erd
+\end_inset
+
+ for old and new items is given respectively by
 \end_layout
 
 \begin_layout Standard
 \begin_inset Formula 
 \begin{eqnarray*}
-P(\text{"known"}\vert\theta,\text{old item}) & = & d_{s}+(1-d_{s})g\\
-P(\text{"known"}\vert\theta,\text{new item}) & = & (1-d_{n})g
+P(\text{"old"}\vert\theta,\text{old item}) & = & d_{o}+(1-d_{o})g\\
+P(\text{"old"}\vert\theta,\text{new item}) & = & (1-d_{n})g
 \end{eqnarray*}
 
 \end_inset
@@ -704,72 +715,101 @@ P(\text{"known"}\vert\theta,\text{new item}) & = & (1-d_{n})g
 \end_layout
 
 \begin_layout Standard
-Responses to 
+The extension of this so called 2 high-threshold model (2HTM) to confidence-rati
+ng scales requires the specification of state-response mapping functions
+ that assign the probability of each rating response, conditional on the
+ discrete state.
+ Let 
+\begin_inset Formula $\delta_{o}$
+\end_inset
+
+, 
+\begin_inset Formula $\delta_{n}$
+\end_inset
+
+,
+\begin_inset Formula $\gamma_{o}$
+\end_inset
+
+, and 
+\begin_inset Formula $\gamma_{n}$
+\end_inset
+
+ be probability vectors with length 
+\begin_inset Formula $M$
+\end_inset
+
+, each vector summing to 1.
+ Vectors 
+\begin_inset Formula $\delta_{o}$
+\end_inset
+
+ and 
+\begin_inset Formula $\delta_{n}$
+\end_inset
+
+ are assigned to states 
+\begin_inset Formula $S_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $S_{3}$
+\end_inset
+
+ respectively, and attribute probability 0 to all ratings 
 \begin_inset Formula $m$
 \end_inset
 
--step confidence rating scales have been discussed extensively (source).
- The early assumption that detect states lead invariably to the highest
- confidence rating could not be supported sufficiently by empirical data
- (source).
- Recent literature suggests that each state has a corresponding response
- mapping function that assigns each possible response 
-\begin_inset Formula $j\in\{1,2,\ldots,m\}$
+ inconsistent with the binary response.
+ Similarly, vectors 
+\begin_inset Formula $\gamma_{o}$
 \end_inset
 
-, with greater values meaning higher confidence, a probability for a given
- cognitive state.
- The family of mapping functions can be denoted as 
-\begin_inset Formula $\left(\text{map}_{s}(x)\right){}_{s\in S}$
+ and 
+\begin_inset Formula $\gamma_{n}$
 \end_inset
 
- which assign, given cognitive state 
-\begin_inset Formula $s$
+ attribute probability 0 to all ratings 
+\begin_inset Formula $m$
 \end_inset
 
-, each possible rating 
-\begin_inset Formula $x\in\{1,2,\ldots,\frac{m}{2}\}$
+ inconsistent with the binary response (
+\begin_inset Quotes eld
 \end_inset
 
- a certain probability.
- Since response bias parameter 
+old
+\begin_inset Quotes erd
+\end_inset
+
+ with probability 
 \begin_inset Formula $g$
 \end_inset
 
- can be expressed as 
-\begin_inset Formula $g=\sum_{i=\frac{m}{2}+1}^{m}\text{map}_{S_{3}}(i)$
+ and 
+\begin_inset Quotes eld
 \end_inset
 
- it is now redundant and thus omitted.
- Let 
-\begin_inset Formula $X$
+new
+\begin_inset Quotes erd
 \end_inset
 
- denote the observed response.
- The probability for response 
-\begin_inset Formula $j$
+ with probability 
+\begin_inset Formula $1-g$
 \end_inset
 
- is then given as:
-\end_layout
-
-\begin_layout Standard
-For straight 
+).
+ The probability of response rating 
 \begin_inset Formula $m$
 \end_inset
 
- the response scale can be split in two equal parts, which are then equivalent
- to classical responses known - upper half - and unknown - lower half.
- Thus, the mapping functions only map responses to the half of the scale
- the state would have resulted in a classical non-rating task.
- 
+ being given to an old and new item are respectively
 \end_layout
 
 \begin_layout Standard
 \begin_inset Formula 
 \begin{eqnarray*}
-P(X=j\vert\theta,\text{old item}) & = & d_{s}\text{map}_{S_{1}}(j)+(1-d_{s})\text{map}_{S_{3}}(j)\\
-P(X=j\vert\theta,\text{new item}) & = & d_{n}\text{map}_{S_{2}}(j)+(1-d_{n})\text{map}_{S_{3}}(j)
+P(m\vert\theta,\text{old item}) & = & d_{s}\delta_{o.m}+(1-d_{s})g\gamma{}_{o,m}\\
+P(m\vert\theta,\text{new item}) & = & d_{n}\delta_{n,m}+(1-d_{n})g\gamma{}_{o,m}
 \end{eqnarray*}
 
 \end_inset
