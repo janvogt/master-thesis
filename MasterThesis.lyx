@@ -559,7 +559,7 @@ In a two-alternative forced-choice (2AFC) task two items are presented on
 \emph on
 Sure Left
 \emph default
-) and 
+) to 
 \begin_inset Formula $m=M$
 \end_inset
 
@@ -808,8 +808,8 @@ new
 \begin_layout Standard
 \begin_inset Formula 
 \begin{eqnarray*}
-P(m\vert\theta,\text{old item}) & = & d_{s}\delta_{o.m}+(1-d_{s})g\gamma{}_{o,m}\\
-P(m\vert\theta,\text{new item}) & = & d_{n}\delta_{n,m}+(1-d_{n})g\gamma{}_{o,m}
+P(m\vert\theta,\text{old item}) & = & d_{o}\delta_{o.m}+(1-d_{o})\bigl(g\gamma{}_{o,m}+(1-g)\gamma{}_{n,m}\bigr)\\
+P(m\vert\theta,\text{new item}) & = & d_{n}\delta_{n,m}+(1-d_{n})\bigl(g\gamma{}_{o,m}+(1-g)\gamma{}_{n,m}\bigr)
 \end{eqnarray*}
 
 \end_inset
@@ -818,83 +818,177 @@ P(m\vert\theta,\text{new item}) & = & d_{n}\delta_{n,m}+(1-d_{n})g\gamma{}_{o,m}
 \end_layout
 
 \begin_layout Standard
-In 2AFC tasks states 
+In 2AFC tasks both detection states 
 \begin_inset Formula $S_{1}$
 \end_inset
 
  and 
-\begin_inset Formula $S_{2}$
-\end_inset
-
- are not anymore distinguishable because and old and a new item is always
- presented simultaneously, also there is no possibility to have a tendency
- towards answering known or unknown.
- Thus a new set of states for 2AFC tasks is necessary 
-\begin_inset Formula $S^{*}=\{S_{1}^{*},S_{2}^{*},\ldots,S_{n}^{*}\}$
-\end_inset
-
-.
- For recognition memory data these are namely: 
-\begin_inset Formula $S_{1}^{*}$
-\end_inset
-
-, 
-\begin_inset Formula $S_{2}^{*}$
-\end_inset
-
-: for detecting any of the two items' status if the correct one is on the
- left or right side, respectively - which are equivalently to 
-\begin_inset Formula $S_{1}\cup S_{2}$
-\end_inset
-
- if the old item is shown on the respective side - and 
 \begin_inset Formula $S_{3}$
 \end_inset
 
-: guessing that the old item is on the 
-\emph on
-right
-\emph default
- side, without loss of generality.
- Additionally parameters 
-\begin_inset Formula $d_{l}=P(S_{1}^{*}\vert\text{old item left})$
+ lead invariable to the correct answer (e.g.
+ 
+\begin_inset Quotes eld
 \end_inset
 
-, 
-\begin_inset Formula $d_{r}=P(S_{2}^{*}\vert\text{old item right})$
+right
+\begin_inset Quotes erd
+\end_inset
+
+ independently if the right item is being recognized as the old one or the
+ left one as the new).
+ Thus 
+\begin_inset Formula $d_{o}$
+\end_inset
+
+ and 
+\begin_inset Formula $d_{n}$
+\end_inset
+
+ are not separable and thus replaced by 
+\begin_inset Formula $d_{l}$
 \end_inset
 
 , and 
-\begin_inset Formula $g_{r}=P\left(S_{3}^{*}\big\vert\left(S_{1}^{*}\cup S_{2}^{*}\right){}^{C}\right)=\sum_{i=\frac{m}{2}+1}^{m}\text{map}_{S_{3}^{*}}^{*}(i)$
+\begin_inset Formula $d_{r}$
 \end_inset
 
-, and the new family of mapping functions 
-\begin_inset Formula $\left(\text{map}_{s}^{*}(x)\right){}_{s\in S^{*}}$
+, representing the probabilities of entering any detect state if the old
+ item is presented on the left or right side, respectively.
+ Formally they can be understood as 
+\begin_inset Formula $d_{l}=1-(1-d_{o})(1-d_{n})$
 \end_inset
 
- are defined.
- The probability for rating 
-\begin_inset Formula $j$
+ if the old item is presented on the left side and 
+\begin_inset Formula $d_{r}$
 \end_inset
 
- if ratings 
-\begin_inset Formula $j\leq\frac{m}{2}$
+ being the equivalent for the right side.
+ The uncertainty state 
+\begin_inset Formula $S_{2}$
 \end_inset
 
- indicate that the left item is classified as known with smaller ratings
- meaning higher confidence and ratings 
-\begin_inset Formula $j>\frac{m}{2}$
+ leads to guessing wether the old item is left or right with 
+\begin_inset Formula $g$
 \end_inset
 
- indicate that the right item is classified as known with higher ratings
- meaning higher confidence, is given as:
+ being the probability for a response 
+\begin_inset Quotes eld
+\end_inset
+
+right
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Formula $1-g$
+\end_inset
+
+ for 
+\begin_inset Quotes eld
+\end_inset
+
+left
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Similar to the yes-no confidence-rating task we define 
+\begin_inset Formula $\delta_{l}$
+\end_inset
+
+, 
+\begin_inset Formula $\delta_{r}$
+\end_inset
+
+, 
+\begin_inset Formula $\gamma_{l}$
+\end_inset
+
+, and 
+\begin_inset Formula $\gamma_{r}$
+\end_inset
+
+ as the state-response mapping.
+ 
+\begin_inset Formula $\delta_{l}$
+\end_inset
+
+ and 
+\begin_inset Formula $\delta_{r}$
+\end_inset
+
+ are mapping detect states on the left and right side, respectively, to
+ rating 
+\begin_inset Formula $m$
+\end_inset
+
+ with probability 0 for the other side.
+ And 
+\begin_inset Formula $\gamma_{l}$
+\end_inset
+
+, and 
+\begin_inset Formula $\gamma_{r}$
+\end_inset
+
+ attribute probabilities 0 to all ratings 
+\begin_inset Formula $m$
+\end_inset
+
+ inconsistent with the binary 
+\begin_inset Quotes eld
+\end_inset
+
+left
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+right
+\begin_inset Quotes erd
+\end_inset
+
+ answer, respectively.
+ Again, let us consider the 
+\begin_inset Formula $M$
+\end_inset
+
+-step scale from 
+\begin_inset Formula $m=1$
+\end_inset
+
+ (
+\emph on
+Sure left
+\emph default
+) to 
+\begin_inset Formula $m=M$
+\end_inset
+
+ (
+\emph on
+Sure Left
+\emph default
+),
+\emph on
+ 
+\emph default
+the probability of response 
+\begin_inset Formula $m$
+\end_inset
+
+ being given an left-old and right-old item are respectively:
 \end_layout
 
 \begin_layout Standard
 \begin_inset Formula 
 \begin{eqnarray*}
-P(X=j\vert\theta,\text{old item left}) & = & d_{l}\text{map}_{S_{1}^{*}}^{*}(j)+(1-d_{l})\text{map}_{S_{3}^{*}}^{*}(j)\\
-P(X=j\vert\theta,\text{new item rigth}) & = & d_{r}\text{map}_{S_{2}^{*}}^{*}(j)+(1-d_{r})\text{map}_{S_{3}^{*}}^{*}(j)
+P(m\vert\theta,\text{left}) & = & d_{l}\delta_{l.m}+(1-d_{l})\bigl(g\gamma{}_{r,m}+(1-g)\gamma{}_{l,m}\bigr)\\
+P(m\vert\theta,\text{right}) & = & d_{r}\delta_{r,m}+(1-d_{r})\bigl(g\gamma{}_{r,m}+(1-g)\gamma{}_{l,m}\bigr)
 \end{eqnarray*}
 
 \end_inset
@@ -903,190 +997,9 @@ P(X=j\vert\theta,\text{new item rigth}) & = & d_{r}\text{map}_{S_{2}^{*}}^{*}(j)
 \end_layout
 
 \begin_layout Standard
-Response mapping in this general way introduces a great amount of flexibility.
- All three states map freely on the full response scale, which nets to 
-\begin_inset Formula $3(m-1)$
-\end_inset
-
- degrees of freedom for response mapping only.
- Thus it is necessary to restrict the mapping functions reasonably.
- It can be argued that if a detect state is entered the response can not
- be on the 
-\begin_inset Quotes eld
-\end_inset
-
-wrong
-\begin_inset Quotes erd
-\end_inset
-
- side of the scale (e.g.
- 
-\begin_inset Formula $j\leq\frac{m}{2}$
-\end_inset
-
- if the old item is on the left hand side is detected), thus the mapping
- functions for detect states can be restricted to zero probability for the
- 
-\begin_inset Quotes eld
-\end_inset
-
-wrong
-\begin_inset Quotes erd
-\end_inset
-
- responses.
- This eliminates 
-\begin_inset Formula $2\frac{m}{2}=m$
-\end_inset
-
- degrees of freedom.
- Furthermore adding the symmetry constraints used by 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "province_evidence_2012"
-
-\end_inset
-
- - namely 
-\begin_inset Formula $\text{map}_{S_{2}^{*}}^{*}(x)=\text{map}_{S_{1}^{*}}^{*}(m-x+1)$
-\end_inset
-
- that is the mapping for detection on the left hand side is identical to
- mapping on the right side and 
-\begin_inset Formula 
-\[
-\left(\frac{map_{S_{2}^{*}}^{*}(x)}{(1-g_{r})}=\frac{\text{map}_{S_{2}^{*}}^{*}(m-x+1)}{g_{r}}\right)_{x\in\left\{ 1,2,\ldots,\frac{m}{2}\right\} }
-\]
-
-\end_inset
-
- that is the mapping for the guessing is a weighted point reflection on
- the scales center - eliminates 
-\begin_inset Formula $\frac{m}{2}-1$
-\end_inset
-
- df for equal detection mapping and 
-\begin_inset Formula $\frac{m}{2}-1$
-\end_inset
-
- df for guessing mapping symmetry.
- With all these restrictions response mapping 
-\begin_inset Quotes eld
-\end_inset
-
-costs
-\begin_inset Quotes erd
-\end_inset
-
- for all states 
-\begin_inset Formula $3(m-1)-m-(\frac{m}{2}-1)-\frac{m}{2}=m-2$
-\end_inset
-
- degrees of freedom.
- Trivial and in this thesis used mapping functions fulfilling the criteria
- are 
-\begin_inset Formula 
-\[
-\text{map}_{S_{1}^{*}}^{*}(j)=\begin{cases}
-\prod_{i=1}^{\frac{m}{2}-1}(1-p_{d,i})^{\mathbf{1}_{\{x>i\}}(j)}p_{d,i}^{\mathbf{1}_{\{x=i\}}(j)}, & j\leq\frac{m}{2}\\
-0 & j>\frac{m}{2}
-\end{cases},
-\]
-
-\end_inset
-
- 
-\begin_inset Formula 
-\[
-\text{map}_{S_{2}^{*}}^{*}(j)=\text{map}_{S_{1}^{*}}^{*}(m-j+1),
-\]
-
-\end_inset
-
-for detect states with parameters 
-\begin_inset Formula $\{p_{d,1},p_{d,2},\ldots,p_{d,\frac{m}{2}-1}\}$
-\end_inset
-
-, and 
-\begin_inset Formula 
-\[
-\text{map}_{S_{3}^{*}}^{*}(j)=\begin{cases}
-(1-g_{r})\prod_{i=1}^{\frac{m}{2}-1}(1-p_{g,i})^{\mathbf{1}_{\{x>i\}}(\frac{m}{2}-j+1)}p_{g,i}^{\mathbf{1}_{\{x=i\}}(\frac{m}{2}-j+1)}, & j\leq\frac{m}{2}\\
-g_{r}\prod_{i=1}^{\frac{m}{2}-1}(1-p_{g,i})^{\mathbf{1}_{\{x>i\}}(j-\frac{m}{2})}p_{g,i}^{\mathbf{1}_{\{x=i\}}(j-\frac{m}{2})}, & j>\frac{m}{2}
-\end{cases}
-\]
-
-\end_inset
-
- for guessing states with parameters 
-\begin_inset Formula $\{g_{r},p_{g,1},p_{g,2},\ldots,p_{g,\frac{m}{2}-1}\}$
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-In this thesis the 1 high-threshold model (1HTM) is used, which is a special
- case of the before described 2 high-threshold model (2HTM) for 2AFC confidence
- rating tasks, with the restriction that there is only one parameter 
-\begin_inset Formula $d$
-\end_inset
-
- for detection and 
+In this thesis I will focus on the 1 high-threshold model (1HTM), in which
+ there is only one detect parameter for both sides 
 \begin_inset Formula $d=d_{l}=d_{r}$
-\end_inset
-
-.
- Different encoding strengths are expected to influence the memory parameter
- 
-\begin_inset Formula $d$
-\end_inset
-
- and different scales are expected to influence response mapping parameter
- 
-\begin_inset Formula $p_{d,i}$
-\end_inset
-
-, 
-\begin_inset Formula $g_{r}$
-\end_inset
-
-, 
-\begin_inset Formula $p_{g,i}$
-\end_inset
-
-.
- Thus, for 
-\begin_inset Formula $e$
-\end_inset
-
- encoding strengths, 
-\begin_inset Formula $s$
-\end_inset
-
- scales and 
-\begin_inset Formula $n$
-\end_inset
-
--step 2AFC confidence ratings the here used model has parameters
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\uuline off
-\uwave off
-\noun off
-\color none
-\lang english
- 
-\begin_inset Formula $\theta=\{d_{1},\ldots,d_{e},p_{d,1,1},\ldots,p_{d,\frac{m}{2}-1,1},g_{r,s},p_{g,1,1},\ldots,p_{g,\frac{m}{2}-1,1},p_{d,1,s},\ldots,p_{d,\frac{m}{2}-1,s},g_{r,s},p_{g,1,s},\ldots,p_{g,\frac{m}{2}-1,s}\}$
-\end_inset
-
- with parameter space 
-\begin_inset Formula $[0,1]^{e+s(\frac{m}{2}-1)}$
 \end_inset
 
 .
