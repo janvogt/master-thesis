@@ -33,6 +33,83 @@ plot.vp(subset(dists.list[[1]][[1]], code=="AG1503"), model.param[[1]][[1]][1, ]
 ########################
 # Deprecated Functions #
 ########################
+plot.UVSDT <- function(parameter, show.zero=TRUE){ 
+  parameter <- parameter[grep(".*UVSDT_", names(parameter))]
+  names <- names(parameter)
+  #Get scales and states
+  crit.scale.levels <- get.levels.from.strings(names, ".*?_c\\.(\\d+)\\.(.+)")
+  scales <- crit.scale.levels[[2]]
+  crit <- crit.scale.levels[[1]]
+  #Get encoding strengths and left/right names
+  enc.levels <- get.levels.from.strings(names, ".*?_mu\\.(.+)")
+  enc.states <- enc.levels[[1]]
+  left.right.names <- c("left", "right")
+  #only param names
+  r.res <- regexec(".*?_(.*)", names)
+  names(parameter) <- mapply(function(x, y) substr(y, x[2], x[2]+attr(x, "match.length")[2]), r.res, names)
+  crit.mat <- unlist(parameter[paste(rep(paste("c", crit, sep="."), each=length(scales)), scales, sep=".")])
+  dim(crit.mat) <- c(length(scales), length(crit))
+  crit.mat <- t(sapply(1:length(scales), function(x, y) cumsum(y[x,]), crit.mat))
+  dimnames(crit.mat) <- list(scales, crit)
+  mu.mat <- unlist(parameter[rep(paste("mu", enc.states, sep="."), length(left.right.names))])
+  dim(mu.mat) <- c(length(enc.states), length(left.right.names))
+  dimnames(mu.mat) <- list(enc.states, left.right.names)
+  mu.mat[,"left"] <- -1* mu.mat[,"left"]
+  sd.mat <- unlist(parameter[rep(paste("sd", enc.states, sep="."), length(left.right.names))])
+  dim(sd.mat) <- c(length(enc.states), length(left.right.names))
+  dimnames(sd.mat) <- list(enc.states, left.right.names)
+  return(list("UVSDT"=list(mu.mat=mu.mat, sd.mat=sd.mat, crit.mat=crit.mat, show.zero=show.zero)))
+}
+plot.MPT2HTM <- function(parameter){
+  parameter <- parameter[grep(".*MPT2HTM_", names(parameter))]
+  names <- names(parameter)
+  #Get scales and states
+  states.scale.levels <- get.levels.from.strings(names, ".*?_mg\\.([^_]+)\\.(.+)")
+  scales <- states.scale.levels[[2]]
+  n.states <- (length(states.scale.levels[[1]])+1)*2  
+  #Get encoding strengths and left/right names
+  enc.pos.levels <- get.levels.from.strings(names, ".*?_d\\.([^_]+)\\.(.+)")
+  enc.states <- enc.pos.levels[[1]]
+  left.right.names <- enc.pos.levels[[2]]
+  #only param names
+  r.res <- regexec(".*?_(.*)", names)
+  names(parameter) <-  mapply(function(x, y) substr(y, x[2], x[2]+attr(x, "match.length")[2]), r.res, names)
+  dist.param <- parameter[paste(c(paste("md", 1:(n.states/2-1), sep="."), paste("mg", 1:(n.states/2-1), sep=".")), rep(scales, each=n.states-2), sep=".")]
+  mapping.mat <- unlist(mapdists.mpt(dist.param, 1:n.states, scales))
+  dim(mapping.mat) <- c(length(scales), n.states, 2)
+  dimnames(mapping.mat) <- list(scales, 1:n.states, c("detect", "guess"))
+  guessing.vec <- rep(parameter[["gr"]], length(scales))
+  names(guessing.vec) <- scales
+  detection.mat <- unlist(parameter[paste("d", enc.states, rep(left.right.names, each=length(enc.states)), sep=".")])
+  dim(detection.mat) <- c(length(enc.states), length(left.right.names))
+  dimnames(detection.mat) <- list(enc.states, left.right.names)
+  return(list("MPT2HTM"=list(detection.mat=detection.mat, guessing.vec=guessing.vec, mapping.mat=mapping.mat)))
+}
+plot.MPT1HTM2g <- function(parameter){
+  parameter <- parameter[grep(".*MPT1HTM2g_", names(parameter))]
+  names <- names(parameter)
+  #Get scales and states
+  states.scale.levels <- get.levels.from.strings(names, ".*?_mg\\.([^_]+)\\.(.+)")
+  scales <- states.scale.levels[[2]]
+  n.states <- (length(states.scale.levels[[1]])+1)*2  
+  #Get encoding strengths and left/right names
+  enc.levels <- get.levels.from.strings(names, ".*?_d\\.(.+)")
+  enc.states <- enc.levels[[1]]
+  left.right.names <- c("left", "right")
+  #only param names
+  r.res <- regexec(".*?_(.*)", names)
+  names(parameter) <-  mapply(function(x, y) substr(y, x[2], x[2]+attr(x, "match.length")[2]), r.res, names)
+  dist.param <- parameter[paste(c(paste("md", 1:(n.states/2-1), sep="."), paste("mg", 1:(n.states/2-1), sep=".")), rep(scales, each=n.states-2), sep=".")]
+  mapping.mat <- unlist(mapdists.mpt(dist.param, 1:n.states, scales))
+  dim(mapping.mat) <- c(length(scales), n.states, 2)
+  dimnames(mapping.mat) <- list(scales, 1:n.states, c("detect", "guess"))
+  guessing.vec <- unlist(parameter[paste("gr", scales, sep=".")])
+  names(guessing.vec) <- scales
+  detection.mat <- rep(unlist(parameter[paste("d", enc.states, sep=".")]), 2)
+  dim(detection.mat) <- c(length(enc.states), length(left.right.names))
+  dimnames(detection.mat) <- list(enc.states, left.right.names)
+  return(list("MPT1HTM2g"=list(detection.mat=detection.mat, guessing.vec=guessing.vec, mapping.mat=mapping.mat)))
+}
 MPT1HTM2g <- function(){
   d.vec <- function(resp, enc, scale, posold, internal=FALSE){
     enc.states <- levels(enc)[levels(enc)!=0]

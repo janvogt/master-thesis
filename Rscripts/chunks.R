@@ -1,5 +1,18 @@
 ## @knitr Demographics
 demographics.df <- read.csv(file="data/Demographics.csv", sep=";")
+n.ges <- length(levels(factor(c(row.names(model.param[[c(1,1)]]), row.names(model.param[[c(1,2)]])))))
+exp.dem <- subset(demographics.df, group=="normal")
+
+n.ses.2 <- length(row.names(model.param[[c(1,2)]])) 
+n.dropout <- length(row.names(model.param[[c(1,1)]])) - n.ses.2
+summary(exp1.dem$sex)
+summary(exp1.dem$age)
+length(grep("(sycholo|SYCHOLO)", exp.dem$occupdesc))
+
+n.exp.2 <- length(levels(factor(c(row.names(model.param[[c(2,1)]]), row.names(model.param[[c(2,2)]])))))
+n.exp2.ses.1 <- length(row.names(model.param[[c(2,1)]]))
+n.exp2.ses.2 <- length(row.names(model.param[[c(2,2)]]))
+
 
 ## @knitr DataSetup
 rec.data <- read.csv(file="data/Rec.csv", sep=";")
@@ -10,7 +23,7 @@ model.param <- fit.data$fit.par
 model.res <- fit.data$model.res
 
 ## @knitr AllPlots
-#plot.vps(dists.list, model.param)
+plot.vps(dists.list, model.param)
 
 ## @knitr LoadExp1
 res.ses1 <- model.res[[c(1,1)]]
@@ -29,14 +42,6 @@ comp1mpt <- gsq.test("MPT1HTM", "MPT1HTM(res.d.scale)", res.ses1)
 comp1sdt <- gsq.test("EVSDT", "EVSDT(res.mu.scale)", res.ses1)
 comp2mpt <- gsq.test("MPT1HTM(res.d.scale)", "MPT1HTM(res.d.scale,res.map)", res.ses1)
 comp2sdt <- gsq.test("EVSDT(res.mu.scale)", "EVSDT(res.mu.scale,res.crit)", res.ses1)
-n.part.ses1
-n.part.ses2
-select.ses1
-select.ses2
-comp1mpt
-comp1sdt
-comp2mpt
-comp2sdt
 
 ## @knitr Res02
 select.ses1 <- select.mpt(res.ses1[c("MPT1HTM(res.d.scale)", "EVSDT(res.mu.scale)")], output="full")
@@ -45,12 +50,6 @@ diff.ses1 <- g.sq.diff("MPT1HTM(res.d.scale)","EVSDT(res.mu.scale)", res.ses1)
 sum.diff.ses1 <- summary(diff.ses1[[1]][1:diff.ses1[[2]][1,3],4])
 diff.ses2 <- g.sq.diff("MPT1HTM(res.d.scale)","EVSDT(res.mu.scale)", res.ses2)
 sum.diff.ses2 <- summary(diff.ses2[[1]][1:diff.ses2[[2]][1,3],4])
-select.ses1
-select.ses2
-diff.ses1
-sum.diff.ses1
-diff.ses2
-sum.diff.ses2
 
 ## @knitr Res02p1
 plot.g.sq.diff(diff.ses1)
