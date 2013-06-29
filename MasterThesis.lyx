@@ -383,6 +383,13 @@ Results of experiments involving a finite set of behavioral categories
 
 \begin_layout Subsection
 Latent-Strength models
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Latent-Strength-models"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -434,9 +441,19 @@ Let
 , the probability for a hit and a false alert are then given as
 \begin_inset Formula 
 \begin{align*}
-P(\text{"old"}\vert\theta,\text{old item}) & =\Phi\left(\frac{\mu_{o}-c}{\sigma_{o}}\right)\\
+P(\text{"old"}\vert\theta,\text{old item}) & =\Phi\left(\frac{c-\mu_{o}}{\sigma_{o}}\right)\\
 P(\text{"old"}\vert\theta,\text{new item}) & =\Phi(-c)
 \end{align*}
+
+\end_inset
+
+
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+mu-c geändert in c-mu sonst dürfte es eigentlich nicht stimmen
+\end_layout
 
 \end_inset
 
@@ -575,8 +592,8 @@ Sure Right
  being given to a left-old and right-old item are respectively 
 \begin_inset Formula 
 \begin{eqnarray*}
-P(m\vert\theta,\text{left}) & = & \Phi\left(\frac{c_{m}-\mu}{\sqrt{1+\sigma^{2}}}\right)-\Phi\left(\frac{c_{m-1}-\mu}{\sqrt{1+\sigma^{2}}}\right)\\
-P(m\vert\theta,\text{rigth}) & = & \Phi\left(\frac{c_{m}+\mu}{\sqrt{1+\sigma^{2}}}\right)-\Phi\left(\frac{c_{m-1}+\mu}{\sqrt{1+\sigma^{2}}}\right)
+P(m\vert\theta,\text{left}) & = & \Phi\left(\frac{c_{m}+\mu}{\sqrt{1+\sigma^{2}}}\right)-\Phi\left(\frac{c_{m-1}+\mu}{\sqrt{1+\sigma^{2}}}\right)\\
+P(m\vert\theta,\text{rigth}) & = & \Phi\left(\frac{c_{m}-\mu}{\sqrt{1+\sigma^{2}}}\right)-\Phi\left(\frac{c_{m-1}-\mu}{\sqrt{1+\sigma^{2}}}\right)
 \end{eqnarray*}
 
 \end_inset
@@ -585,7 +602,24 @@ P(m\vert\theta,\text{rigth}) & = & \Phi\left(\frac{c_{m}+\mu}{\sqrt{1+\sigma^{2}
 \end_layout
 
 \begin_layout Standard
-In this thesis I will focus on the equal-variance SDT model, in which
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+c-mu für rechts alt und c+mu für links alt
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In this thesis I will focus on the equal-variance SDT (
+\begin_inset Formula $\text{EVSDT}$
+\end_inset
+
+) model, in which
 \begin_inset Formula $\sigma_{o}$
 \end_inset
 
@@ -594,6 +628,13 @@ In this thesis I will focus on the equal-variance SDT model, in which
 
 \begin_layout Subsection
 Discrete-State models
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Discrete-State-models"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -959,7 +1000,7 @@ right
 \end_inset
 
 .
- Let us consider a 
+ Considering the 
 \begin_inset Formula $M$
 \end_inset
 
@@ -1003,9 +1044,12 @@ P(m\vert\theta,\text{right}) & = & d_{r}\delta_{r,m}+(1-d_{r})\bigl(g\gamma{}_{r
 \end_layout
 
 \begin_layout Standard
-In this thesis I will focus on the 1 high-threshold model (1HTM), in which
- detection states are set to be equal for both sides 
-\begin_inset Formula $d=d_{l}=d_{r}$
+In this thesis I will focus on the 1 high-threshold model (
+\begin_inset Formula $\text{1HTM}$
+\end_inset
+
+), in which detection states are set to be equal for both sides 
+\begin_inset Formula $d_{l}=d_{r}$
 \end_inset
 
  and state-response mappings are mirrored on the response-scale's center
@@ -1018,6 +1062,19 @@ In this thesis I will focus on the 1 high-threshold model (1HTM), in which
 \end_inset
 
 .
+ For simplicity we speak only parameter 
+\begin_inset Formula $d=d_{l}=d_{r}$
+\end_inset
+
+, 
+\begin_inset Formula $\delta_{l}$
+\end_inset
+
+, and 
+\begin_inset Formula $\gamma_{m}=\bigl(g\gamma{}_{r,m}+(1-g)\gamma{}_{l,m}\bigr)$
+\end_inset
+
+ as the model is thereby fully specified.
 \end_layout
 
 \begin_layout Subsection
@@ -1741,6 +1798,29 @@ Two experiments are conducted, the first being a more classical version
 Experiment 1
 \end_layout
 
+\begin_layout Standard
+This experiment is designed to be a close replication of 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "province_evidence_2012"
+
+\end_inset
+
+, with the addition of scale manipulation and a second session with pictures
+ as memorized stimuli.
+ Also all unusual characteristics of 
+\begin_inset CommandInset citation
+LatexCommand citeauthor
+key "province_evidence_2012"
+
+\end_inset
+
+'s experiments were omitted, namely the use of continuous and post-hoc binned
+ rating scales, the use of associated words as targets and lures, the scale
+ manipulation with stronger penalization for wrong responses and immediate
+ feedback, and the zero repetition condition.
+\end_layout
+
 \begin_layout Subsubsection
 Subjects
 \end_layout
@@ -1812,7 +1892,7 @@ key "duyck_wordgen:_2004"
 \end_inset
 
 , were selected.
- Image stimuli for Session 2 were 525 black and white line drawings that
+ Pictures stimuli for Session 2 were 525 black and white line drawings that
  were obtained from 
 \begin_inset CommandInset citation
 LatexCommand cite
@@ -1867,8 +1947,8 @@ high-risk
 \emph on
 13 
 \emph default
-points in steps of 4, for the most central to the most peripheral buttons
- on each side, respectively.
+points in steps of 4, for the most meidal to the most lateral buttons on
+ each side, respectively.
  Each scale was presented below the two stimuli of the 2AFC task with each
  stimuli being centered above the it's respective half of the scale (e.g.
  the 
@@ -2049,13 +2129,14 @@ weak
 \begin_inset Quotes erd
 \end_inset
 
- encoded images being repeated for 3 and 1 time respectively.
- Together with the ten primacy and recency filler images this evaluates
- to 258 images presented in each of the two learning phases.
+ encoded pictures being shown for 3 and 1 time respectively.
+ Together with the ten primacy and recency filler pictures this evaluates
+ to 258 pictures presented in each of the two learning phases.
  Presentation times were 250 msec.
  with the same ISI of 200 msec.
  as in Session 1.
- Retention and recall phase were conceptually identical.
+ Retention and recall phase were conceptually identical with 124 pictures
+ being rated in each block.
  The only difference was that in the recall phase the scales were not manipulate
 d and only the low-risk scale was used for both blocks.
 \end_layout
@@ -2076,18 +2157,23 @@ Design
 \end_layout
 
 \begin_layout Standard
-The main treatment factors were the encoding strength that is how often
- a word has been shown in the learning phase, the position of the learned
- item in the 2AFC-rating task, the response scale used in the 2AFC task.
- 
+The key treatment factors were Encoding, Scale, and Position the respective
+ levels are shown in 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:experimental-factors"
 
 \end_inset
 
-shows all factor combinations, resulting data cells and degrees of freedom.
- All factor combinations are applied in a within subject factorial design.
+.
+ Encoding strength was manipulated item-wise in both Sessions via different
+ repetition conditions for memorized stimuli.
+ Scale was manipulated block-wise and only in Session 1 via different points
+ on the rating scale.
+ Position was manipulated item-wise via the position of the old word in
+ the 2AFC rating task.
+ This evaluated to a 2 x 2 x 2 and 2 x 1 x 2 within participants factorial
+ design for Session 1 and 2, respectively.
 \end_layout
 
 \begin_layout Standard
@@ -2100,7 +2186,8 @@ status open
 \begin_inset Caption
 
 \begin_layout Plain Layout
-Tadaa
+Experimental design for both experiments.
+ 
 \begin_inset CommandInset label
 LatexCommand label
 name "tab:experimental-factors"
@@ -2152,7 +2239,7 @@ Session
 \begin_inset Text
 
 \begin_layout Plain Layout
-encoding
+Encoding
 \end_layout
 
 \end_inset
@@ -2170,7 +2257,7 @@ encoding
 \begin_inset Text
 
 \begin_layout Plain Layout
-old-pos.
+Position
 \end_layout
 
 \end_inset
@@ -2188,7 +2275,7 @@ old-pos.
 \begin_inset Text
 
 \begin_layout Plain Layout
-scale
+Scale
 \end_layout
 
 \end_inset
@@ -2655,7 +2742,7 @@ Verbal
 \begin_inset Text
 
 \begin_layout Plain Layout
-(None)
+(no-old)
 \end_layout
 
 \end_inset
@@ -2893,7 +2980,7 @@ Visual
 \begin_inset Text
 
 \begin_layout Plain Layout
-(None)
+(no-old)
 \end_layout
 
 \end_inset
@@ -3098,163 +3185,73 @@ Experiment 2
 \end_layout
 
 \begin_layout Standard
-Otherwise participants were asked for their socio-demographic data after
- each session.
- 
+This Experiment is designed to be a replication of Experiment one with the
+ addition of the zero repetition condition used by 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "province_evidence_2012"
+
+\end_inset
+
+ which turned out to be crucial to differentiate between the 
+\begin_inset Formula $\text{1HTM}$
+\end_inset
+
+ and the 
+\begin_inset Formula $\text{EVSDT}$
+\end_inset
+
+ model.
+ The sole additional change was the use of a 6-step rating scale since the
+ medium two steps for each half of the 8-step scale in Experiment 1 sometimes
+ led to empty cells making it difficult to properly estimate their empirical
+ probabilities.
+\end_layout
+
+\begin_layout Subsubsection
+Subjects
 \end_layout
 
 \begin_layout Standard
-The 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-Sexpr{nrow(demographics.df)}
-\end_layout
-
+Thirty-three participants were recruited by same means as used for Experiment
+ 1.
+ This led to comparable characteristics (female: 28, male: 5, 
+\begin_inset Formula $ $
 \end_inset
 
- participants with were recruited in courses, via email list, and bulletin
- offer.
- Participants were offered VP hour, their individual results, a copy of
- the completed thesis, and the merit-based chance of getting 50€, 30€ or
- 20€ as the 1st, 2nd, and 3rd place, respectively.
- The sample consisted mostly of young (
+
 \emph on
-Mdn
+M
 \emph default
-=
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-Sexpr{median(demographics.df$age)}
-\end_layout
-
-\end_inset
-
-, range=
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-Sexpr{min(demographics.df$age)}
-\end_layout
-
-\end_inset
-
--
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-Sexpr{max(demographics.df$age)}
-\end_layout
-
-\end_inset
-
-) psychology (
+=21.4, range: 18-34) and 
 \emph on
 n
 \emph default
-=
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-Sexpr{length(grep("(sycholo|SYCHOLO)", demographics.df$occupdesc))}
+=31 being psychology students.
+ The incentives and background story were identical to Experiment one.
+ It was not possible for participants to know in which experiment they took
+ part.
+ Thirty participants participated in both sessions and the the remaining
+ three only in Session 1.
 \end_layout
 
-\end_inset
-
-) students (
-\emph on
-n
-\emph default
-=
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-Sexpr{length(demographics.df$occup[demographics.df$occup=="student"])}
-\end_layout
-
-\end_inset
-
-).
- The first 
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-Sexpr{nrow(subset(demographics.df, group=="normal"))}
-\end_layout
-
-\end_inset
-
- subjects were assigned to Group 1 
-\begin_inset Quotes eld
-\end_inset
-
-fully encoded
-\begin_inset Quotes erd
-\end_inset
-
- the rest (
-\emph on
-n
-\emph default
-=
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-Sexpr{nrow(subset(demographics.df, group=="forcedguess"))}
-\end_layout
-
-\end_inset
-
-) were assigned to Group 2 
-\begin_inset Quotes eld
-\end_inset
-
-forced guessing
-\begin_inset Quotes erd
-\end_inset
-
-.
- Each participant were invited for two session: Session 1 with verbal items
- and session 2 with visual items.
+\begin_layout Subsubsection
+Materials
 \end_layout
 
 \begin_layout Standard
-For Group 2 I used 857 nouns, that were of approximately equal word frequency
- in common German, as indicated by frequency classes obtained for each word
- from DeReWo
+The same Python program running on the same computers was used.
+ Word stimuli were selected form the same pool obtained from 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "lahl_using_2009"
+
+\end_inset
+
+ but in order to keep memory constant, additional words for the zero repetition
+ condition were necessary.
+ Thus 857 nouns with also approximately equal word frequency in common German,
+ as indicated by frequency classes obtained for each word from DeReWo
 \begin_inset CommandInset citation
 LatexCommand citep
 before "ranging from 10 to 16; "
@@ -3263,24 +3260,648 @@ key "institut_fur_deutsche_sprache_programmbereich_korpuslinguistik_korpusbasier
 \end_inset
 
 .
- Visual stimuli for both sessions were 525 black and white line drawings
- taken from 
+ Pictures were the same525 taken from 
 \begin_inset CommandInset citation
-LatexCommand cite
-key "szekely_timed_2003"
+LatexCommand citet
+key "szekely_new_2004"
 
 \end_inset
 
-.
+ as in Experiment 1.
+ The 2AFC trials were almost identical to Session 1 only being reduced to
+ 6-steps.
+ Thus the low-risk scale ranged from 
+\emph on
+1
+\emph default
+ to 
+\emph on
+3
+\emph default
+ points and the high-risk scale ranged from 
+\emph on
+1
+\emph default
+ to 
+\emph on
+9 
+\emph default
+points, from the medial to the lateral buttons (see
+\emph on
+ 
+\emph default
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Rating-scales"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Subsubsection
+Procedures
 \end_layout
 
 \begin_layout Standard
-or the fully encoded group and 1, 2, 3; 1, 5, 9 for the forced guessing
- group each low-risk and high-risk scales, respectively.
+The instructions, the overall experimental procedures (e.g.
+ three phases per block; 4, 2 block in Session 1 and 2, respectively), and
+ the timing was identical to Experiment 1.
+ The sole exception was the inclusion of a zero repetition condition in
+ both Sessions.
+\end_layout
+
+\begin_layout Paragraph
+Session 1
+\end_layout
+
+\begin_layout Standard
+For each participant 2 x 360 words were randomly selected to act as old
+ and new words, respectively.
+ In each of the four blocks 90 of the old words were considered as memorized,
+ but only 72 were actually presented 4 or 1 times as strong and weak encoded
+ words, respectively (i.e.
+ the learning phase was identical to the corresponding one in Experiment
+ 1).
+ The remaining 18 words in each block were not shown in the memory phase,
+ thus they are labeled them as 0 times shown.
+ In the 2AFC task all 90 items per block were rated, but the position of
+ the 0 times shown words was unimportant, as both items were new to the
+ participants.
+ Thus the 90 2AFC trials in each block were equally divided in five types:
+ two left-old and two right-old for each 1 x and 4 x repetition condition,
+ respectively, and one no-old for the 0 x repetition condition.
+\end_layout
+
+\begin_layout Paragraph
+Session 2
+\end_layout
+
+\begin_layout Standard
+For each participant 2 x 250 pictures were randomly selected to act as old
+ and new images, respectively.
+ In each of the two blocks 125 of the old pictures were considered as memorizes,
+ but only 100 were actually presented 3 or 1 times as strong and weak encoded
+ pictures, respectively (i.e.
+ due to the restricting size of the used picture pool, participants had
+ to memorize 24 pictures less in each block compared to Experiment 1, which,
+ in turn, led to a slight but unproblematic increase in correct answers).
+ The remaining 25 pictures in each block used as 0 times shown items.
+ Thus, the 125 items per block were equally across the five types of 2AFC
+ trials in the recall phase.
+\end_layout
+
+\begin_layout Subsubsection
+Design
+\end_layout
+
+\begin_layout Standard
+The design had the same factors as Experiment 1 although with additional
+ levels to account for the addition of the zero repetition condition (see
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:experimental-factors"
+
+\end_inset
+
+).
+ The Scale manipulation was applied block-wise and exclusively in Session
+ 1.
+ Encoding strengths and Positions were varied item-wise with the no-old
+ position being the only position for the 0 x encoding strength level and
+ left-old and right-old position being nested under the weak and strong
+ levels of the Encoding factor.
+ This evaluates to (2 x 2 + 1 x 1) x 2 and (2 x 2 + 1 x 1) x 1 factor combinatio
+ns for Encoding, Position, and Scale factors in Session 1 and 2, respectively.
 \end_layout
 
 \begin_layout Subsection
 Model Specification
+\end_layout
+
+\begin_layout Standard
+The most general versions and three restricted versions, respectively, of
+ the discrete-state model and the continuous model are used to analyze the
+ data.
+ In the following they will be defined one by one.
+\end_layout
+
+\begin_layout Subsubsection
+Discrete-state models
+\end_layout
+
+\begin_layout Standard
+In this thesis I focus on the 1HTM as a proxy for discrete state models.
+\end_layout
+
+\begin_layout Paragraph
+\begin_inset Formula $\text{1HTM}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The model is a extended version of the general form described in 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "sub:Discrete-State-models"
+
+\end_inset
+
+.
+ The extension accounts for the experimental factors intended to influence
+ specific processes.
+ The most general form, herein after referred to as 
+\begin_inset Formula $\text{1HTM}$
+\end_inset
+
+, has parameter denoted as 
+\begin_inset Formula $d_{\text{weak}}$
+\end_inset
+
+ and 
+\begin_inset Formula $d_{\text{strong}}$
+\end_inset
+
+ for weak and strong encoded items, respectively.
+ Additionally it has two full parameter sets for each Scale denoted by the
+ index low and high for low-risk and high-risk scales, respectively.
+ Let 
+\begin_inset Formula $E$
+\end_inset
+
+ denote the number of encoding strengths without the zero repetition and
+ 
+\begin_inset Formula $Z$
+\end_inset
+
+ the number of scales, the probability of observing a rating 
+\begin_inset Formula $m$
+\end_inset
+
+ from 
+\begin_inset Formula $m=1$
+\end_inset
+
+ (
+\emph on
+Sure Left
+\emph default
+) to 
+\begin_inset Formula $m=M$
+\end_inset
+
+(
+\emph on
+Sure right
+\emph default
+) for any given factor combination
+\begin_inset Formula $(\epsilon,\zeta)_{1\leq\epsilon\leq E,\,1\leq\xi\leq Z}$
+\end_inset
+
+ and left-old, right-old an no-old trials, respectively, are given as:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+P(m\vert\text{left},\epsilon,\zeta) & = & d_{\epsilon,\zeta}\delta_{l,m,\zeta}+(1-d_{\epsilon,\zeta})\gamma_{m,\zeta}\\
+P(m\vert\text{rigth},\epsilon,\zeta) & = & d_{\epsilon,\zeta}\delta_{l,M-m+1,\zeta}+(1-d_{\epsilon,\zeta})\gamma_{m,\zeta}\\
+P(m\vert\text{none},0,\zeta) & = & \gamma_{m,\zeta}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The model's degree of freedom are given as 
+\begin_inset Formula $Z\left(E+M-1\right)$
+\end_inset
+
+ which evaluates to 18, 9, 14, 7 for Experiment 1 Session 1, 2 and Experiment
+ 2 Session 1, 2, respectively.
+\end_layout
+
+\begin_layout Paragraph
+\begin_inset Formula $\text{1HTM}_{d_{\text{strong}}=d_{\text{weak}}}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This model is derived from the 1HTM via setting 
+\begin_inset Formula $d_{\text{strong}}=d_{\text{weak}}$
+\end_inset
+
+.
+ If this restriction holds the experimental manipulation of the encoding
+ strength had no influence on the probability of entering a certainty state.
+ As increased memory performance is assumed for 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\lang english
+stronger encoded items, asserting this model would question either the validity
+ of the models assumptions regarding the memory process or the effectivity
+ of the experimental manipulation.
+ 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+\lang american
+The model's degree of freedom are given as 
+\begin_inset Formula $ZM$
+\end_inset
+
+ which evaluates to 16, 8, 12, 6 for Experiment 1 Session 1, 2 and Experiment
+ 2 Session 1, 2, respectively.
+\end_layout
+
+\begin_layout Paragraph
+\begin_inset Formula $\text{1HTM}_{d_{\text{low}}=d_{\text{high}}}$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+This model is derived from the 1HTM via setting 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\lang english
+
+\begin_inset Formula $d_{\text{low}}=d_{\text{high}}$
+\end_inset
+
+.
+ If this restriction holds the experimental manipulation of the response
+ scale had no influence on the probability of entering a certainty state.
+ As different response scales are assumed to influence only the state-response
+ mapping and not the probability of entering the confidence state, this
+ model is expected to hold.
+ If this model will be rejected the validity of the models assumption are
+ to be questioned, as it is not reasonable that manipulation of the response
+ scale influences memory performance.
+ 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+\lang american
+The model's degree of freedom are given as 
+\begin_inset Formula $E+Z(M-1)$
+\end_inset
+
+ which evaluates to 16, 12 for the first sessions of Experiment 1 and 2,
+ respectively.
+ For the second sessions without scale manipulation this model is equivalent
+ to the 1HTM and therefor disregarded.
+\end_layout
+
+\begin_layout Paragraph
+\begin_inset Formula $\text{1HTM}_{d_{\text{low}}=d_{\text{high}},\,\delta,\gamma_{\text{low}}=\delta,\gamma_{\text{high}}}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This model is derived from the 
+\begin_inset Formula $\text{1HTM}_{d_{\text{low}}=d_{\text{high}}}$
+\end_inset
+
+ via setting 
+\begin_inset Formula $\delta_{\text{low}}=\delta_{\text{low}}$
+\end_inset
+
+ and 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\lang english
+
+\begin_inset Formula $\gamma_{\text{low}}=\gamma_{\text{high}}$
+\end_inset
+
+.
+ If these restrictions hold manipulation of the response scale hat no influence
+ on the state-response mapping parameters.
+ As response mapping is assumed to be dependent on the response scale, asserting
+ this model would question either the validity of the models assumption
+ regarding the state-response mapping or the effectivity of the experimental
+ manipulation.
+ 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+\lang american
+The model's degree of freedom are given as 
+\begin_inset Formula $E+M-1$
+\end_inset
+
+ which evaluates to 9, 7, for the first sessions of Experiment 1 and 2,
+ respectively..
+ For the second sessions without scale manipulation this model is equivalent
+ to the 1HTM and therefor disregarded.
+\end_layout
+
+\begin_layout Subsubsection
+Continuous models
+\end_layout
+
+\begin_layout Standard
+In this thesis I focus on the EVSDT as a proxy for continuous models.
+\end_layout
+
+\begin_layout Paragraph
+\begin_inset Formula $\text{EVSDT}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The model is a extended version of the general form described in 
+\begin_inset CommandInset ref
+LatexCommand formatted
+reference "sub:Latent-Strength-models"
+
+\end_inset
+
+.
+ The extension accounts for the experimental factors indented to influence
+ specific processes.
+ The most general form, herein after referred to as EVSDT, has parameters
+ denoted as 
+\begin_inset Formula $\mu_{\text{weak}}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mu_{\text{strong}}$
+\end_inset
+
+ for weak and strong encoded items, respectively.
+ Additionally it has two full parameter sets for each Scale denoted by the
+ index low and high for low-risk and high-risk scales, respectively.
+ For any factor combination 
+\begin_inset Formula $\epsilon,\zeta$
+\end_inset
+
+ the probability of response 
+\begin_inset Formula $m$
+\end_inset
+
+ is given for left-old, right-old and no-old trials, respectively:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+P(m\vert\text{left},\epsilon,\zeta) & = & \Phi\left(\frac{c_{m,\zeta}+\mu_{\epsilon,\zeta}}{\sqrt{2}}\right)-\Phi\left(\frac{c_{m-1,\zeta}+\mu_{\epsilon,\zeta}}{\sqrt{2}}\right)\\
+P(m\vert\text{rigth},\epsilon,\zeta) & = & \Phi\left(\frac{c_{m,\zeta}-\mu_{\epsilon,\zeta}}{\sqrt{2}}\right)-\Phi\left(\frac{c_{m-1,\zeta}-\mu_{\epsilon,\zeta}}{\sqrt{2}}\right)\\
+P(m\vert\text{none},0,\zeta) & = & \Phi\left(\frac{c_{m,\zeta}}{\sqrt{2}}\right)-\Phi\left(\frac{c_{m-1,\zeta}}{\sqrt{2}}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The model's degree of freedom are equal to the corresponding 1HTM model
+ and given as 
+\begin_inset Formula $Z\left(E+M-1\right)$
+\end_inset
+
+.
+ That is 18, 9, 14, 7 df for Experiment 1 Session 1, 2 and Experiment 2
+ Session 1, 2, respectively.
+\end_layout
+
+\begin_layout Paragraph
+\begin_inset Formula $\text{EVSDT}_{\mu_{\text{strong}}=\mu_{\text{weak}}}$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+This model is derived from the EVSDT via setting 
+\begin_inset Formula $\mu_{\text{strong}}=\mu_{\text{weak}}$
+\end_inset
+
+.
+ If this restriction holds different encoding strengths did not lead to
+ a different shifts of the familiarity distribution.
+ As with the 
+\begin_inset Formula $\text{1HTM}_{d_{\text{strong}}=d_{\text{weak}}}$
+\end_inset
+
+, asserting this model would question it's validity or the effectiveness
+ of the experimental manipulation.
+ The model's degree of freedom are given, equivalently to the corresponding
+ 
+\begin_inset Formula $\text{1HTM}_{d_{\text{strong}}=d_{\text{weak}}}$
+\end_inset
+
+, as 
+\begin_inset Formula $ZM$
+\end_inset
+
+ which evaluates to 16, 8, 12, 6 for Experiment 1 Session 1, 2 and Experiment
+ 2 Session 1, 2, respectively.
+\end_layout
+
+\begin_layout Paragraph
+\begin_inset Formula $\text{EVSDT}_{\mu_{\text{low}}=\mu_{\text{high}}}$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+This model is derived from the EVSDT via setting 
+\begin_inset Formula $\mu_{\text{low}}=\mu_{\text{high}}$
+\end_inset
+
+.
+ If this restriction holds different response scales did not lead to a different
+ shifts of the familiarity distributions.
+ This is, equivalently to the 
+\begin_inset Formula $\text{1HTM}_{d_{\text{low}}=d_{\text{high}}}$
+\end_inset
+
+, expected, as it is not reasonable to assume that a different scale affects
+ the familiarity of the presented words
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Although, and in contrast to the 1HTM, it could be discussed wether framing
+ influences familiarity by paving or inhibiting associations.
+ Nevertheless, finding these effects would seriously weaken the validity
+ of 
+\begin_inset Formula $\mu$
+\end_inset
+
+ as a memory parameter.
+ 
+\end_layout
+
+\end_inset
+
+ and a failure to reject this model model would cast doubt on the validity
+ of 
+\begin_inset Formula $\mu$
+\end_inset
+
+ as a memory parameter.
+ The model's degree of freedom are given, equivalently to the corresponding
+ 
+\begin_inset Formula $\text{1HTM}_{d_{\text{low}}=d_{\text{high}}}$
+\end_inset
+
+ , as 
+\begin_inset Formula $E+Z(M-1)$
+\end_inset
+
+ which evaluates to 16, 12 for the first sessions of Experiment 1 and 2,
+ respectively.
+ For the second sessions without scale manipulation this model is equivalent
+ to the EVSDT and therefor disregarded.
+\end_layout
+
+\begin_layout Paragraph
+\begin_inset Formula $\text{EVSDT}_{\mu_{\text{low}}=\mu_{\text{high}},\, c_{\text{low}}=c_{\text{high}}}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This model is derived from the 
+\begin_inset Formula $\text{EVSDT}_{\mu_{\text{low}}=\mu_{\text{high}}}$
+\end_inset
+
+ via setting all 
+\begin_inset Formula $ $
+\end_inset
+
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\lang english
+
+\begin_inset Formula $c_{i,\text{low}}=c_{i,\text{high}}$
+\end_inset
+
+ for all 
+\begin_inset Formula $0\leq i\leq M$
+\end_inset
+
+.
+ If this restriction holds different response scales did not lead to different
+ cutoff criteria.
+ As these cutoff criteria are assumed to be dependent on the response scales,
+ asserting this model would question either the validity of the models assumptio
+ns regarding the response process or the effectivity of the experimental
+ manipulation.
+ The model's degree of freedom are given, equivalently to the 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+\lang american
+
+\begin_inset Formula $\text{1HTM}_{d_{\text{low}}=d_{\text{high}},\,\delta,\gamma_{\text{low}}=\delta,\gamma_{\text{high}}}$
+\end_inset
+
+, as 
+\begin_inset Formula $ $
+\end_inset
+
+
+\begin_inset Formula $E+M-1$
+\end_inset
+
+ which evaluates to 9, 7, for the first sessions of Experiment 1 and 2,
+ respectively..
+ For the second sessions without scale manipulation this model is equivalent
+ to the 1HTM and therefor disregarded.
+\end_layout
+
+\begin_layout Subsubsection
+Continuous
 \end_layout
 
 \begin_layout Section
