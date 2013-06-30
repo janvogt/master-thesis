@@ -3406,7 +3406,7 @@ In this thesis I focus on the 1HTM as a proxy for discrete state models.
 \begin_layout Standard
 The model is a extended version of the general form described in 
 \begin_inset CommandInset ref
-LatexCommand formatted
+LatexCommand ref
 reference "sub:Discrete-State-models"
 
 \end_inset
@@ -3677,7 +3677,7 @@ In this thesis I focus on the EVSDT as a proxy for continuous models.
 \begin_layout Standard
 The model is a extended version of the general form described in 
 \begin_inset CommandInset ref
-LatexCommand formatted
+LatexCommand ref
 reference "sub:Latent-Strength-models"
 
 \end_inset
@@ -3898,10 +3898,6 @@ ns regarding the response process or the effectivity of the experimental
  respectively..
  For the second sessions without scale manipulation this model is equivalent
  to the 1HTM and therefor disregarded.
-\end_layout
-
-\begin_layout Subsubsection
-Continuous
 \end_layout
 
 \begin_layout Section
@@ -6120,15 +6116,153 @@ The two experiments provides a solid base for the conclusion that the inclusion
  be sure no memory processes have been involved in the constitution of the
  observable response, is crucial to discriminate between discrete-state
  and continuous models of recognition memory.
- But is the advantage for discrete state models due to a lack of a shifted
- unimodal distribution for weakly encoded items as suggested by 
+ 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "province_evidence_2012"
 
 \end_inset
 
-? Whereas there is no reason to deny this, 
+ attributed this to the lack of the shifted unimodal observed response distribut
+ion, In fact, the response distribution of the observed data is in most
+ cases bimodal distributed.
+ But this is the in as much the case in Experiment 1 where both models accounted
+ equally well for the data, as it is the case for Experiments 2, where the
+ EVSDT was clearly outperformed by the 1HTM.
+ Whereas the 1HTM is do to its functional form not able to account for any
+ modus shifts for different encoding strengths, the EVSDT is apparently
+ able to account for bimodal data about equally well (as seen in Experiment
+ 1).
+ Looking at the parameters of the EVSDT bimodal predictions are the result
+ of very small differences between adjacent 
+\begin_inset Formula $c$
+\end_inset
+
+ parameters leading to valleys in the predicted distribution.
+ 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "province_evidence_2012"
+
+\end_inset
+
+ argument for the shifted modality is still true, but each response category
+ can be scaled freely via different distances between the upper and lower
+ bound 
+\begin_inset Formula $c$
+\end_inset
+
+ parameter, therefore even with the classes maximal possible probability
+ it my still be by far lower than its direct neighbors.
+ Thus the lack of a shifted observed response distribution is necessary
+ but not sufficient for the 1HTM's superiority.
+ 
+\end_layout
+
+\begin_layout Standard
+The relevant factor seems to be the zero repetition condition.
+ With this manipulation it is possible to estimate the models prediction
+ for new items independently.
+ For the 1HTM this is a stable distribution (i.e.
+ response tendency) and for the EVSTD this is the calibration of the cutoff
+ criteria based on the fixed familiarity distribution for new items.
+ A common pattern across many participants of Experiment to is, that the
+ response frequency for the central (i.e.
+ low confidence) responses are under estimated by the EVSDT and frequencies
+ for strong encoded items overestimated.
+ Which suggests that there is a tradeoff between 
+\begin_inset Formula $c$
+\end_inset
+
+'s and 
+\begin_inset Formula $\mu$
+\end_inset
+
+ to accommodate for the frequencies of central responses whilst still predicting
+ the frequencies for the high confidence responses.
+ 
+\end_layout
+
+\begin_layout Standard
+All response cells are always dependent on the items status, whereas in
+ the 1HTM only the correct half and the incorrect half is stable scaled
+ down.
+ This is in principle the effect of the by province and rouder suggested
+ shifted response distribution.
+ 
+\end_layout
+
+\begin_layout Standard
+It is noteworthy that the intermediary responses (i.e.
+ not the medial and lateral) are in general selected rarely.
+ SDT offers no explanation for this clear data pattern (although being able
+ to fit it via small 
+\begin_inset Formula $c$
+\end_inset
+
+ differences as mentioned before), however 1HTM does: central responses
+ for uncertainty states and lateral responses for detect states.
+ The latter pattern is often found throughout the data of this experiment.
+ This strongly suggest that for the vast majority of items, a discrete-state
+ assumption seems to be more appropriate.
+ Despite the often intuitively assumed continuity and relativeness of processes
+ - which hold for many natural phenomena in contrast to black-white binary
+ explanations usually do not - it seems to be that recognition memory is
+ better described binary.
+ But on second sight this might not be that contra intuitive after all:
+ The continuity often results from the aggregation of non-continuous events,
+ or states (e.g.
+ chemistry: mixture of reaction products is described on the continuous
+ law of mass action which is derived from the single states of all atoms,
+ physics: the whole quantum mechanics are based on the assumption that that
+ some physical behavior is based on discrete states (latin quanta), and
+ last but not least the normal distribution itself is based on the summation
+ of infinite binary events), thus bounded aggregation of evidence towards
+ one decision as the 1HTM assumes seems more plausible.
+ Additionally it is more appropriate for our everyday behavior because the
+ common task for recognition memory is to recognize or not and not to quantify
+ how sure we are.
+ This is supported by the results of 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "mickes_strong_2011"
+
+\end_inset
+
+ who tried to scale high memories and can be further extended to the current
+ findings which would add it is difficult to scale intermediate responses.
+ But if we finally left with what are basically two answers it is obvious
+ to conclude that a discrete state model is more appropriate for the process
+ of interest.
+ 
+\end_layout
+
+\begin_layout Standard
+Ask yourself: if you are walking on a street, do you perceive a familiarity
+ level for each person you encounter or is it rather a classification between
+ known or unknown.
+ And if you are the next time in this situation and find someone you know
+ - take care, this might lead to awkward situations...
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Standard
+Two states with different, but stable distributions.
+ 
+\end_layout
+
+\begin_layout Standard
+the in the response distribution Thus the lack of a bimodal This leads to
+ small differences between subsequent 
+\begin_inset Formula $c$
+\end_inset
+
+ parameters for valleys and greater differences are resulting in a bimodal
+ distribution.
+ This is seen in many individual cases especially 
 \end_layout
 
 \begin_layout Standard
@@ -6207,13 +6341,6 @@ More parameter models, but what should these parameter captue?
 
 \begin_layout Standard
 Strong memories are hard to scale 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "mickes_strong_2011"
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Subsection
